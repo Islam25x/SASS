@@ -133,7 +133,7 @@ const Welcome = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        navigate('/Dashboard');
+        navigate("/Dashboard");
     };
 
 
