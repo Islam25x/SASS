@@ -30,7 +30,7 @@ const Login = () => {
       setErrors(validationErrors);
       return;
     }
-    navigate("/Welcome");
+    navigate("/Dashboard");
   };
 
   return (
