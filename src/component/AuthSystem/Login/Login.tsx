@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({ name: "", password: "" });
   const [errors, setErrors] = useState<{ name?: string; password?: string }>({});
 
+  const navigate = useNavigate();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -28,7 +30,7 @@ const Login = () => {
       setErrors(validationErrors);
       return;
     }
-    alert("Form submitted (static mode)");
+    navigate("/Welcome");
   };
 
   return (
