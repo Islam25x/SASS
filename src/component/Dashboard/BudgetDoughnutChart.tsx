@@ -5,12 +5,17 @@ import {
   Legend,
   Title,
 } from "chart.js";
-import type { ChartOptions, ChartData, Plugin } from "chart.js";
+import type {
+  ChartOptions,
+  ChartData,
+  Plugin,
+  ChartDataset,
+} from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-// Plugin لكتابة النص في النص
+// ✅ Plugin لكتابة النص في المنتصف
 const centerText: Plugin<"doughnut"> = {
   id: "centerText",
   beforeDraw(chart) {
@@ -49,17 +54,17 @@ const BudgetDoughnutChart = () => {
           "rgba(167,139,250,0.8)", // بنفسجي فاتح
         ],
         borderWidth: 0,
-        cutout: "70%", // يخليها Doughnut
-      },
+        cutout: "70%",
+      } as ChartDataset<"doughnut", number[]>,
     ],
   };
 
   const options: ChartOptions<"doughnut"> = {
-    responsive: false,
+    responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false, // مخفي لأننا هنعمله يدوي
+        display: false, // هنستخدم legend مخصص
       },
       tooltip: {
         enabled: true,
@@ -70,9 +75,9 @@ const BudgetDoughnutChart = () => {
   const colors = data.datasets[0].backgroundColor as string[];
 
   return (
-    <div className="p-6 border bg-white border-gray-400 rounded-xl w-[40%] h-72 flex">
-      {/* الليجند */}
-      <div className="left">
+    <div className="p-6 border bg-white border-gray-400 rounded-xl w-full md:w-[40%] h-80 flex flex-col md:flex-row gap-6">
+      {/* ✅ الليجند (متجاوب) */}
+      <div className="flex-1">
         <h2 className="text-lg font-semibold mb-4">Budget</h2>
         <ul className="space-y-2">
           {data.labels?.map((label, index) => (
@@ -81,21 +86,22 @@ const BudgetDoughnutChart = () => {
                 className="inline-block w-3 h-3 rounded-full"
                 style={{ backgroundColor: colors[index] }}
               ></span>
-              {label}: {data.datasets[0].data[index]}
+              {String(label)}: {data.datasets[0].data[index]}
             </li>
           ))}
         </ul>
       </div>
 
-      {/* الرسمه */}
-      <Doughnut
-        data={data}
-        options={options}
-        plugins={[centerText]}
-        width={180}
-        height={180}
-        style={{ margin: "2rem 0 0 auto" }}
-      />
+      {/* ✅ الرسمه */}
+      <div className="flex-1 flex justify-center items-center">
+        <Doughnut
+          data={data}
+          options={options}
+          plugins={[centerText]}
+          width={180}
+          height={180}
+        />
+      </div>
     </div>
   );
 };

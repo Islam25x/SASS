@@ -7,7 +7,7 @@ import {
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import Header from "./header";
+import Header from "./Header";
 
 const DashboardTop = () => {
   const dashboardItems = [
