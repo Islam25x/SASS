@@ -1,4 +1,5 @@
-import { useRef, FormEvent } from "react";
+import { useRef } from "react";
+import type { FormEvent } from "react";
 
 const ContactSupport = () => {
     const form = useRef<HTMLFormElement>(null);

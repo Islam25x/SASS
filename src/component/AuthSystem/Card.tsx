@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Card = () => {
     const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const Card = () => {
         cvv: "",
         cardAmount: "",
     });
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState<{
         cardNumber?: string;
@@ -45,7 +47,7 @@ const Card = () => {
             setErrors(validationErrors);
             return;
         }
-        alert("Card login submitted: " + JSON.stringify(formData, null, 2));
+        navigate('/Welcome');
     };
 
     return (

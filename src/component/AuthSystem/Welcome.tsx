@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Welcome = () => {
     const [step, setStep] = useState(1);
     const totalSteps = 4;
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         // Step 1 - Income
@@ -130,8 +133,7 @@ const Welcome = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Final Data:", formData);
-        alert("Form submitted successfully!");
+        navigate('/Dashboard');
     };
 
 

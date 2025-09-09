@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
     const [formData, setFormData] = useState({
         phoneNumber: "",
         pinCode: "",
     });
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState<{
         phoneNumber?: string;
@@ -35,7 +37,7 @@ const Wallet = () => {
             setErrors(validationErrors);
             return;
         }
-        alert("Wallet login submitted: " + JSON.stringify(formData, null, 2));
+        navigate('/Welcome');
     };
 
     return (
