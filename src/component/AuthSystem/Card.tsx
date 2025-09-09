@@ -126,8 +126,8 @@ const Card = () => {
                         </label>
                         <input
                             type="number"
-                            id="CardAmount"
-                            name="CardAmount"
+                            id="cardAmount"
+                            name="cardAmount"
                             value={formData.cardAmount}
                             onChange={handleChange}
                             className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
