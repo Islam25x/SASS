@@ -1,4 +1,15 @@
 import { Link } from "react-router-dom";
+import type { LucideIcon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Receipt,
+  Wallet,
+  BarChart3,
+  Layers,
+  Settings,
+  HelpCircle,
+  LogOut,
+} from "lucide-react";
 
 interface AdminNavProps {
   setActiveComponent: (component: string) => void;
@@ -6,108 +17,94 @@ interface AdminNavProps {
 }
 
 function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
+  const navItems = [
+    { name: "Dashboard", icon: LayoutDashboard },
+    { name: "Transactions", icon: Receipt },
+    { name: "Wallet", icon: Wallet },
+    { name: "Analytics", icon: BarChart3 },
+    { name: "Transverse", icon: Layers },
+    { name: "Setting", icon: Settings, link: "/Profile" },
+  ];
+
+  const bottomNav = [
+    { name: "Help", icon: HelpCircle, link: "/support" },
+    { name: "Log out", icon: LogOut, link: "/" },
+  ];
+
+  const renderNavItem = (
+    name: string,
+    Icon: LucideIcon,
+    link?: string
+  ) => {
+    const isActive = activeComponent === name;
+    const classes = `flex items-center justify-center ms-3 lg:justify-start gap-3 
+      px-3 py-3 cursor-pointer 
+      w-full lg:w-[85%] h-12 
+      rounded-2xl transition-colors
+      ${
+        isActive
+          ? "bg-primary-600 text-white"
+          : "text-black hover:bg-primary-600 hover:text-white"
+      }`;
+
+    const content = (
+      <>
+        <Icon size={20} className="shrink-0" />
+        <span className="hidden lg:block">{name}</span>
+      </>
+    );
+
+    return link ? (
+      <Link
+        key={name}
+        to={link}
+        onClick={() => setActiveComponent(name)}
+        className={classes}
+      >
+        {content}
+      </Link>
+    ) : (
+      <button
+        key={name}
+        onClick={() => setActiveComponent(name)}
+        className={classes}
+      >
+        {content}
+      </button>
+    );
+  };
+
   return (
-    <aside className="fixed top-0 left-0 w-60 h-screen border-r border-gray-700 z-[1030] bg-white">
+    <aside className="fixed top-0 left-0 w-16 lg:w-60 h-screen z-[1030] bg-customBg flex flex-col items-center lg:items-start">
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8 px-4">
-        <img src="imgs\logo.png" alt="Logo" className=" w-12 h-12 object-cover mt-4" />
-        <h2 className="hidden lg:block mt-2 font-normal text-lg text-black">
-          finexa
-        </h2>
+      <div className="mb-5 ms-3 w-10 lg:w-[60%] mt-4" data-aos="zoom-in" data-aos-once="true">
+        <img
+          src="/src/assets/black logo.png"
+          alt="Logo"
+          className="w-full object-cover"
+        />
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col mb-5">
-        <p
-          className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "Dashboard"
-            ? "bg-blue-600 text-white"
-            : "text-black hover:bg-blue-600 hover:text-white"
-            }`}
-          onClick={() => setActiveComponent("Dashboard")}
-        >
-          <i className="fa-solid fa-chart-simple ms-1"></i>
-          <span className="hidden lg:block">Dashboard</span>
-        </p>
-        <p
-          className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "Transactions"
-            ? "bg-blue-600 text-white"
-            : "text-black hover:bg-blue-600 hover:text-white"
-            }`}
-          onClick={() => setActiveComponent("Transactions")}
-        >
-          <i className="fa-solid fa-user ms-1"></i>
-          <span className="hidden lg:block">Transactions</span>
-        </p>
-        <p
-          className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "Wallet"
-            ? "bg-blue-600 text-white"
-            : "text-black hover:bg-blue-600 hover:text-white"
-            }`}
-          onClick={() => setActiveComponent("Wallet")}
-        >
-          <i className="fa-solid fa-user ms-1"></i>
-          <span className="hidden lg:block">Wallet</span>
-        </p>
-        <p
-          className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "Analytics"
-            ? "bg-blue-600 text-white"
-            : "text-black hover:bg-blue-600 hover:text-white"
-            }`}
-          onClick={() => setActiveComponent("Analytics")}
-        >
-          <i className="fa-solid fa-user ms-1"></i>
-          <span className="hidden lg:block">Analytics</span>
-        </p>
-        <p
-          className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "Transverse"
-            ? "bg-blue-600 text-white"
-            : "text-black hover:bg-blue-600 hover:text-white"
-            }`}
-          onClick={() => setActiveComponent("Transverse")}
-        >
-          <i className="fa-solid fa-user ms-1"></i>
-          <span className="hidden lg:block">Transverse</span>
-        </p>
-        <p
-          className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "ChatAgent"
-            ? "bg-blue-600 text-white"
-            : "text-black hover:bg-blue-600 hover:text-white"
-            }`}
-          onClick={() => setActiveComponent("ChatAgent")}
-        >
-          <i className="fa-solid fa-user ms-1"></i>
-          <span className="hidden lg:block">Chat Agent</span>
-        </p>
-        <Link to={"/Profile"}>
-          <p
-            className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition-colors ${activeComponent === "Setting"
-              ? "bg-blue-600 text-white"
-              : "text-black hover:bg-blue-600 hover:text-white"
-              }`}
-            onClick={() => setActiveComponent("Setting")}
-          >
-            <i className="fa-solid fa-building ms-1"></i>
-            <span className="hidden lg:block">Setting</span>
-          </p>
-        </Link>
+      <nav
+        className="flex flex-col mb-5 space-y-2 w-full items-center lg:items-start"
+        data-aos="fade-right"
+        data-aos-once="true"
+      >
+        {navItems.map(({ name, icon, link }) =>
+          renderNavItem(name, icon, link)
+        )}
       </nav>
 
-      {/* Bottom Logout */}
-      <div className="absolute bottom-12 w-full grid">
-        <Link
-          to="/support"
-          className="flex items-center gap-2 px-4 py-3 text-black hover:bg-blue-600 hover:text-white transition-colors"
-        >
-          <i className="fa-solid fa-arrow-right-from-bracket"></i>
-          <span className="hidden lg:inline">Help</span>
-        </Link>
-        <Link
-          to="/"
-          className="flex items-center gap-2 px-4 py-3 text-black hover:bg-blue-600 hover:text-white transition-colors"
-        >
-          <i className="fa-solid fa-arrow-right-from-bracket"></i>
-          <span className="hidden lg:inline">Log out</span>
-        </Link>
+      {/* Bottom Navigation */}
+      <div
+        className="absolute bottom-12 w-full flex flex-col items-center lg:items-start space-y-2"
+        data-aos="fade-up"
+        data-aos-once="true"
+      >
+        {bottomNav.map(({ name, icon, link }) =>
+          renderNavItem(name, icon, link)
+        )}
       </div>
     </aside>
   );

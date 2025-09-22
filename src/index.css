@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+/* ✨ تعريف الـ theme الجديد */
+@theme {
+  --color-customBg: #f6f4ff;
+
+  --color-primary: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+
+  --color-skyAccent: #38bef8;
+
+  --shadow-blue-glow: 0 10px 30px rgba(56, 189, 248, 0.18),
+    0 0 20px rgba(56, 189, 248, 0.08);
+}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap");
+
+/* تطبيق الثيم */
+@layer base {
+  html {
+    font-family: "Inter", "Poppins", ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+      "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol", "Noto Color Emoji";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Poppins", "Inter", sans-serif;
+  }
+  span {
+    font-family: "Poppins", "Inter", sans-serif;
+  }
+}
+@layer base {
+  body {
+    @apply text-gray-900;
+  }
+}
+
+/* 🧩 Components utilities */
+@layer components {
+  .card {
+    @apply bg-white text-black rounded-2xl p-8 max-w-2xl;
+    box-shadow: var(--shadow-blue-glow);
+  }
+
+  .input {
+    @apply w-full mt-1 px-3 py-2 border border-gray-300 rounded-md
+           focus:outline-none focus:ring-2 focus:ring-primary shadow-sm;
+  }
+
+  .btn-primary {
+    @apply w-full bg-primary text-white py-2 rounded-md transition-all;
+    box-shadow: var(--shadow-blue-glow);
+  }
+
+  .checkbox {
+    @apply h-4 w-4 text-primary border-gray-300 rounded;
+  }
+}

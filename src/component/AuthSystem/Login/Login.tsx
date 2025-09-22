@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import BackgroundCanvas from "../BackgroundCanvas";
 
 const Login = () => {
   const [formData, setFormData] = useState({ name: "", password: "" });
   const [errors, setErrors] = useState<{ name?: string; password?: string }>({});
 
   const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -36,19 +37,27 @@ const Login = () => {
   return (
     <section
       id="Login"
-      className="h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center text-white"
-      style={{ backgroundImage: "url('/images/auth.jpg')" }}
+      className="h-screen flex items-center justify-center relative overflow-hidden "
     >
-      <div className="bg-white text-black rounded-2xl shadow-md p-8 w-full max-w-md">
+      {/* Background Canvas */}
+      <div className="absolute inset-0 -z-10">
+        <BackgroundCanvas />
+      </div>
+
+      {/* form */}
+      <div
+        className="bg-white shadow-[0_0_25px_rgba(56,189,248,0.6)] text-black rounded-2xl p-8 w-full max-w-md relative z-10 backdrop-blur-md bg-opacity-80"
+        data-aos="fade-up"
+      >
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6" data-aos="zoom-in">
           <h2 className="text-2xl font-semibold">Sign into your account</h2>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} data-aos="flip-left">
           {/* Name */}
-          <div className="mb-4">
+          <div className="mb-4" data-aos="fade-right">
             <label htmlFor="name" className="block font-medium">
               Name
             </label>
@@ -64,7 +73,7 @@ const Login = () => {
           </div>
 
           {/* Password */}
-          <div className="mb-4">
+          <div className="mb-4" data-aos="fade-left">
             <label htmlFor="password" className="block font-medium">
               Password
             </label>
@@ -82,13 +91,13 @@ const Login = () => {
           </div>
 
           {/* Policy */}
-          <p className="text-gray-500 text-sm mb-3">
+          <p className="text-gray-500 text-sm mb-3" data-aos="fade-up">
             By submitting your info, you agree to our policy at{" "}
-            <span className="text-sky-600">TheHomeless.org</span>
+            <span className="text-sky-600">finexa</span>
           </p>
 
           {/* Register link */}
-          <p className="text-sm mb-4">
+          <p className="text-sm mb-4" data-aos="fade-up" data-aos-delay="200">
             Don&apos;t have an account?{" "}
             <Link to="/Register" className="text-sky-600 hover:underline">
               Register
@@ -98,7 +107,9 @@ const Login = () => {
           {/* Button */}
           <button
             type="submit"
-            className="w-full bg-sky-800 hover:bg-sky-600 text-white py-2 rounded-md transition-colors"
+            data-aos="zoom-in"
+            data-aos-delay="400"
+            className="w-full bg-sky-800 hover:bg-sky-600 text-white py-2 rounded-md transition-colors cursor-pointer"
           >
             Sign In
           </button>

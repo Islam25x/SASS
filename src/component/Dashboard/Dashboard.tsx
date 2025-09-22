@@ -37,7 +37,6 @@ function Dashboard() {
       setActiveComponent={setActiveComponent}
     />
 
-    {/* نخلي المحتوى يبدأ بعد عرض الـ sidenav */}
     <div className="flex-1 flex flex-col ml-60 me-8 !ms-[17rem]">
       <DashboardTop />
       <div className="p-4">{renderActiveComponent()}</div>

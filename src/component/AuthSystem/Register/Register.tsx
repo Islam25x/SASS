@@ -1,26 +1,26 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import BackgroundCanvas from "../BackgroundCanvas";
 
 const Register = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
+    fullName: "",
     username: "",
     email: "",
     password: "",
-    role: "",
-    isProfessional: false,
-    walletAmount: "",
-    cardNumber: "",
+    confirmPassword: "",
+    agree: false,
   });
 
   const [errors, setErrors] = useState<{
+    fullName?: string;
     username?: string;
     email?: string;
     password?: string;
-    role?: string;
-    walletAmount?: string;
-    cardNumber?: string;
+    confirmPassword?: string;
+    agree?: string;
   }>({});
 
   const handleChange = (
@@ -34,19 +34,13 @@ const Register = () => {
 
   const validate = () => {
     const newErrors: typeof errors = {};
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
     if (!formData.username.trim()) newErrors.username = "Username is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.password.trim()) newErrors.password = "Password is required";
-    if (!formData.role.trim()) newErrors.role = "Payment method is required";
-
-    if (formData.role === "Wallet" && !formData.walletAmount.trim()) {
-      newErrors.walletAmount = "Please enter your wallet amount";
-    }
-
-    if (formData.role === "Card" && !formData.cardNumber.trim()) {
-      newErrors.cardNumber = "Please enter your card number";
-    }
-
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
+    if (!formData.agree) newErrors.agree = "You must agree to the policy";
     return newErrors;
   };
 
@@ -55,169 +49,131 @@ const Register = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      return; // ❌ مايتنقلش لصفحة تانية
+      return;
     }
-
-    // ✅ التنقل حسب الدور
-    if (formData.role === "Wallet") {
-      navigate("/Wallet");
-    } else if (formData.role === "Card") {
-      navigate("/Card");
-    }
+    // Navigate or API call can be added here
+    navigate("/");
   };
 
   return (
     <section
-      id="SignUp"
-      className="h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center text-white"
+      id="Register"
+      className="h-screen flex items-center justify-center relative overflow-hidden"
     >
-      <div className="bg-white text-black rounded-2xl shadow-md p-8 w-full max-w-md">
+      {/* Background Canvas */}
+      <div className="absolute inset-0 -z-10">
+        <BackgroundCanvas />
+      </div>
+
+      {/* Registration Form */}
+      <div
+        className="bg-white text-black rounded-2xl shadow-[0_0_25px_rgba(56,189,248,0.6)] p-8 w-full max-w-2xl relative z-10 backdrop-blur-lg bg-opacity-90"
+        data-aos="fade-up"
+      >
         {/* Header */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold">Create an Account</h2>
+        <div className="text-center mb-6" data-aos="zoom-in">
+          <h2 className="text-3xl font-bold text-sky-700 drop-shadow-md">
+            Create an Account
+          </h2>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Username */}
-          <div className="mb-4">
-            <label htmlFor="username" className="block font-medium">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-            />
-            {errors.username && (
-              <p className="text-red-500 text-sm">{errors.username}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div className="mb-4">
-            <label htmlFor="email" className="block font-medium">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="mb-4">
-            <label htmlFor="password" className="block font-medium">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password}</p>
-            )}
-          </div>
-
-          {/* Role Select */}
-          <div className="mb-4">
-            <label htmlFor="role" className="block font-medium">
-              Select Payment Method
-            </label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-sky-500"
-            >
-              <option value="">— Select Payment Method —</option>
-              <option value="Wallet">Wallet</option>
-              <option value="Card">Card</option>
-            </select>
-            {errors.role && (
-              <p className="text-red-500 text-sm">{errors.role}</p>
-            )}
-          </div>
-
-          {/* Wallet Amount */}
-          {formData.role === "Wallet" && (
-            <div className="mb-4">
-              <label htmlFor="walletAmount" className="block font-medium">
-                Enter Wallet Amount
-              </label>
-              <input
-                type="number"
-                id="walletAmount"
-                name="walletAmount"
-                value={formData.walletAmount}
-                onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-              {errors.walletAmount && (
-                <p className="text-red-500 text-sm">{errors.walletAmount}</p>
-              )}
-            </div>
-          )}
-
-          {/* Card Number */}
-          {formData.role === "Card" && (
-            <div className="mb-4">
-              <label htmlFor="cardNumber" className="block font-medium">
-                Enter Card Number
+        <form onSubmit={handleSubmit} className="space-y-6" data-aos="flip-left">
+          {/* Username & Email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div data-aos="fade-right">
+              <label htmlFor="username" className="block font-medium">
+                Username
               </label>
               <input
                 type="text"
-                id="cardNumber"
-                name="cardNumber"
-                value={formData.cardNumber}
+                id="username"
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
               />
-              {errors.cardNumber && (
-                <p className="text-red-500 text-sm">{errors.cardNumber}</p>
+              {errors.username && (
+                <p className="text-red-500 text-sm">{errors.username}</p>
               )}
             </div>
-          )}
 
-          {/* Professional checkbox */}
-          <div className="flex items-center mb-4">
-            <input
-              type="checkbox"
-              id="isProfessional"
-              name="isProfessional"
-              checked={formData.isProfessional}
-              onChange={handleChange}
-              className="h-4 w-4 border-gray-300 rounded"
-            />
-            <label htmlFor="isProfessional" className="ml-2 text-sm">
-              I am an industry professional
-            </label>
+            <div data-aos="fade-left">
+              <label htmlFor="email" className="block font-medium">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+              />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+            </div>
           </div>
 
-          {/* Policy */}
-          <p className="text-gray-500 text-sm mb-3">
-            By submitting your info, you agree to our policy at{" "}
-            <span className="text-sky-600">TheHomeless.org</span>
-          </p>
+          {/* Password & Confirm Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div data-aos="fade-right">
+              <label htmlFor="password" className="block font-medium">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password}</p>
+              )}
+            </div>
+
+            <div data-aos="fade-left">
+              <label htmlFor="confirmPassword" className="block font-medium">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Policy Checkbox */}
+          <div className="flex items-center gap-2" data-aos="fade-up">
+            <input
+              type="checkbox"
+              id="agree"
+              name="agree"
+              checked={formData.agree}
+              onChange={handleChange}
+              className="h-4 w-4 text-sky-600 border-gray-300 rounded"
+            />
+            <label htmlFor="agree" className="text-sm text-gray-700">
+              I agree to the <span className="text-sky-600 font-semibold">finexa policy</span>
+            </label>
+          </div>
+          {errors.agree && <p className="text-red-500 text-sm">{errors.agree}</p>}
 
           {/* Login link */}
-          <p className="text-sm mb-4">
-            Already have an account?{" "}
+          <p
+            className="text-sm"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            Already have an account? {" "}
             <Link to="/" className="text-sky-600 hover:underline">
               Login
             </Link>
@@ -226,9 +182,9 @@ const Register = () => {
           {/* Button */}
           <button
             type="submit"
-            className="w-full block text-center bg-sky-800 hover:bg-sky-600 text-white py-2 rounded-md transition-colors cursor-pointer"
+            className="w-full bg-sky-700 hover:bg-sky-600 text-white py-2 rounded-md transition-all cursor-pointer"
           >
-            Sign Up
+            Register
           </button>
         </form>
       </div>

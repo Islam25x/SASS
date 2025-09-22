@@ -3,6 +3,7 @@ import { User, Lock, Settings, Upload } from "lucide-react";
 import ProfileInfo from "./ProfileInfo";
 import Security from "./Security";
 import Preferences from "./Preferences";
+import BackgroundCanvas from "../AuthSystem/BackgroundCanvas";
 
 const Profile = () => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -17,8 +18,11 @@ const Profile = () => {
     return (
         <section
             id="Support"
-            className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900 p-6"
+            className="min-h-scree text-gray-900 p-6 relative"
         >
+            <div className="absolute inset-0 -z-10">
+                <BackgroundCanvas />
+            </div>
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-2xl font-bold mb-6">Profile</h1>
                 <div
