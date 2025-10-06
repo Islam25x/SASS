@@ -11,7 +11,7 @@ const SavingGoals = () => {
     ];
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-md w-[30%]">
+        <div className="box p-6 rounded-xl h-full !w-full">
             <h2 className="text-lg font-semibold mb-4">Saving Goals</h2>
 
             <div className="space-y-4">

@@ -18,19 +18,27 @@ function Dashboard() {
         return (
           <div className="Charts mt-[-1.5rem]">
             <div className="flex gap-4">
-              <MoneyFlowChart />
-              <BudgetPieChart />
+              <div className="w-9/12">
+                <MoneyFlowChart />
+              </div>
+              <div className="w-4/12">
+                <BudgetPieChart />
+              </div>
             </div>
             <div className="flex gap-4 mt-4">
-              <RecentTransactions />
-              <SavingGoals />
+              <div className="w-9/12">
+                <RecentTransactions />
+              </div>
+              <div className="w-4/12">
+                <SavingGoals />
+              </div>
             </div>
           </div>
         );
-    }
+}
   };
 
-  return (
+return (
   <section id="Admin" className="h-screen flex">
     <SideNav
       activeComponent={activeComponent}

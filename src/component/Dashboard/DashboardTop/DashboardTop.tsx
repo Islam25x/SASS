@@ -7,6 +7,7 @@ import {
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
+import { MoveUpRight } from 'lucide-react';
 import Header from "./Header";
 
 const DashboardTop = () => {
@@ -24,6 +25,7 @@ const DashboardTop = () => {
       value: 3500,
       pev: "8% vs last month",
       isIncrease: true,
+      arrow: true
     },
     {
       titleKey: "Expenses",
@@ -31,6 +33,7 @@ const DashboardTop = () => {
       value: 2200,
       pev: "5% vs last month",
       isIncrease: false,
+      arrow: true
     },
     {
       titleKey: "Total savings",
@@ -44,14 +47,22 @@ const DashboardTop = () => {
   return (
     <>
       <Header />
-      <section id="DashboardTop" className="container mx-auto mt-5 pb-8">
+      <section id="DashboardTop" className="container mx-auto mt-5 px-3 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardItems.map((item, index) => (
             <div
               key={index}
-              className="p-6 pt-4 rounded-lg border border-gray-400 text-black"
+              className="p-6 pt-4 rounded-4xl box text-black"
             >
-              <h6 className="text-black text-lg mb-4">{item.titleKey}</h6>
+              <div className="flex justify-between">
+                <h6 className="text-black text-lg mb-4">{item.titleKey}</h6>
+                {
+                  item.arrow &&
+                  <div className="rounded-full border-gray-300 justify-items-center content-center me-[-1rem] mt-[-.8rem] solid border-1 h-10 w-10 cursor-pointer hover:bg-primary hover:text-white duration-150">
+                    <MoveUpRight />
+                  </div>
+                }
+              </div>
 
               <div className="flex items-center gap-3 mb-2">
                 {item.icon}

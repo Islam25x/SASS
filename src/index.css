@@ -50,8 +50,7 @@
   }
 
   .input {
-    @apply w-full mt-1 px-3 py-2 border border-gray-300 rounded-md
-           focus:outline-none focus:ring-2 focus:ring-primary shadow-sm;
+    @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400;
   }
 
   .btn-primary {
@@ -61,5 +60,11 @@
 
   .checkbox {
     @apply h-4 w-4 text-primary border-gray-300 rounded;
+  }
+  .label {
+    @apply block mb-2 text-start text-sm font-medium text-gray-700;
+  }
+  .box{
+    @apply border border-gray-200 bg-white shadow-sm;
   }
 }
