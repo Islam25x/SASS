@@ -1,116 +1,89 @@
-import { Bot, Send, CreditCard, LayoutDashboard } from "lucide-react";
-import { useState } from "react";
-import PaymentMethod from "./PaymentMethod";
-import RobotCanvas from "../../three/canvas/RobotCanvas";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { Camera, Lightbulb, Mic, Target, TrendingUp, Wallet } from "lucide-react";
+import CTASection from "../../components/landing/CTASection";
+import FeatureSection from "../../components/landing/FeatureSection";
+import GoalsSection from "../../components/landing/GoalsSection";
+import HeroSection from "../../components/landing/HeroSection";
+import type { BenefitItem, LandingCardItem } from "../../components/landing/types";
 
-export default function Welcome() {
-    const [showModal, setShowModal] = useState(false);
+const NAV_LOGO_SRC = "/src/assets/logo.png";
+const ROBOT_IMAGE_SRC = "/src/assets/Finixa robot.png";
+const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 
-    const openModal = () => setShowModal(true);
-    const closeModal = () => setShowModal(false);
+const heroBenefits: BenefitItem[] = [
+  { id: "voice-photo", label: "Track expenses by voice or photo" },
+  { id: "alerts", label: "Get alerts before you're broke" },
+];
 
-    const features = [
-        {
-            icon: <Bot className="w-10 h-10 text-indigo-600" />,
-            title: "AI Agent",
-            desc: "A smart advisor that helps you make better financial decisions using AI.",
-        },
-        {
-            icon: <Send className="w-10 h-10 text-indigo-600" />,
-            title: "Transfer Money",
-            desc: "Send money quickly and securely anywhere in the world.",
-        },
-        {
-            icon: <CreditCard className="w-10 h-10 text-indigo-600" />,
-            title: "Flexible Payments",
-            desc: "Manage your money with a digital wallet, cash, or Visa cards all in one place.",
-        },
-        {
-            icon: <LayoutDashboard className="w-10 h-10 text-indigo-600" />,
-            title: "Dashboard",
-            desc: "A clear and intuitive dashboard to track and manage all your finances.",
-        },
-    ];
+const preventionCards: LandingCardItem[] = [
+  {
+    id: "voice",
+    title: "Record expenses by voice",
+    description: "Just say it, we'll track it automatically.",
+    icon: Mic,
+  },
+  {
+    id: "receipt",
+    title: "Snap a photo of your receipt",
+    description: "Just snap a photo, done.",
+    icon: Camera,
+  },
+  {
+    id: "forecast",
+    title: "See when you'll be broke",
+    description: "Know in advance if you'll overshoot your budget.",
+    icon: TrendingUp,
+  },
+];
 
-    return (
-        <section className="h-screen bg-gradient-to-br from-gray-50 to-indigo-100 flex flex-col lg:flex-row p-6 !overflow-hidden">
-            {/* Left side: text and features */}
-            <div className="flex-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-left lg:order-1 order-2 space-y-8">
-                {/* العنوان */}
-                <div data-aos="fade-down">
-                    <h1 className="text-4xl lg:text-5xl font-bold text-indigo-700 mb-4">
-                        Welcome to finexa
-                    </h1>
-                    <p className="text-lg text-gray-600 max-w-xl">
-                        Discover the full power of managing your money with our smart and secure solutions.
-                    </p>
-                </div>
+const goalsCards: LandingCardItem[] = [
+  {
+    id: "goals",
+    title: "Simple Goals",
+    description: "Set a specific target to save each month.",
+    icon: Target,
+  },
+  {
+    id: "budgeting",
+    title: "Budgeting",
+    description: "Set your spending limits before you overspend.",
+    icon: Wallet,
+  },
+  {
+    id: "insights",
+    title: "Smart Insights",
+    description: "Break down expenses and get personalized tips.",
+    icon: Lightbulb,
+  },
+];
 
-                {/* Features */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl w-full">
-                    {features.map((f, i) => (
-                        <div
-                            key={i}
-                            className="shadow-lg rounded-2xl hover:shadow-xl hover:scale-[1.03] transition duration-300 ease-in-out bg-white p-6 flex flex-col items-center text-center"
-                            data-aos="zoom-in"
-                            data-aos-once="true"
-                            data-aos-delay={i * 200}
-                        >
-                            {f.icon}
-                            <h3 className="mt-4 text-xl font-semibold text-gray-800">
-                                {f.title}
-                            </h3>
-                            <p className="text-gray-500 mt-2 text-sm">{f.desc}</p>
-                        </div>
-                    ))}
-                </div>
+function StickyNavbar() {
+  return (
+    <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-customBg/95 backdrop-blur">
+      <div className={CONTAINER_CLASS}>
+        <nav className="flex h-20 items-center" aria-label="Finexa">
+          <img src={NAV_LOGO_SRC} alt="Finexa" className="h-12 w-auto object-contain lg:h-14" />
+        </nav>
+      </div>
+    </header>
+  );
+}
 
-                {/* Button */}
-                <button
-                    onClick={openModal}
-                    className="px-8 py-4 text-lg rounded-2xl bg-indigo-600 transition-all duration-300 ease-in-out text-white hover:bg-indigo-700 cursor-pointer"
-                    data-aos="fade-right"
-                    data-aos-anchor-placement="top-bottom"
-                    data-aos-offset="0"
-                >
-                    Add payment method
-                </button>
-            </div>
-
-            {/* Right Side: robot + animation */}
-            <div className="flex-1 lg:h-screen h-96 flex items-center justify-center relative lg:order-2 order-1 overflow-hidden">
-                {/* ✨ الخلفية المتحركة (لوتي) */}
-                <div className="absolute inset-0 flex items-center justify-center z-1 opacity-70">
-                    <DotLottieReact
-                        src="https://lottie.host/b4e921e8-412b-4cc3-9e60-a3ca2cf2db8c/pI7zSbyVRI.lottie"
-                        loop
-                        autoplay
-                        className="w-[800px] h-[800px] scale-106"
-                    />
-                </div>
-
-                {/* 🤖 الروبوت */}
-                <div className="w-full h-full relative z-10">
-                    <RobotCanvas />
-                </div>
-            </div>
-
-            {/* Modal */}
-            {showModal && (
-                <div
-                    onClick={closeModal}
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-                >
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        data-aos="fade-up"
-                        data-aos-duration="400"
-                    >
-                        <PaymentMethod />
-                    </div>
-                </div>
-            )}
-        </section>
-    );
+export default function WelcomePage() {
+  return (
+    <main className="min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-customBg">
+      <StickyNavbar />
+      <HeroSection robotImageSrc={ROBOT_IMAGE_SRC} benefits={heroBenefits} />
+      <FeatureSection
+        title="How Finexa"
+        highlighted="prevents running out of money"
+        cards={preventionCards}
+      />
+      <GoalsSection
+        title="How Finexa helps you"
+        highlighted="save before the end of the month"
+        cards={goalsCards}
+      />
+      <CTASection />
+    </main>
+  );
 }

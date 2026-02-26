@@ -68,8 +68,15 @@ function AiApiFlowsExample({
   const isReceiptFlowPending = receiptOcrMutation.isPending || confirmingReceipt;
 
   const receiptTransactions = useMemo(
-    () => receiptOcrMutation.preview?.transactions ?? [],
-    [receiptOcrMutation.preview],
+    () =>
+      (receiptOcrMutation.data?.items ?? []).map((item) => ({
+        amount: item.line_total ?? item.unit_price ?? 0,
+        category: "Receipt",
+        description:
+          item.name ?? receiptOcrMutation.data?.merchant ?? "Receipt item",
+        date: receiptOcrMutation.data?.issued_at,
+      })),
+    [receiptOcrMutation.data],
   );
 
   useEffect(() => {
@@ -139,7 +146,6 @@ function AiApiFlowsExample({
     setConfirmingReceipt(true);
     try {
       await onConfirmReceiptTransactions(receiptTransactions);
-      receiptOcrMutation.clearPreview();
       receiptOcrMutation.reset();
     } catch {
       setToastMessage("Unable to save receipt transactions right now.");

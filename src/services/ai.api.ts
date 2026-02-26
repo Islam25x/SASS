@@ -14,8 +14,17 @@ export interface ParsedTransaction {
   description: string;
 }
 
+export interface ReceiptOcrItem {
+  name?: string;
+  line_total?: number;
+  unit_price?: number;
+  quantity?: number;
+}
+
 export interface ReceiptOcrResponse {
-  transactions: ParsedTransaction[];
+  items: ReceiptOcrItem[];
+  merchant?: string;
+  issued_at?: string;
 }
 
 export interface Transaction {
@@ -25,6 +34,8 @@ export interface Transaction {
   description: string;
   date?: string;
   transaction_type?: string;
+  type?: string;
+  method?: "voice" | "receipt";
 }
 
 interface ApiErrorPayload {
@@ -174,6 +185,23 @@ function toParsedTransaction(value: unknown): ParsedTransaction {
   };
 }
 
+function toReceiptOcrItem(value: unknown): ReceiptOcrItem {
+  if (!isObject(value)) {
+    throw new ApiError("Invalid receipt item payload received.", 500, "INVALID_RESPONSE");
+  }
+
+  return {
+    name:
+      asString(value.name) ??
+      asString(value.merchant) ??
+      asString(value.description) ??
+      undefined,
+    line_total: toFiniteNumber(value.line_total) ?? toFiniteNumber(value.amount) ?? undefined,
+    unit_price: toFiniteNumber(value.unit_price) ?? undefined,
+    quantity: toFiniteNumber(value.quantity) ?? undefined,
+  };
+}
+
 function toTransaction(value: unknown): Transaction {
   if (!isObject(value)) {
     throw new ApiError("Invalid transaction payload received.", 500, "INVALID_RESPONSE");
@@ -261,13 +289,37 @@ export async function receiptOcr(
 
   if (Array.isArray(payload)) {
     return {
-      transactions: payload.map(toParsedTransaction),
+      items: payload.map((entry) => {
+        const parsed = toParsedTransaction(entry);
+        return {
+          name: parsed.merchant ?? parsed.description,
+          line_total: parsed.amount,
+          quantity: 1,
+        };
+      }),
+    };
+  }
+
+  if (isObject(payload) && Array.isArray(payload.items)) {
+    return {
+      items: payload.items.map(toReceiptOcrItem),
+      merchant: asString(payload.merchant) ?? undefined,
+      issued_at: asString(payload.issued_at) ?? asString(payload.date) ?? undefined,
     };
   }
 
   if (isObject(payload) && Array.isArray(payload.transactions)) {
     return {
-      transactions: payload.transactions.map(toParsedTransaction),
+      items: payload.transactions.map((entry) => {
+        const parsed = toParsedTransaction(entry);
+        return {
+          name: parsed.merchant ?? parsed.description,
+          line_total: parsed.amount,
+          quantity: 1,
+        };
+      }),
+      merchant: asString(payload.merchant) ?? undefined,
+      issued_at: asString(payload.issued_at) ?? asString(payload.date) ?? undefined,
     };
   }
 
