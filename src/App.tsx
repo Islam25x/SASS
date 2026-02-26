@@ -1,15 +1,8 @@
 import { useState , useEffect } from "react"
-import { Route, Routes } from "react-router-dom"
-import Dashboard from "./component/Dashboard/Dashboard"
-import Login from "./component/AuthSystem/Login/Login"
-import Register from "./component/AuthSystem/Register/Register"
-import Support from "./Support/Support"
-import AI from "./Support/AI"
-import Profile from "./component/Profile/Profile"
-import Loader from "./component/Loader/Loader"
+import Loader from "./layouts/AppLoader"
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Welcome from "./component/Welcome/Welcome"
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -22,17 +15,7 @@ function App() {
     return <Loader onFinish={() => setLoading(false)} />
   }
 
-  return (
-    <Routes>
-      <Route path="/Profile" element={<Profile />} />
-      <Route path="/AI" element={<AI />} />
-      <Route path="/Support" element={<Support />} />
-      <Route path="/Welcome" element={<Welcome />}></Route>
-      <Route path="/Dashboard" element={<Dashboard />} />
-      <Route path="/" element={<Login />} />
-      <Route path="/Register" element={<Register />} />
-    </Routes>
-  )
+  return <AppRoutes />
 }
 
 export default App
