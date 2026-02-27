@@ -6,6 +6,12 @@ import HeroSection from "../../components/landing/HeroSection";
 import type { BenefitItem, LandingCardItem } from "../../components/landing/types";
 import navLogoSrc from "../../assets/logo.png";
 import robotImageSrc from "../../assets/Finixa robot.png";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  motionViewport,
+  pageEnter,
+  slideIn,
+} from "../../shared/animations/motionPresets";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 
@@ -57,33 +63,86 @@ const goalsCards: LandingCardItem[] = [
 ];
 
 function StickyNavbar() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-customBg/95 backdrop-blur">
+    <motion.header
+      variants={slideIn({
+        direction: "down",
+        distance: 16,
+        duration: 0.45,
+        reducedMotion: shouldReduceMotion,
+      })}
+      initial="hidden"
+      animate="visible"
+      className="sticky top-0 z-20 border-b border-slate-200/70 bg-customBg/95 backdrop-blur"
+    >
       <div className={CONTAINER_CLASS}>
         <nav className="flex h-20 items-center" aria-label="Finexa">
           <img src={navLogoSrc} alt="Finexa" className="h-12 w-auto object-contain lg:h-14" />
         </nav>
       </div>
-    </header>
+    </motion.header>
   );
 }
 
 export default function WelcomePage() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
-    <main className="min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-customBg">
+    <motion.main
+      variants={pageEnter({ reducedMotion: shouldReduceMotion })}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-customBg"
+    >
       <StickyNavbar />
       <HeroSection robotImageSrc={robotImageSrc} benefits={heroBenefits} />
-      <FeatureSection
-        title="How Finexa"
-        highlighted="prevents running out of money"
-        cards={preventionCards}
-      />
-      <GoalsSection
-        title="How Finexa helps you"
-        highlighted="save before the end of the month"
-        cards={goalsCards}
-      />
-      <CTASection />
-    </main>
+      <motion.div
+        variants={slideIn({
+          direction: "up",
+          distance: 24,
+          reducedMotion: shouldReduceMotion,
+        })}
+        initial="hidden"
+        whileInView="visible"
+        viewport={motionViewport.once}
+      >
+        <FeatureSection
+          title="How Finexa"
+          highlighted="prevents running out of money"
+          cards={preventionCards}
+        />
+      </motion.div>
+      <motion.div
+        variants={slideIn({
+          direction: "up",
+          distance: 24,
+          delay: 0.04,
+          reducedMotion: shouldReduceMotion,
+        })}
+        initial="hidden"
+        whileInView="visible"
+        viewport={motionViewport.once}
+      >
+        <GoalsSection
+          title="How Finexa helps you"
+          highlighted="save before the end of the month"
+          cards={goalsCards}
+        />
+      </motion.div>
+      <motion.div
+        variants={slideIn({
+          direction: "up",
+          distance: 18,
+          reducedMotion: shouldReduceMotion,
+        })}
+        initial="hidden"
+        whileInView="visible"
+        viewport={motionViewport.once}
+      >
+        <CTASection />
+      </motion.div>
+    </motion.main>
   );
 }

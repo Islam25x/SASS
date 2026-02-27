@@ -1,5 +1,12 @@
 import Card from "./Card";
 import type { LandingCardItem } from "./types";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  motionViewport,
+  slideIn,
+  staggerChild,
+  staggerParent,
+} from "../../shared/animations/motionPresets";
 
 interface FeatureSectionProps {
   title: string;
@@ -14,17 +21,45 @@ export default function FeatureSection({
   highlighted,
   cards,
 }: FeatureSectionProps) {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
     <section className="bg-slate-50 py-12 lg:py-20" aria-labelledby="feature-section-title">
       <div className={CONTAINER_CLASS}>
-        <h2 id="feature-section-title" className="text-center text-2xl font-semibold text-slate-900 sm:text-3xl">
+        <motion.h2
+          variants={slideIn({
+            direction: "up",
+            distance: 20,
+            reducedMotion: shouldReduceMotion,
+          })}
+          initial="hidden"
+          whileInView="visible"
+          viewport={motionViewport.once}
+          id="feature-section-title"
+          className="text-center text-2xl font-semibold text-slate-900 sm:text-3xl"
+        >
           {title} <span className="text-primary">{highlighted}</span>
-        </h2>
-        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {cards.map((card) => (
-            <Card key={card.id} item={card} />
+        </motion.h2>
+        <motion.div
+          variants={staggerParent({ delayChildren: 0.08, staggerChildren: 0.1 })}
+          initial="hidden"
+          whileInView="visible"
+          viewport={motionViewport.once}
+          className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3"
+        >
+          {cards.map((card, index) => (
+            <motion.div
+              key={card.id}
+              variants={staggerChild({
+                direction: index % 2 === 0 ? "left" : "right",
+                distance: 24,
+                reducedMotion: shouldReduceMotion,
+              })}
+            >
+              <Card item={card} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
