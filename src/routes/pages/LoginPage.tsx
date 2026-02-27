@@ -31,7 +31,7 @@ const Login = () => {
       setErrors(validationErrors);
       return;
     }
-    navigate("/Dashboard");
+    navigate("/dashboard");
   };
 
   return (
@@ -99,7 +99,7 @@ const Login = () => {
           {/* Register link */}
           <p className="text-sm mb-4" data-aos="fade-up" data-aos-delay="200">
             Don&apos;t have an account?{" "}
-            <Link to="/Register" className="text-sky-600 hover:underline">
+            <Link to="/register" className="text-sky-600 hover:underline">
               Register
             </Link>
           </p>

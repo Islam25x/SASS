@@ -4,9 +4,9 @@ import FeatureSection from "../../components/landing/FeatureSection";
 import GoalsSection from "../../components/landing/GoalsSection";
 import HeroSection from "../../components/landing/HeroSection";
 import type { BenefitItem, LandingCardItem } from "../../components/landing/types";
+import navLogoSrc from "../../assets/logo.png";
+import robotImageSrc from "../../assets/Finixa robot.png";
 
-const NAV_LOGO_SRC = "/src/assets/logo.png";
-const ROBOT_IMAGE_SRC = "/src/assets/Finixa robot.png";
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 
 const heroBenefits: BenefitItem[] = [
@@ -61,7 +61,7 @@ function StickyNavbar() {
     <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-customBg/95 backdrop-blur">
       <div className={CONTAINER_CLASS}>
         <nav className="flex h-20 items-center" aria-label="Finexa">
-          <img src={NAV_LOGO_SRC} alt="Finexa" className="h-12 w-auto object-contain lg:h-14" />
+          <img src={navLogoSrc} alt="Finexa" className="h-12 w-auto object-contain lg:h-14" />
         </nav>
       </div>
     </header>
@@ -72,7 +72,7 @@ export default function WelcomePage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-customBg">
       <StickyNavbar />
-      <HeroSection robotImageSrc={ROBOT_IMAGE_SRC} benefits={heroBenefits} />
+      <HeroSection robotImageSrc={robotImageSrc} benefits={heroBenefits} />
       <FeatureSection
         title="How Finexa"
         highlighted="prevents running out of money"

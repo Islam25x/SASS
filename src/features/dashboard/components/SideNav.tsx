@@ -10,6 +10,7 @@ import {
   HelpCircle,
   LogOut,
 } from "lucide-react";
+import blackLogoSrc from "../../../assets/black logo.png";
 
 interface AdminNavProps {
   setActiveComponent: (component: string) => void;
@@ -23,7 +24,7 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     { name: "Wallet", icon: Wallet },
     { name: "Goals", icon: BarChart3 },
     { name: "Transverse", icon: Layers },
-    { name: "Setting", icon: Settings, link: "/Profile" },
+    { name: "Setting", icon: Settings, link: "/profile" },
   ];
 
   const bottomNav = [
@@ -83,7 +84,7 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
         data-aos-once="true"
       >
         <img
-          src="/src/assets/black logo.png"
+          src={blackLogoSrc}
           alt="Logo"
           className="w-full object-cover"
         />
