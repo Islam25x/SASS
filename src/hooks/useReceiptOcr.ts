@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { ApiError, type ReceiptOcrResponse, receiptOcr } from "../services/ai.api";
+import { parseReceiptUseCase } from "../application/transactions/parse-receipt.usecase";
+import type { ReceiptOcrResponse } from "../domain/ai/ai.types";
+import { ApiError } from "../infrastructure/api/api-error";
 
 type ReceiptOcrMutation = UseMutationResult<ReceiptOcrResponse, ApiError, File>;
 
@@ -20,7 +22,7 @@ export function useReceiptOcr(): UseReceiptOcrResult {
       abortControllerRef.current = controller;
 
       try {
-        return await receiptOcr(file, { signal: controller.signal });
+        return await parseReceiptUseCase(file, { signal: controller.signal });
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;

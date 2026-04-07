@@ -7,6 +7,7 @@ import VoiceLedgerModal from "./VoiceLedgerModal";
 import { useVoiceLedgerFlow } from "../../../hooks/useVoiceLedgerFlow";
 import { useReceiptOcrFlow } from "../../../hooks/useReceiptOcrFlow";
 import ReceiptOcrModal from "./ReceiptOcrModal";
+import { Button, Text } from "../../../shared/ui";
 
 const NOOP = () => { };
 
@@ -78,18 +79,23 @@ interface AiActionButtonProps {
 }
 
 function AiActionButton({ icon: Icon, label, onClick }: AiActionButtonProps) {
+    const MotionButton = motion(Button);
     return (
-        <motion.button
+        <MotionButton
             type="button"
             variants={actionItemVariants}
             onClick={onClick}
+            variant="secondary"
+            size="sm"
             className="h-11 shrink-0 rounded-full border border-primary/20 bg-white px-5 text-sm font-semibold text-slate-700 shadow-sm transition-colors duration-150 hover:bg-primary/10 hover:text-primary"
         >
             <span className="flex items-center gap-2">
                 <Icon size={16} strokeWidth={2} />
-                <span>{label}</span>
+                <Text as="span" variant="body">
+                    {label}
+                </Text>
             </span>
-        </motion.button>
+        </MotionButton>
     );
 }
 
@@ -193,13 +199,16 @@ function ChatIcon() {
                                     className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-primary/40 to-primary/20"
                                 />
 
-                                <button
+                                <Button
                                     type="button"
                                     onClick={() => setIsPinnedOpen((v) => !v)}
-                                    className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full bg-primary text-white"
+                                    variant="primary"
+                                    size="sm"
+                                    shape="circle"
+                                    className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full p-0"
                                 >
                                     <Brain size={40} strokeWidth={2.6} />
-                                </button>
+                                </Button>
                             </div>
                         </motion.section>
                     </motion.div>

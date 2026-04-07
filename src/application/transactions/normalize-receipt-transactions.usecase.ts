@@ -1,0 +1,16 @@
+import type { ReceiptOcrResponse } from "../../domain/ai/ai.types";
+import { buildTransactionsFromReceipt } from "../../domain/transactions/transaction.rules";
+import type { Transaction } from "../../domain/transactions/transaction.types";
+
+export async function normalizeReceiptTransactionsUseCase(
+  response: ReceiptOcrResponse,
+): Promise<Transaction[]> {
+  const issuedAt = response.issued_at ?? new Date().toISOString();
+  const ids = response.items.map((_, index) =>
+    typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${index}`,
+  );
+
+  return buildTransactionsFromReceipt(response, { issuedAt, ids });
+}

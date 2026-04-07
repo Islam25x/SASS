@@ -1,3 +1,5 @@
+import { Button, Card, Text } from "../../../shared/ui";
+
 const Documentation = () => {
     const documents = [
         {
@@ -21,39 +23,45 @@ const Documentation = () => {
 
     return (
         <section id="Documentation">
-            <div
+            <Card
+                variant="outline"
+                padding="md"
+                className="h-fit relative shadow-sm rounded-lg"
                 data-aos="zoom-in"
                 data-aos-duration="500"
-                className="bg-white border border-gray-200 h-fit p-6 relative rounded-lg shadow-sm"
             >
-                <h2 className="text-xl font-semibold mb-6 text-gray-900">
+                <Text as="h2" variant="subtitle" weight="bold" className="mb-6 text-gray-900">
                     Documentation
-                </h2>
+                </Text>
 
                 {/* Documents */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {documents.map((doc, index) => (
-                        <div
+                        <Card
                             key={index}
-                            className="bg-gray-50 p-4 border border-gray-200 hover:border-blue-400 rounded-lg"
+                            variant="outline"
+                            padding="sm"
+                            className="bg-gray-50 hover:border-primary/40 rounded-lg"
                         >
-                            <h3 className="text-lg font-medium mb-2 text-gray-900">
+                            <Text as="h3" variant="subtitle" weight="medium" className="mb-2 text-gray-900">
                                 {doc.title}
-                            </h3>
-                            <p className="text-gray-600">{doc.description}</p>
-                            <button className="inline-flex items-center justify-center text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-9 px-3 mt-3 rounded transition">
+                            </Text>
+                            <Text variant="body" className="text-gray-600">
+                                {doc.description}
+                            </Text>
+                            <Button variant="primary" size="sm" className="mt-3 rounded">
                                 Download PDF
-                            </button>
-                        </div>
+                            </Button>
+                        </Card>
                     ))}
                 </div>
 
                 {/* Videos */}
-                <h2 className="text-xl font-semibold my-6 text-gray-900">
+                <Text as="h2" variant="subtitle" weight="bold" className="my-6 text-gray-900">
                     Tutorial Videos
-                </h2>
+                </Text>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <Card variant="outline" padding="sm" className="bg-gray-50 rounded-lg">
                         <div className="aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
                             <iframe
                                 className="w-full h-full rounded"
@@ -65,13 +73,15 @@ const Documentation = () => {
                                 allowFullScreen
                             ></iframe>
                         </div>
-                        <h4 className="font-medium text-gray-900">Getting Started Guide</h4>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <Text as="h4" variant="body" weight="medium" className="text-gray-900">
+                            Getting Started Guide
+                        </Text>
+                        <Text variant="body" className="text-gray-600 mt-1">
                             Learn the basics of using the system in this quick start video.
-                        </p>
-                    </div>
+                        </Text>
+                    </Card>
 
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <Card variant="outline" padding="sm" className="bg-gray-50 rounded-lg">
                         <div className="aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
                             <iframe
                                 className="w-full h-full rounded"
@@ -83,17 +93,18 @@ const Documentation = () => {
                                 allowFullScreen
                             ></iframe>
                         </div>
-                        <h4 className="font-medium text-gray-900">
+                        <Text as="h4" variant="body" weight="medium" className="text-gray-900">
                             Advanced Analysis Techniques
-                        </h4>
-                        <p className="text-sm text-gray-600 mt-1">
+                        </Text>
+                        <Text variant="body" className="text-gray-600 mt-1">
                             Explore advanced techniques and best practices for data analysis.
-                        </p>
-                    </div>
+                        </Text>
+                    </Card>
                 </div>
-            </div>
+            </Card>
         </section>
     );
 };
 
 export default Documentation;
+

@@ -68,7 +68,7 @@ const ProfileInfo = () => {
   };
 
   const inputClass =
-    "flex h-10 w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500";
+    "flex h-10 w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40";
 
   // 🧩 تعريف الحقول كمصفوفة ثنائية
   const fields: FieldType[][] = [
@@ -167,7 +167,7 @@ const ProfileInfo = () => {
         {/* Save Button */}
         <button
           type="submit"
-          className="inline-flex items-center justify-center text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md h-10 px-4 py-2 transition"
+          className="inline-flex items-center justify-center text-sm font-medium bg-primary text-white hover:bg-primary-700 rounded-md h-10 px-4 py-2 transition"
         >
           <Save size={20} className="mr-2" />
           Update Profile
@@ -178,3 +178,4 @@ const ProfileInfo = () => {
 };
 
 export default ProfileInfo;
+

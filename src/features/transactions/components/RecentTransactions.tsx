@@ -1,45 +1,55 @@
 import { useMemo } from "react";
 import { useTransactions } from "../../../hooks/useTransactions";
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-});
+import {
+  normalizeTransactionType,
+  selectRecentTransactions,
+} from "../../../application/transactions/transactions.selectors";
+import { currencyFormatter, formatTransactionDate } from "../../../application/transactions/transactions.formatters";
+import { TransactionType } from "../../../domain/transactions/transaction.enums";
+import { Button, PanelCard, PanelHeader, Text } from "../../../shared/ui";
 
 function RecentTransactions() {
   const { data, isLoading, isError, error } = useTransactions();
 
   const transactions = useMemo(() => data ?? [], [data]);
-  const visibleTransactions = useMemo(() => transactions.slice(0, 3), [transactions]);
+  const visibleTransactions = useMemo(
+    () => selectRecentTransactions(transactions, 3),
+    [transactions]
+  );
 
   return (
-    <div className="rounded-xl box p-6 !w-full">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Recent transactions</h2>
-        <div className="flex gap-2">
-          <button className="rounded-full border px-3 py-1 text-sm text-gray-600 hover:bg-gray-100">
-            All accounts
-          </button>
-        </div>
-      </div>
+    <PanelCard className="!w-full">
+      <PanelHeader
+        title="Recent transactions"
+        right={
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-full px-3 py-1 text-sm text-gray-600 border-gray-200"
+            >
+              All accounts
+            </Button>
+          </div>
+        }
+      />
 
-      {isLoading && <p className="py-8 text-sm text-slate-500">Loading transactions...</p>}
+      {isLoading && (
+        <Text variant="body" className="py-8 text-slate-500">
+          Loading transactions...
+        </Text>
+      )}
 
       {isError && (
-        <p className="py-8 text-sm text-rose-600">
+        <Text variant="body" className="py-8 text-rose-600">
           {error?.message ?? "Failed to load transactions."}
-        </p>
+        </Text>
       )}
 
       {!isLoading && !isError && transactions.length === 0 && (
-        <p className="py-8 text-sm text-slate-500">No transactions yet.</p>
+        <Text variant="body" className="py-8 text-slate-500">
+          No transactions yet.
+        </Text>
       )}
 
       {!isLoading && !isError && visibleTransactions.length > 0 && (
@@ -58,17 +68,12 @@ function RecentTransactions() {
               {visibleTransactions.map((transaction) => (
                 <tr key={transaction.id} className="border-t">
                   <td className="py-3">
-                    {transaction.date
-                      ? dateFormatter.format(new Date(transaction.date))
-                      : "N/A"}
+                    {formatTransactionDate(transaction.date)}
                   </td>
                   {(() => {
-                    const normalizedType = (transaction.transaction_type ?? "")
-                      .toLowerCase()
-                      .trim();
-                    const isIncome = normalizedType === "income";
-                    const isExpense =
-                      normalizedType === "expense" || normalizedType === "expence";
+                    const normalizedType = normalizeTransactionType(transaction);
+                    const isIncome = normalizedType === TransactionType.Income;
+                    const isExpense = normalizedType === TransactionType.Expense;
                     const amountPrefix = isIncome ? "+" : isExpense ? "-" : "";
                     const amountColor = isIncome
                       ? "text-emerald-600"
@@ -78,7 +83,7 @@ function RecentTransactions() {
 
                     return (
                       <td className={`py-3 font-medium ${amountColor}`}>
-                        {amountPrefix} {currencyFormatter.format(transaction.amount)}
+                        {amountPrefix} {currencyFormatter.format(Math.abs(transaction.amount))}
                       </td>
                     );
                   })()}
@@ -93,7 +98,7 @@ function RecentTransactions() {
           </table>
         </div>
       )}
-    </div>
+    </PanelCard>
   );
 }
 

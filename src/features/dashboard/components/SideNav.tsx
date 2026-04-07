@@ -3,14 +3,15 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Receipt,
-  Wallet,
   BarChart3,
   Layers,
   Settings,
   HelpCircle,
   LogOut,
 } from "lucide-react";
-import blackLogoSrc from "../../../assets/black logo.png";
+import logoSrc from "../../../assets/logo.png";
+import mobileLogoSrc from "../../../assets/mobile view logo.png";
+import { Button, Text, cn } from "../../../shared/ui";
 
 interface AdminNavProps {
   setActiveComponent: (component: string) => void;
@@ -21,10 +22,9 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Transactions", icon: Receipt },
-    { name: "Wallet", icon: Wallet },
     { name: "Goals", icon: BarChart3 },
     { name: "Transverse", icon: Layers },
-    { name: "Setting", icon: Settings, link: "/profile" },
+    { name: "Setting", icon: Settings },
   ];
 
   const bottomNav = [
@@ -38,20 +38,21 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     link?: string
   ) => {
     const isActive = activeComponent === name;
-    const classes = `flex items-center justify-center lg:justify-start gap-3 
-      px-3 py-3 cursor-pointer 
-      w-full lg:w-[85%] h-12 
-      rounded-2xl transition-colors duration-200 lg:ms-4 
-      ${
-        isActive
-          ? "bg-primary-600 text-white"
-          : "text-black hover:bg-primary-600 hover:text-white"
-      }`;
+    const baseClasses =
+      "flex items-center justify-center lg:justify-start gap-3 px-3 py-3 cursor-pointer w-full lg:w-[85%] h-12 rounded-2xl transition-colors duration-200 lg:ms-4 font-normal";
+    const activeClasses = "!bg-primary-600 text-white";
+    const hoverClasses = "hover:bg-primary-600 hover:text-white";
+    const classes = cn(
+      baseClasses,
+      isActive ? activeClasses : cn("text-black", hoverClasses)
+    );
 
     const content = (
       <>
         <Icon size={20} className="shrink-0" />
-        <span className="hidden lg:block">{name}</span>
+        <Text as="span" variant="body" className="hidden lg:block">
+          {name}
+        </Text>
       </>
     );
 
@@ -65,13 +66,15 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
         {content}
       </Link>
     ) : (
-      <button
+      <Button
         key={name}
         onClick={() => setActiveComponent(name)}
         className={classes}
+        variant="ghost"
+        size="md"
       >
         {content}
-      </button>
+      </Button>
     );
   };
 
@@ -79,14 +82,15 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     <aside className="fixed top-0 left-0 w-16 md:w-20 lg:w-60 h-screen z-[1030] bg-customBg flex flex-col items-center lg:items-start shadow-md">
       {/* 🔹 اللوجو */}
       <div
-        className="mb-5 ms-3 w-10 lg:w-[60%] mt-4"
+        className="mb-5 ms-3 w-10 lg:w-[60%] mt-4 flex flex-col items-center lg:items-start"
         data-aos="zoom-in"
         data-aos-once="true"
       >
+        <img src={logoSrc} alt="Finexa" className="hidden w-full object-cover md:block" />
         <img
-          src={blackLogoSrc}
-          alt="Logo"
-          className="w-full object-cover"
+          src={mobileLogoSrc}
+          alt="Finexa mobile"
+          className="block w-full object-contain md:hidden"
         />
       </div>
 

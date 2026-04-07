@@ -3,7 +3,8 @@ import { Loader2 } from "lucide-react";
 import { useParseTransaction } from "../../../hooks/useParseTransaction";
 import { useReceiptOcr } from "../../../hooks/useReceiptOcr";
 import { useVoiceToText } from "../../../hooks/useVoiceToText";
-import type { ParsedTransaction } from "../../../services/ai.api";
+import type { ParsedTransaction } from "../../../domain/ai/ai.types";
+import { Button, Card, Input, Text } from "../../../shared/ui";
 
 // Example UI layer: consumes hooks only, keeps API details outside the component.
 interface AiApiFlowsExampleProps {
@@ -20,14 +21,18 @@ function InlineToast({ message, onClose }: InlineToastProps) {
   return (
     <div className="fixed right-6 top-6 z-[70] rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 shadow-lg">
       <div className="flex items-center gap-3">
-        <span>{message}</span>
-        <button
+        <Text as="span" variant="body" className="text-rose-700">
+          {message}
+        </Text>
+        <Button
           type="button"
           onClick={onClose}
+          variant="ghost"
+          size="sm"
           className="rounded px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100"
         >
           Dismiss
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -35,10 +40,10 @@ function InlineToast({ message, onClose }: InlineToastProps) {
 
 function SpinnerLabel({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <Text as="span" variant="body" className="inline-flex items-center gap-2">
       <Loader2 size={16} className="animate-spin" />
       {label}
-    </span>
+    </Text>
   );
 }
 
@@ -155,80 +160,98 @@ function AiApiFlowsExample({
   };
 
   return (
-    <section className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <Card variant="outline" padding="md" className="space-y-6 rounded-2xl shadow-sm">
       {toastMessage && (
         <InlineToast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
 
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Voice Flow</h3>
-        <input
+        <Text as="h3" variant="body" weight="bold" className="text-slate-900">
+          Voice Flow
+        </Text>
+        <Input
           type="file"
           accept="audio/*"
           onChange={(event) => setVoiceFile(event.target.files?.[0] ?? null)}
-          className="block w-full rounded-lg border border-slate-200 p-2 text-sm text-slate-700"
+          className="block w-full p-2 text-sm text-slate-700"
         />
-        <button
+        <Button
           type="button"
           disabled={!voiceFile || isVoiceFlowPending}
           onClick={handleVoiceFlow}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+          variant="primary"
+          size="sm"
+          className="rounded-lg px-4 py-2 text-sm"
         >
           {isVoiceFlowPending ? (
             <SpinnerLabel label="Processing..." />
           ) : (
             "Transcribe and Parse"
           )}
-        </button>
+        </Button>
 
         {transcriptText && (
           <div className="rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
-            <p className="font-medium text-slate-900">Transcript</p>
-            <p className="mt-1">{transcriptText}</p>
+            <Text variant="body" weight="medium" className="text-slate-900">
+              Transcript
+            </Text>
+            <Text variant="body" className="mt-1">
+              {transcriptText}
+            </Text>
           </div>
         )}
 
         {parsedPreview && (
           <div className="rounded-lg border border-slate-200 p-4">
-            <p className="text-sm font-semibold text-slate-900">Parsed Preview</p>
+            <Text variant="body" weight="bold" className="text-slate-900">
+              Parsed Preview
+            </Text>
             <div className="mt-2 space-y-1 text-sm text-slate-700">
-              <p>Amount: {parsedPreview.amount}</p>
-              <p>Category: {parsedPreview.category}</p>
-              <p>Description: {parsedPreview.description}</p>
-              <p>Date: {parsedPreview.date ?? "N/A"}</p>
+              <Text variant="body">Amount: {parsedPreview.amount}</Text>
+              <Text variant="body">Category: {parsedPreview.category}</Text>
+              <Text variant="body">Description: {parsedPreview.description}</Text>
+              <Text variant="body">Date: {parsedPreview.date ?? "N/A"}</Text>
             </div>
-            <button
+            <Button
               type="button"
               disabled={confirmingVoice}
               onClick={handleConfirmParsed}
-              className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+              variant="primary"
+              size="sm"
+              className="mt-3 rounded-lg px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700"
             >
               {confirmingVoice ? <SpinnerLabel label="Saving..." /> : "Confirm Transaction"}
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-base font-semibold text-slate-900">Receipt Flow</h3>
-        <input
+        <Text as="h3" variant="body" weight="bold" className="text-slate-900">
+          Receipt Flow
+        </Text>
+        <Input
           type="file"
           accept="image/*"
           onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
-          className="block w-full rounded-lg border border-slate-200 p-2 text-sm text-slate-700"
+          className="block w-full p-2 text-sm text-slate-700"
         />
-        <button
+        <Button
           type="button"
           disabled={!receiptFile || isReceiptFlowPending}
           onClick={handleReceiptFlow}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+          variant="primary"
+          size="sm"
+          className="rounded-lg px-4 py-2 text-sm"
         >
           {isReceiptFlowPending ? <SpinnerLabel label="Extracting..." /> : "Run OCR"}
-        </button>
+        </Button>
 
         {receiptTransactions.length > 0 && (
           <div className="rounded-lg border border-slate-200 p-4">
-            <p className="text-sm font-semibold text-slate-900">Extracted Transactions</p>
+            <Text variant="body" weight="bold" className="text-slate-900">
+              Extracted Transactions
+            </Text>
             <ul className="mt-2 space-y-2 text-sm text-slate-700">
               {receiptTransactions.map((transaction, index) => (
                 <li key={`${transaction.description}-${index}`} className="rounded bg-slate-50 p-2">
@@ -236,18 +259,20 @@ function AiApiFlowsExample({
                 </li>
               ))}
             </ul>
-            <button
+            <Button
               type="button"
               disabled={confirmingReceipt}
               onClick={handleConfirmReceipt}
-              className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+              variant="primary"
+              size="sm"
+              className="mt-3 rounded-lg px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700"
             >
               {confirmingReceipt ? <SpinnerLabel label="Saving..." /> : "Confirm Bulk Add"}
-            </button>
+            </Button>
           </div>
         )}
       </div>
-    </section>
+    </Card>
   );
 }
 

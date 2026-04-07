@@ -46,7 +46,7 @@ function PaymentMethodForm({ fields, paymentMethod }: PaymentMethodFormProps) {
                                         type={field.type}
                                         placeholder={field.placeholder}
                                         maxLength={field.maxLength}
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400"
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-600 focus:ring-2 focus:ring-primary/40"
                                     />
                                 </>
                             )}
@@ -56,7 +56,7 @@ function PaymentMethodForm({ fields, paymentMethod }: PaymentMethodFormProps) {
                                 <button
                                     type="button"
                                     onClick={handleVerify}
-                                    className="text-xs text-indigo-600 mt-1 text-end w-full hover:underline cursor-pointer"
+                                    className="text-xs text-primary-600 mt-1 text-end w-full hover:underline cursor-pointer"
                                 >
                                     verify
                                 </button>
@@ -75,7 +75,7 @@ function PaymentMethodForm({ fields, paymentMethod }: PaymentMethodFormProps) {
                                         id="verify-id"
                                         type="text"
                                         placeholder="Enter verification code"
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400"
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary-600 focus:ring-2 focus:ring-primary/40"
                                     />
                                     <button
                                         type="button"
@@ -100,7 +100,7 @@ function PaymentMethodForm({ fields, paymentMethod }: PaymentMethodFormProps) {
                                         id="wallet-amount"
                                         type="number"
                                         placeholder="Enter amount"
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400"
+                                        className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary-600 focus:ring-2 focus:ring-primary/40"
                                     />
                                 </div>
                             )}
@@ -113,3 +113,4 @@ function PaymentMethodForm({ fields, paymentMethod }: PaymentMethodFormProps) {
 }
 
 export default PaymentMethodForm;
+

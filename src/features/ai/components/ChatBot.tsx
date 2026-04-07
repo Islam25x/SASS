@@ -1,7 +1,8 @@
 import { X, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { sendChatbotMessage } from "../../../services/ai.api";
+import { sendChatMessageUseCase } from "../../../application/ai/send-chat-message.usecase";
+import { Button, Input, Text } from "../../../shared/ui";
 
 interface ChatBotProps {
     setActive: (value: boolean) => void;
@@ -32,7 +33,7 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
 
         try {
             // 🔹 إرسال الطلب للباكند
-            const res = await sendChatbotMessage(userMessage);
+            const res = await sendChatMessageUseCase(userMessage);
 
             const data = await res.json();
 
@@ -69,10 +70,18 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
         >
             {/* Header */}
             <div className="bg-primary text-white p-4 font-semibold flex justify-between items-center">
-                <span>Chat Assistant</span>
-                <button className="cursor-pointer hover:text-primary-600 transition-all duration-150 ease-in-out" onClick={handleClose}>
+                <Text as="span" variant="body" weight="bold" className="text-white">
+                    Chat Assistant
+                </Text>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    shape="circle"
+                    className="cursor-pointer text-white hover:text-primary-600"
+                    onClick={handleClose}
+                >
                     <X size={22} />
-                </button>
+                </Button>
             </div>
 
             {/* Messages */}
@@ -93,26 +102,33 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
                         </span>
                     </div>
                 ))}
-                {loading && <p className="text-gray-400 text-sm">Bot is typing...</p>}
+                {loading && (
+                    <Text variant="body" className="text-gray-400 text-sm">
+                        Bot is typing...
+                    </Text>
+                )}
             </div>
 
             {/* Input */}
             <div className="border-t p-3 flex items-center gap-2">
-                <input
+                <Input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
                     placeholder="Type your message..."
-                    className="flex-1 border rounded-lg p-2 outline-none focus:ring-2 focus:ring-primary/50"
+                    className="flex-1 p-2"
                 />
-                <button
+                <Button
                     onClick={handleSend}
-                    className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition"
+                    variant="primary"
+                    size="sm"
                     disabled={loading}
+                    shape="circle"
+                    className="p-0"
                 >
                     <Send size={18} />
-                </button>
+                </Button>
             </div>
         </motion.div>
     );

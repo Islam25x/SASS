@@ -1,3 +1,5 @@
+import { Card, Text } from "../../../shared/ui";
+
 const Questions = () => {
     const questions = [
         {
@@ -25,18 +27,24 @@ const Questions = () => {
     return (
         <section id="Questions" className="py-10 bg-gray-100 text-gray-900">
             <div className="max-w-6xl mx-auto px-4">
-                <h2 className="text-center text-2xl font-bold mb-8">
+                <Text as="h2" variant="title" weight="bold" className="text-center mb-8">
                     Frequently Asked Questions
-                </h2>
+                </Text>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {questions.map((q, index) => (
-                        <div
+                        <Card
                             key={index}
-                            className="bg-white border border-gray-200 shadow-sm rounded-lg p-6 hover:shadow-md transition"
+                            variant="outline"
+                            padding="md"
+                            className="hover:shadow-md transition rounded-lg"
                         >
-                            <h3 className="text-lg font-semibold mb-2">{q.question}</h3>
-                            <p className="text-gray-600">{q.answer}</p>
-                        </div>
+                            <Text as="h3" variant="subtitle" weight="bold" className="mb-2">
+                                {q.question}
+                            </Text>
+                            <Text variant="body" className="text-gray-600">
+                                {q.answer}
+                            </Text>
+                        </Card>
                     ))}
                 </div>
             </div>

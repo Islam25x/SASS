@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import type { CSSProperties } from "react";
 import DoughnutChartBase from "../../../shared/chart/DoughnutChartBase";
 import type { DoughnutChartInputData, DoughnutChartInputOptions } from "../../../shared/chart/DoughnutChartBase";
+import { Card, Text } from "../../../shared/ui";
 
 const BudgetDoughnutChart = memo(() => {
   const data = useMemo<DoughnutChartInputData>(
@@ -49,9 +50,15 @@ const BudgetDoughnutChart = memo(() => {
   );
 
   return (
-    <div className="p-6 box rounded-xl !w-full md:w-[40%] h-80 flex flex-col md:flex-row gap-6">
+    <Card
+      variant="default"
+      padding="md"
+      className="!w-full md:w-[40%] h-80 flex flex-col md:flex-row gap-6"
+    >
       <div className="flex-1">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900">Saving plan</h2>
+        <Text as="h2" variant="subtitle" weight="bold" className="mb-4 text-gray-900">
+          Saving plan
+        </Text>
         <ul className="space-y-2 text-gray-700">
           {legendItems.map((item, index) => (
             <li key={index} className="flex items-center gap-2 text-sm">
@@ -73,7 +80,7 @@ const BudgetDoughnutChart = memo(() => {
           centerSubText="Total for month"
         />
       </div>
-    </div>
+    </Card>
   );
 });
 

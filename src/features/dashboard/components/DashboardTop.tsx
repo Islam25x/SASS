@@ -7,8 +7,9 @@ import {
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { MoveUpRight } from 'lucide-react';
 import Header from "./Header";
+import DashboardSummaryCard from "./DashboardSummaryCard";
+import { Text } from "../../../shared/ui";
 
 const DashboardTop = () => {
   const dashboardItems = [
@@ -21,7 +22,7 @@ const DashboardTop = () => {
     },
     {
       titleKey: "Income",
-      icon: <FontAwesomeIcon icon={faClock} className="text-blue-500" />,
+      icon: <FontAwesomeIcon icon={faClock} className="text-primary" />,
       value: 3500,
       pev: "8% vs last month",
       isIncrease: true,
@@ -51,35 +52,24 @@ const DashboardTop = () => {
       <section id="DashboardTop" className="container mt-5 px-3 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {dashboardItems.map((item, index) => (
-            <div
+            <DashboardSummaryCard
               key={index}
-              className="p-6 pt-4 rounded-4xl box text-black"
-            >
-              <div className="flex justify-between">
-                <h6 className="text-black text-lg mb-4">{item.titleKey}</h6>
-                {
-                  item.arrow &&
-                  <div className="rounded-full border-gray-300 justify-items-center content-center me-[-1rem] mt-[-.8rem] solid border-1 h-10 w-10 cursor-pointer hover:bg-primary hover:text-white duration-150">
-                    <MoveUpRight />
-                  </div>
-                }
-              </div>
-
-              <div className="flex items-center gap-3 mb-2">
-                {item.icon}
-                <span className="text-2xl font-bold">{item.value}</span>
-              </div>
-
-              <div
-                className={`flex items-center gap-2 text-sm font-medium ${item.isIncrease ? "text-green-600" : "text-red-600"
-                  }`}
-              >
-                <FontAwesomeIcon
-                  icon={item.isIncrease ? faArrowUp : faArrowDown}
-                />
-                <span>{item.pev}</span>
-              </div>
-            </div>
+              title={item.titleKey}
+              icon={item.icon}
+              value={item.value}
+              changeLabel={
+                <>
+                  <FontAwesomeIcon
+                    icon={item.isIncrease ? faArrowUp : faArrowDown}
+                  />
+                  <Text as="span" variant="body">
+                    {item.pev}
+                  </Text>
+                </>
+              }
+              isIncrease={item.isIncrease}
+              showArrow={item.arrow}
+            />
           ))}
         </div>
       </section>
@@ -89,3 +79,4 @@ const DashboardTop = () => {
 };
 
 export default DashboardTop;
+

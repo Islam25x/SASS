@@ -6,10 +6,12 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import {
+  parseTransactionUseCase,
+} from "../application/ai/parse-transaction.usecase";
+import type { ParsedTransaction } from "../domain/ai/ai.types";
+import {
   ApiError,
-  type ParsedTransaction,
-  parseTransaction,
-} from "../services/ai.api";
+} from "../infrastructure/api/api-error";
 
 const DEFAULT_TRANSACTIONS_QUERY_KEY: QueryKey = ["transactions"];
 
@@ -44,7 +46,7 @@ export function useParseTransaction(
       abortControllerRef.current = controller;
 
       try {
-        return await parseTransaction(text, { signal: controller.signal });
+        return await parseTransactionUseCase(text, { signal: controller.signal });
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;

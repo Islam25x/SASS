@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { type ParsedTransaction, type Transaction } from "../services/ai.api";
+import { createTransactionUseCase } from "../application/transactions/create-transaction.usecase";
+import type { ParsedTransaction } from "../domain/ai/ai.types";
+import type { Transaction } from "../domain/transactions/transaction.types";
+import { ApiError } from "../infrastructure/api/api-error";
 import { useParseTransaction } from "./useParseTransaction";
 import { useVoiceToText } from "./useVoiceToText";
 
@@ -105,7 +108,7 @@ export function useVoiceLedgerFlow(
     async (value: string): Promise<ParsedTransaction> => {
       const normalizedText = value.trim();
       if (!normalizedText) {
-        throw new Error("Transcribed text is empty.");
+        throw new ApiError("Transcribed text is empty.", 400, "INVALID_RESPONSE");
       }
 
       setState("parsing");
@@ -185,7 +188,7 @@ export function useVoiceLedgerFlow(
         };
 
         recorder.onerror = () => {
-          reject(new Error("Recording failed."));
+          reject(new ApiError("Recording failed.", 500, "INVALID_RESPONSE"));
         };
 
         recorder.stop();
@@ -195,7 +198,7 @@ export function useVoiceLedgerFlow(
       mediaRecorderRef.current = null;
 
       if (!blob || blob.size === 0) {
-        throw new Error("No audio captured.");
+        throw new ApiError("No audio captured.", 400, "INVALID_RESPONSE");
       }
 
       const response = await voiceToTextMutation.mutateAsync(blob);
@@ -233,7 +236,7 @@ export function useVoiceLedgerFlow(
     try {
       const normalizedTranscript = transcript.trim();
       if (!normalizedTranscript) {
-        throw new Error("Please provide transaction text before confirming.");
+        throw new ApiError("Please provide transaction text before confirming.", 400, "INVALID_RESPONSE");
       }
 
       let parsed = parsedTransaction;
@@ -243,14 +246,7 @@ export function useVoiceLedgerFlow(
 
       setState("submitting");
 
-      const newTransaction: Transaction = {
-        id: String(Date.now()),
-        amount: parsed.amount,
-        category: parsed.category,
-        description: parsed.merchant ?? "Voice transaction",
-        date: parsed.date,
-        transaction_type: parsed.transaction_type ?? "expense",
-      };
+      const newTransaction = await createTransactionUseCase(parsed);
 
       queryClient.setQueryData<Transaction[]>(TRANSACTIONS_QUERY_KEY, (old) => {
         return [newTransaction, ...(old ?? [])];

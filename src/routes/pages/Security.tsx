@@ -51,7 +51,7 @@ const Security = () => {
     };
 
     const inputClass =
-        "flex h-10 w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10";
+        "flex h-10 w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 pl-10";
 
     return (
         <section id="Security">
@@ -125,7 +125,7 @@ const Security = () => {
                 <div className="flex flex-col md:flex-row gap-4 my-4">
                     <button
                         type="submit"
-                        className="relative inline-flex items-center justify-center bg-blue-600 text-white text-sm font-medium rounded-md transition hover:bg-blue-700 h-10 px-9 py-2"
+                        className="relative inline-flex items-center justify-center bg-primary text-white text-sm font-medium rounded-md transition hover:bg-primary-700 h-10 px-9 py-2"
                     >
                         <Lock className="absolute left-2" size={18} />
                         Change Password
@@ -145,3 +145,4 @@ const Security = () => {
 };
 
 export default Security;
+

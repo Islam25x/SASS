@@ -48,7 +48,7 @@ const Preferences = () => {
                         </div>
                     ))}
                 </div>
-                <button className="!inline-flex !items-center !justify-center !text-sm !font-medium !bg-white !text-[#020817] hover:!bg-sky-50 !h-10 !px-4 !py-2">
+                <button className="!inline-flex !items-center !justify-center !text-sm !font-medium !bg-white !text-[#020817] hover:!bg-customBg !h-10 !px-4 !py-2">
                     <Save size={20} color="#020817" strokeWidth={2} className="me-2" />
                     Save Preferences
                 </button>
@@ -58,3 +58,4 @@ const Preferences = () => {
 };
 
 export default Preferences;
+

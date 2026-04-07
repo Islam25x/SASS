@@ -12,11 +12,12 @@ import {
 interface HeroSectionProps {
   robotImageSrc: string;
   benefits: BenefitItem[];
+  onTryFree: () => void;
 }
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 
-export default function HeroSection({ robotImageSrc, benefits }: HeroSectionProps) {
+export default function HeroSection({ robotImageSrc, benefits, onTryFree }: HeroSectionProps) {
   const shouldReduceMotion = Boolean(useReducedMotion());
 
   return (
@@ -60,6 +61,7 @@ export default function HeroSection({ robotImageSrc, benefits }: HeroSectionProp
             <motion.button
               type="button"
               aria-label="Try Finexa for free"
+              onClick={onTryFree}
               variants={slideIn({
                 direction: "up",
                 distance: 16,

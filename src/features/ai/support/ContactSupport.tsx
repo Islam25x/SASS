@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import type { FormEvent } from "react";
+import { Button, Card, Input, Text } from "../../../shared/ui";
 
 const ContactSupport = () => {
     const form = useRef<HTMLFormElement>(null);
@@ -12,58 +13,56 @@ const ContactSupport = () => {
 
     return (
         <section id="ContactSupport">
-            <div
+            <Card
+                variant="outline"
+                padding="md"
+                className="h-fit relative shadow-sm rounded-lg"
                 data-aos="zoom-in"
                 data-aos-duration="500"
-                className="bg-white border h-fit border-gray-300 p-6 relative rounded-lg shadow-sm"
             >
-                <h2 className="text-xl font-semibold mb-6 text-gray-900">
+                <Text as="h2" variant="subtitle" weight="bold" className="mb-6 text-gray-900">
                     Contact Support
-                </h2>
+                </Text>
                 <form ref={form} onSubmit={handleSubmit}>
                     <div className="space-y-2">
-                        <label htmlFor="Subject" className="text-gray-700 font-medium">
-                            Subject
-                        </label>
-                        <input
+                        <Input
                             type="text"
                             placeholder="Enter subject"
                             name="Subject"
-                            className="flex w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            label="Subject"
                             required
                         />
                     </div>
                     <div className="space-y-2 my-4">
-                        <label htmlFor="Message" className="text-gray-700 font-medium">
-                            Message
-                        </label>
-                        <textarea
+                        <Input
+                            as="textarea"
                             placeholder="Describe your issue..."
                             name="Message"
-                            className="flex w-full h-40 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            label="Message"
+                            className="h-40"
                             required
                         />
                     </div>
                     <div className="space-y-2">
-                        <label htmlFor="Attachment" className="text-gray-700 font-medium">
-                            Attachment (optional)
-                        </label>
-                        <input
+                        <Input
                             type="file"
                             name="Attachment"
-                            className="flex w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            label="Attachment (optional)"
                         />
                     </div>
-                    <button
+                    <Button
                         type="submit"
-                        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                        variant="primary"
+                        size="md"
+                        className="mt-4 rounded-md"
                     >
                         Send
-                    </button>
+                    </Button>
                 </form>
-            </div>
+            </Card>
         </section>
     );
 };
 
 export default ContactSupport;
+

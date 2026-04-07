@@ -1,7 +1,7 @@
-import ProfilePanel from "./ProfilePanel";
+import DashboardView from "../../features/dashboard/components/DashboardView";
 
 const ProfilePage = () => {
-  return <ProfilePanel />;
+  return <DashboardView initialActiveComponent="Setting" />;
 };
 
 export default ProfilePage;

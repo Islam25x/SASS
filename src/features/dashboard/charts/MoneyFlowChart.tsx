@@ -1,6 +1,7 @@
 import { memo, useMemo } from "react";
 import LineChartBase from "../../../shared/chart/LineChartBase";
 import type { LineChartRow } from "../../../shared/chart/LineChartBase";
+import { Button, Card, Text } from "../../../shared/ui";
 
 
 const MoneyFlowChart = () => {
@@ -48,11 +49,11 @@ const MoneyFlowChart = () => {
   );
 
   return (
-    <div className="box rounded-xl relative w-full h-80 flex flex-col">
+    <Card variant="default" padding="sm" className="relative w-full h-80 flex flex-col p-0">
       <div className="flex items-center justify-between my-4 mx-6">
-        <h2 className="text-gray-900 font-semibold text-md my-1">
+        <Text as="h2" variant="subtitle" weight="medium" className="text-gray-900 my-1">
           Money Flow
-        </h2>
+        </Text>
         {/* <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/60 backdrop-blur-xs z-40 text-center p-6">
           <p className="text-gray-800 font-medium mb-2">Please enter your income data</p>
           <p className="text-white text-sm mb-4">We need your income to show the Money Flow chart.</p>
@@ -65,26 +66,34 @@ const MoneyFlowChart = () => {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-sm text-gray-700 font-medium">
+              <Text as="span" variant="body" weight="medium" className="text-gray-700">
                 {item.label}
-              </span>
+              </Text>
             </div>
           ))}
 
-          <button className="px-3 py-1 border rounded-full text-sm text-gray-600 hover:bg-gray-100">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="px-3 py-1 rounded-full text-sm text-gray-600 border-gray-200"
+          >
             All accounts
-          </button>
+          </Button>
 
-          <button className="px-3 py-1 border rounded-full text-sm text-gray-600 hover:bg-gray-100">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="px-3 py-1 rounded-full text-sm text-gray-600 border-gray-200"
+          >
             See all
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="flex-1 min-h-15 px-6 pb-6">
         <LineChartBase data={chartData} series={series} />
       </div>
-    </div>
+    </Card>
   );
 };
 

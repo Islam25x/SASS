@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { ApiError, fetchTransactions, type Transaction } from "../services/ai.api";
+import { fetchTransactionsUseCase } from "../application/transactions/fetch-transactions.usecase";
+import type { Transaction } from "../domain/transactions/transaction.types";
+import { ApiError } from "../infrastructure/api/api-error";
 
 export function useTransactions() {
   return useQuery<Transaction[], ApiError>({
     queryKey: ["transactions"],
-    queryFn: () => fetchTransactions(),
+    queryFn: () => fetchTransactionsUseCase(),
     staleTime: 30_000,
   });
 }
-

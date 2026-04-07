@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { type Transaction } from "../services/ai.api";
+import { normalizeReceiptTransactionsUseCase } from "../application/transactions/normalize-receipt-transactions.usecase";
+import type { Transaction } from "../domain/transactions/transaction.types";
 import { useReceiptOcr } from "./useReceiptOcr";
 
 export type ReceiptOcrState =
@@ -92,23 +93,14 @@ export function useReceiptOcrFlow(
       setState("processing");
       const data = await receiptOcrMutation.mutateAsync(selectedFile);
 
-      if (!data || !Array.isArray(data.items)) {
-        setState("error");
-        setError("Invalid receipt OCR response structure.");
-        return;
-      }
-
-      const normalized = data.items.map((item, index) => ({
-        id: typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${index}`,
-        description: item.name ?? data.merchant ?? "Receipt item",
-        amount: item.line_total ?? item.unit_price ?? 0,
-        quantity: item.quantity ?? 1,
-        category: "Receipt",
-        date: data.issued_at ?? new Date().toISOString(),
+      const normalizedItems = await normalizeReceiptTransactionsUseCase(data);
+      const normalized = normalizedItems.map((item, index) => ({
+        ...item,
+        quantity: data.items[index]?.quantity ?? 1,
         type: "expense" as const,
         transaction_type: "expense" as const,
         method: "receipt" as const,
-        issued_at: data.issued_at ?? new Date().toISOString(),
+        issued_at: data.issued_at ?? item.date ?? new Date().toISOString(),
       }));
 
       setExtractedTransactions(normalized);

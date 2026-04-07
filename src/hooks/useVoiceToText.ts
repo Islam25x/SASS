@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { type VoiceToTextResponse, voiceToText } from "../services/ai.api";
+import { voiceToTextUseCase } from "../application/ai/voice-to-text.usecase";
+import type { VoiceToTextResponse } from "../domain/ai/ai.types";
+import { ApiError } from "../infrastructure/api/api-error";
 
 type VoiceToTextMutation = UseMutationResult<
   VoiceToTextResponse,
-  Error,
+  ApiError,
   Blob
 >;
 
@@ -15,11 +17,11 @@ type UseVoiceToTextResult = VoiceToTextMutation & {
 export function useVoiceToText(): UseVoiceToTextResult {
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const mutation = useMutation<VoiceToTextResponse, Error, Blob>({
+  const mutation = useMutation<VoiceToTextResponse, ApiError, Blob>({
     mutationKey: ["ai", "voice-to-text"],
     mutationFn: async (blob) => {
       if (!(blob instanceof Blob) || blob.size === 0) {
-        throw new Error("No audio captured.");
+        throw new ApiError("No audio captured.", 400, "INVALID_RESPONSE");
       }
 
       abortControllerRef.current?.abort();
@@ -28,7 +30,7 @@ export function useVoiceToText(): UseVoiceToTextResult {
       abortControllerRef.current = controller;
 
       try {
-        return await voiceToText(blob, {
+        return await voiceToTextUseCase(blob, {
           signal: controller.signal,
         });
       } finally {

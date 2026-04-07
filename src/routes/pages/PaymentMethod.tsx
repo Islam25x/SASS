@@ -56,7 +56,7 @@ function PaymentMethod() {
                         id="payment-method"
                         value={paymentMethod}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400"
+                        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm focus:border-primary-600 focus:ring-2 focus:ring-primary/40"
                     >
                         <option value="card">💳 Credit/Debit Card</option>
                         <option value="cash">💵 Cash</option>
@@ -70,7 +70,7 @@ function PaymentMethod() {
 
                 <button
                     type="submit"
-                    className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-white font-medium shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+                    className="w-full rounded-lg bg-primary-600 px-4 py-2 text-white font-medium shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
                 >
                     Save Method
                 </button>
@@ -79,7 +79,7 @@ function PaymentMethod() {
             <div className="mt-6 text-center text-gray-600">
                 <p>
                     Selected Method:{" "}
-                    <span className="font-semibold text-indigo-600">
+                    <span className="font-semibold text-primary-600">
                         {paymentMethod}
                     </span>
                 </p>
@@ -89,3 +89,4 @@ function PaymentMethod() {
 }
 
 export default PaymentMethod
+

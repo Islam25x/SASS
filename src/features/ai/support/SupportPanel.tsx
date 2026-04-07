@@ -4,6 +4,7 @@ import { Mail, CircleHelp, FileText } from "lucide-react";
 import Questions from "./Questions";
 import Documentation from "./Documentation";
 import ContactSupport from "./ContactSupport";
+import { Button, Text } from "../../../shared/ui";
 
 import "./Support.css";
 
@@ -23,20 +24,23 @@ const Support = () => {
             className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-50 text-gray-900 p-6"
         >
             <div className="max-w-5xl mx-auto">
-                <h1 className="text-2xl font-bold mb-6">Support</h1>
+                <Text as="h1" variant="title" weight="bold" className="mb-6">
+                    Support
+                </Text>
                 <nav className="inline-flex h-10 items-center justify-center bg-gray-200 rounded-md p-1 mb-6">
                     {buttons.map((btn, index) => (
-                        <button
+                        <Button
                             key={index}
                             onClick={() => toggleOpen(index)}
-                            className={`justify-center no-underline px-3 py-1.5 text-sm font-medium flex items-center gap-2 rounded-md transition ${activeIndex === index
-                                    ? "bg-blue-600 text-white"
-                                    : "text-gray-600 hover:text-gray-900"
-                                }`}
+                            variant={activeIndex === index ? "primary" : "ghost"}
+                            size="sm"
+                            className={`justify-center no-underline px-3 py-1.5 text-sm font-medium flex items-center gap-2 rounded-md ${
+                                activeIndex === index ? "text-white" : "text-gray-600 hover:text-gray-900"
+                            }`}
                         >
                             {btn.icon}
                             {btn.labelKey}
-                        </button>
+                        </Button>
                     ))}
                 </nav>
 
@@ -53,3 +57,4 @@ const Support = () => {
 };
 
 export default Support;
+

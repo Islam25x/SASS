@@ -1,17 +1,16 @@
-import { Camera, Lightbulb, Mic, Target, TrendingUp, Wallet } from "lucide-react";
+import { Camera, Lightbulb, Mic, Target, TrendingUp, Wallet, X } from "lucide-react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import CTASection from "../../components/landing/CTASection";
 import FeatureSection from "../../components/landing/FeatureSection";
 import GoalsSection from "../../components/landing/GoalsSection";
 import HeroSection from "../../components/landing/HeroSection";
 import type { BenefitItem, LandingCardItem } from "../../components/landing/types";
 import navLogoSrc from "../../assets/logo.png";
+import mobileLogoSrc from "../../assets/mobile view logo.png";
 import robotImageSrc from "../../assets/Finixa robot.png";
-import { motion, useReducedMotion } from "framer-motion";
-import {
-  motionViewport,
-  pageEnter,
-  slideIn,
-} from "../../shared/animations/motionPresets";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { pageMotion } from "../../shared/animations/pageMotion";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 
@@ -62,24 +61,35 @@ const goalsCards: LandingCardItem[] = [
   },
 ];
 
+const MODAL_TRANSITION = {
+  duration: 0.2,
+  ease: "easeOut",
+} as const;
+
 function StickyNavbar() {
   const shouldReduceMotion = Boolean(useReducedMotion());
 
   return (
     <motion.header
-      variants={slideIn({
-        direction: "down",
-        distance: 16,
-        duration: 0.45,
-        reducedMotion: shouldReduceMotion,
-      })}
+      variants={pageMotion.navbar(shouldReduceMotion)}
       initial="hidden"
       animate="visible"
       className="sticky top-0 z-20 border-b border-slate-200/70 bg-customBg/95 backdrop-blur"
     >
       <div className={CONTAINER_CLASS}>
         <nav className="flex h-20 items-center" aria-label="Finexa">
-          <img src={navLogoSrc} alt="Finexa" className="h-12 w-auto object-contain lg:h-14" />
+          <div className="flex flex-col items-start">
+            <img
+              src={navLogoSrc}
+              alt="Finexa"
+              className="hidden h-12 w-auto object-contain md:block lg:h-14"
+            />
+            <img
+              src={mobileLogoSrc}
+              alt="Finexa mobile"
+              className="block h-10 w-auto object-contain md:hidden"
+            />
+          </div>
         </nav>
       </div>
     </motion.header>
@@ -88,25 +98,139 @@ function StickyNavbar() {
 
 export default function WelcomePage() {
   const shouldReduceMotion = Boolean(useReducedMotion());
+  const navigate = useNavigate();
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [loginData, setLoginData] = useState({ name: "", password: "" });
+  const [loginErrors, setLoginErrors] = useState<{ name?: string; password?: string }>(
+    {}
+  );
+  const [registerData, setRegisterData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    agree: false,
+  });
+  const [registerErrors, setRegisterErrors] = useState<{
+    username?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    agree?: string;
+  }>({});
+
+  useEffect(() => {
+    if (!isAuthOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsAuthOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isAuthOpen]);
+
+  const openLoginModal = () => {
+    setAuthMode("login");
+    setIsAuthOpen(true);
+    setLoginErrors({});
+    setRegisterErrors({});
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthOpen(false);
+  };
+
+  const switchToSignup = () => {
+    setAuthMode("signup");
+    setLoginErrors({});
+  };
+
+  const switchToLogin = () => {
+    setAuthMode("login");
+    setRegisterErrors({});
+  };
+
+  const handleLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLoginData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegisterChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    setRegisterData((prev) => ({ ...prev, [name]: newValue }));
+  };
+
+  const validateLogin = () => {
+    const newErrors: { name?: string; password?: string } = {};
+    if (!loginData.name.trim()) newErrors.name = "Name is required";
+    if (!loginData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (loginData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    return newErrors;
+  };
+
+  const validateRegister = () => {
+    const newErrors: typeof registerErrors = {};
+    if (!registerData.username.trim()) newErrors.username = "Username is required";
+    if (!registerData.email.trim()) newErrors.email = "Email is required";
+    if (!registerData.password.trim()) newErrors.password = "Password is required";
+    if (registerData.password !== registerData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (!registerData.agree) newErrors.agree = "You must agree to the policy";
+    return newErrors;
+  };
+
+  const handleLoginSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const validationErrors = validateLogin();
+    if (Object.keys(validationErrors).length > 0) {
+      setLoginErrors(validationErrors);
+      return;
+    }
+    setIsAuthOpen(false);
+    navigate("/dashboard");
+  };
+
+  const handleRegisterSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const validationErrors = validateRegister();
+    if (Object.keys(validationErrors).length > 0) {
+      setRegisterErrors(validationErrors);
+      return;
+    }
+    setIsAuthOpen(false);
+    navigate("/welcome");
+  };
 
   return (
     <motion.main
-      variants={pageEnter({ reducedMotion: shouldReduceMotion })}
+      variants={pageMotion.page(shouldReduceMotion)}
       initial="hidden"
       animate="visible"
       className="min-h-screen overflow-x-hidden bg-gradient-to-b from-white to-customBg"
     >
       <StickyNavbar />
-      <HeroSection robotImageSrc={robotImageSrc} benefits={heroBenefits} />
+      <HeroSection
+        robotImageSrc={robotImageSrc}
+        benefits={heroBenefits}
+        onTryFree={openLoginModal}
+      />
       <motion.div
-        variants={slideIn({
-          direction: "up",
-          distance: 24,
-          reducedMotion: shouldReduceMotion,
-        })}
+        variants={pageMotion.section(shouldReduceMotion, 24)}
         initial="hidden"
         whileInView="visible"
-        viewport={motionViewport.once}
+        viewport={pageMotion.viewport}
       >
         <FeatureSection
           title="How Finexa"
@@ -115,15 +239,10 @@ export default function WelcomePage() {
         />
       </motion.div>
       <motion.div
-        variants={slideIn({
-          direction: "up",
-          distance: 24,
-          delay: 0.04,
-          reducedMotion: shouldReduceMotion,
-        })}
+        variants={pageMotion.sectionDelayed(shouldReduceMotion, { distance: 24, delay: 0.04 })}
         initial="hidden"
         whileInView="visible"
-        viewport={motionViewport.once}
+        viewport={pageMotion.viewport}
       >
         <GoalsSection
           title="How Finexa helps you"
@@ -132,17 +251,247 @@ export default function WelcomePage() {
         />
       </motion.div>
       <motion.div
-        variants={slideIn({
-          direction: "up",
-          distance: 18,
-          reducedMotion: shouldReduceMotion,
-        })}
+        variants={pageMotion.section(shouldReduceMotion, 18)}
         initial="hidden"
         whileInView="visible"
-        viewport={motionViewport.once}
+        viewport={pageMotion.viewport}
       >
-        <CTASection />
+        <CTASection onTryFree={openLoginModal} />
       </motion.div>
+      <AnimatePresence>
+        {isAuthOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={MODAL_TRANSITION}
+            className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm"
+            onClick={closeAuthModal}
+          >
+            <motion.section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="auth-modal-title"
+              initial={{ opacity: 0, y: 18, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.97 }}
+              transition={MODAL_TRANSITION}
+              className="w-full max-w-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="form relative bg-white">
+                <button
+                  type="button"
+                  onClick={closeAuthModal}
+                  className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/70 hover:text-slate-700"
+                  aria-label="Close authentication modal"
+                >
+                  <X size={18} />
+                </button>
+
+                {authMode === "login" ? (
+                  <>
+                    <div className="text-center mb-6">
+                      <h2
+                        id="auth-modal-title"
+                        className="text-2xl font-semibold text-slate-900"
+                      >
+                        Sign into your account
+                      </h2>
+                    </div>
+
+                    <form onSubmit={handleLoginSubmit}>
+                      <div className="mb-4">
+                        <label htmlFor="modal-login-name" className="block font-medium">
+                          email
+                        </label>
+                        <input
+                          type="email"
+                          id="modal-login-name"
+                          name="name"
+                          value={loginData.name}
+                          onChange={handleLoginChange}
+                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        />
+                        {loginErrors.name && (
+                          <p className="text-red-500 text-sm">{loginErrors.name}</p>
+                        )}
+                      </div>
+
+                      <div className="mb-4">
+                        <label htmlFor="modal-login-password" className="block font-medium">
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          id="modal-login-password"
+                          name="password"
+                          value={loginData.password}
+                          onChange={handleLoginChange}
+                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        />
+                        {loginErrors.password && (
+                          <p className="text-red-500 text-sm">{loginErrors.password}</p>
+                        )}
+                      </div>
+
+                      <p className="text-gray-500 text-sm mb-3">
+                        By submitting your info, you agree to our policy at{" "}
+                        <span className="text-primary-600">finexa</span>
+                      </p>
+
+                      <p className="text-sm mb-4">
+                        Don&apos;t have an account?{" "}
+                        <button
+                          type="button"
+                          onClick={switchToSignup}
+                          className="text-primary-600 hover:underline"
+                        >
+                          Sign up
+                        </button>
+                      </p>
+
+                      <button
+                        type="submit"
+                        className="w-full bg-primary-700 hover:bg-primary-600 text-white py-2 rounded-md transition-colors cursor-pointer"
+                      >
+                        Sign In
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center mb-6">
+                      <h2
+                        id="auth-modal-title"
+                        className="text-3xl font-bold text-primary-700 drop-shadow-md"
+                      >
+                        Create an Account
+                      </h2>
+                    </div>
+
+                    <form onSubmit={handleRegisterSubmit} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label htmlFor="modal-register-username" className="block font-medium">
+                            Username
+                          </label>
+                          <input
+                            type="text"
+                            id="modal-register-username"
+                            name="username"
+                            value={registerData.username}
+                            onChange={handleRegisterChange}
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                          />
+                          {registerErrors.username && (
+                            <p className="text-red-500 text-sm">{registerErrors.username}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label htmlFor="modal-register-email" className="block font-medium">
+                            Email Address
+                          </label>
+                          <input
+                            type="email"
+                            id="modal-register-email"
+                            name="email"
+                            value={registerData.email}
+                            onChange={handleRegisterChange}
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                          />
+                          {registerErrors.email && (
+                            <p className="text-red-500 text-sm">{registerErrors.email}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label htmlFor="modal-register-password" className="block font-medium">
+                            Password
+                          </label>
+                          <input
+                            type="password"
+                            id="modal-register-password"
+                            name="password"
+                            value={registerData.password}
+                            onChange={handleRegisterChange}
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                          />
+                          {registerErrors.password && (
+                            <p className="text-red-500 text-sm">{registerErrors.password}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="modal-register-confirm"
+                            className="block font-medium"
+                          >
+                            Confirm Password
+                          </label>
+                          <input
+                            type="password"
+                            id="modal-register-confirm"
+                            name="confirmPassword"
+                            value={registerData.confirmPassword}
+                            onChange={handleRegisterChange}
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                          />
+                          {registerErrors.confirmPassword && (
+                            <p className="text-red-500 text-sm">
+                              {registerErrors.confirmPassword}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="modal-register-agree"
+                          name="agree"
+                          checked={registerData.agree}
+                          onChange={handleRegisterChange}
+                          className="h-4 w-4 text-primary-600 border-gray-300 rounded"
+                        />
+                        <label htmlFor="modal-register-agree" className="text-sm text-gray-700">
+                          I agree to the{" "}
+                          <span className="text-primary-600 font-semibold">finexa policy</span>
+                        </label>
+                      </div>
+                      {registerErrors.agree && (
+                        <p className="text-red-500 text-sm">{registerErrors.agree}</p>
+                      )}
+
+                      <p className="text-sm">
+                        Already have an account?{" "}
+                        <button
+                          type="button"
+                          onClick={switchToLogin}
+                          className="text-primary-600 hover:underline"
+                        >
+                          Login
+                        </button>
+                      </p>
+
+                      <button
+                        type="submit"
+                        className="w-full bg-primary-700 hover:bg-primary-600 text-white py-2 rounded-md transition-all cursor-pointer"
+                      >
+                        Register
+                      </button>
+                    </form>
+                  </>
+                )}
+              </div>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.main>
   );
 }
+

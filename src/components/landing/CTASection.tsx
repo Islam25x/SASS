@@ -3,7 +3,11 @@ import { motionHover, motionViewport, popIn, slideIn } from "../../shared/animat
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 
-export default function CTASection() {
+interface CTASectionProps {
+  onTryFree: () => void;
+}
+
+export default function CTASection({ onTryFree }: CTASectionProps) {
   const shouldReduceMotion = Boolean(useReducedMotion());
 
   return (
@@ -27,6 +31,7 @@ export default function CTASection() {
           <motion.button
             type="button"
             aria-label="Try Finexa and take control"
+            onClick={onTryFree}
             variants={popIn({ delay: 0.08, reducedMotion: shouldReduceMotion })}
             initial="hidden"
             whileInView="visible"

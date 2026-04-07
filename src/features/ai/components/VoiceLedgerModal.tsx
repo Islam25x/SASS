@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { CheckCircle2, Mic, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { ParsedTransaction } from "../../../services/ai.api";
+import type { ParsedTransaction } from "../../../domain/ai/ai.types";
 import type { VoiceLedgerState } from "../../../hooks/useVoiceLedgerFlow";
+import { Button, Input, Text } from "../../../shared/ui";
 
 interface VoiceLedgerModalProps {
   isOpen: boolean;
@@ -83,21 +84,24 @@ function VoiceLedgerModal({
           >
             <header className="flex items-start justify-between border-b border-slate-100 p-6">
               <div>
-                <h2 id="voice-ledger-title" className="text-2xl font-semibold text-slate-900">
+                <Text as="h2" variant="title" weight="bold" id="voice-ledger-title" className="text-slate-900">
                   Voice Ledger
-                </h2>
-                <p className="mt-2 text-sm text-slate-500">
+                </Text>
+                <Text variant="body" className="mt-2 text-slate-500">
                   Press record and speak to capture a transaction...
-                </p>
+                </Text>
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                variant="ghost"
+                size="sm"
+                shape="circle"
+                className="p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Close Voice Ledger"
               >
                 <X size={18} />
-              </button>
+              </Button>
             </header>
 
             <div className="space-y-4 p-6">
@@ -112,7 +116,10 @@ function VoiceLedgerModal({
                         state === "recording" ? "bg-red-500" : "bg-primary"
                       }`}
                     />
-                    <motion.button
+                    {(() => {
+                      const MotionButton = motion(Button);
+                      return (
+                        <MotionButton
                       type="button"
                       onClick={state === "recording" ? onStopRecording : onStartRecording}
                       whileTap={{ scale: 0.96 }}
@@ -122,12 +129,17 @@ function VoiceLedgerModal({
                           ? { duration: 1.2, repeat: Infinity, ease: "easeInOut" }
                           : { duration: 0.15 }
                       }
-                      className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg ${
+                      variant="primary"
+                      size="lg"
+                      shape="circle"
+                      className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg p-0 ${
                         state === "recording" ? "bg-red-500" : "bg-primary"
                       }`}
                     >
                       <Mic size={30} strokeWidth={2.4} />
-                    </motion.button>
+                    </MotionButton>
+                      );
+                    })()}
                   </div>
 
                   {isRecordingLike && (
@@ -148,7 +160,9 @@ function VoiceLedgerModal({
                     </div>
                   )}
 
-                  <p className="text-sm font-medium text-slate-700">{statusLabel}</p>
+                  <Text variant="body" weight="medium" className="text-slate-700">
+                    {statusLabel}
+                  </Text>
                 </div>
               )}
 
@@ -156,23 +170,32 @@ function VoiceLedgerModal({
                 <div className="space-y-3">
                   <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
                     <CheckCircle2 size={16} />
-                    <span>Transcribed</span>
+                    <Text as="span" variant="body" weight="medium" className="text-emerald-700">
+                      Transcribed
+                    </Text>
                   </div>
-                  <textarea
+                  <Input
+                    as="textarea"
                     ref={textareaRef}
                     value={transcript}
                     onChange={(event) => onTranscriptChange(event.target.value)}
                     placeholder="Review and edit your transcribed transaction..."
-                    className="min-h-28 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 outline-none transition-colors focus:border-primary/40 focus:bg-white focus:ring-2 focus:ring-primary/20"
+                    className="min-h-28 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700"
                     disabled={state === "submitting"}
                   />
                   {parsedTransaction && (
                     <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-                      <p className="font-semibold text-slate-900">Structured Preview</p>
-                      <p className="mt-1">Amount: {parsedTransaction.amount}</p>
-                      <p>Category: {parsedTransaction.category}</p>
-                      <p>Description: {parsedTransaction.description}</p>
-                      <p>Date: {parsedTransaction.date ?? "N/A"}</p>
+                      <Text variant="body" weight="bold" className="text-slate-900">
+                        Structured Preview
+                      </Text>
+                      <Text variant="body" className="mt-1">
+                        Amount: {parsedTransaction.amount}
+                      </Text>
+                      <Text variant="body">Category: {parsedTransaction.category}</Text>
+                      <Text variant="body">
+                        Description: {parsedTransaction.description}
+                      </Text>
+                      <Text variant="body">Date: {parsedTransaction.date ?? "N/A"}</Text>
                     </div>
                   )}
                 </div>
@@ -180,43 +203,51 @@ function VoiceLedgerModal({
 
               {error && (
                 <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                  {error}
+                  <Text variant="body" className="text-rose-700">
+                    {error}
+                  </Text>
                 </div>
               )}
             </div>
 
             <footer className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/70 p-4">
               {state !== "idle" && (
-                <button
+                <Button
                   type="button"
                   onClick={onClose}
                   disabled={state === "submitting"}
-                  className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-xl border-slate-300 bg-white px-4 py-2 text-sm text-slate-700"
                 >
                   Cancel
-                </button>
+                </Button>
               )}
 
               {state === "recording" && (
-                <button
+                <Button
                   type="button"
                   onClick={onStopRecording}
                   disabled={isLoading}
-                  className="rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500/90 disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="danger"
+                  size="sm"
+                  className="rounded-xl px-4 py-2 text-sm"
                 >
                   Stop Recording
-                </button>
+                </Button>
               )}
 
               {(state === "transcribed" || state === "preview" || state === "submitting") && (
-                <button
+                <Button
                   type="button"
                   onClick={onConfirm}
                   disabled={(state !== "transcribed" && state !== "preview") || isLoading}
-                  className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="primary"
+                  size="sm"
+                  className="rounded-xl px-4 py-2 text-sm"
                 >
                   {state === "submitting" ? "Confirming..." : "Confirm"}
-                </button>
+                </Button>
               )}
             </footer>
           </motion.section>

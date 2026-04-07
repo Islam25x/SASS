@@ -61,8 +61,8 @@ const Profile = () => {
                                 key={index}
                                 onClick={() => toggleOpen(index)}
                                 className={`justify-center px-4 py-2 text-sm font-medium flex items-center gap-2 rounded-md transition-all duration-200 cursor-pointer ${activeIndex === index
-                                        ? "bg-indigo-600 text-white shadow-md"
-                                        : "text-gray-800 hover:text-indigo-700 hover:bg-white/60"
+                                        ? "bg-primary-600 text-white shadow-md"
+                                        : "text-gray-800 hover:text-primary-700 hover:bg-white/60"
                                     }`}
                             >
                                 {btn.icon}
@@ -88,3 +88,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

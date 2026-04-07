@@ -2,7 +2,8 @@ import { useCallback, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Loader2, Upload, X } from "lucide-react";
 import type { ReceiptOcrState } from "../../../hooks/useReceiptOcrFlow";
-import type { Transaction } from "../../../services/ai.api";
+import type { Transaction } from "../../../domain/transactions/transaction.types";
+import { Button, Input, Text } from "../../../shared/ui";
 
 interface ReceiptOcrModalProps {
   isOpen: boolean;
@@ -88,27 +89,35 @@ function ReceiptOcrModal({
             {/* HEADER */}
             <header className="flex items-start justify-between border-b border-slate-100 p-6">
               <div>
-                <h2
+                <Text
+                  as="h2"
                   id="receipt-ocr-title"
-                  className="text-2xl font-semibold text-slate-900"
+                  variant="title"
+                  weight="bold"
+                  className="text-slate-900"
                 >
                   Smart Receipt
-                </h2>
-                <p className="mt-2 text-sm text-slate-500">{statusLabel}</p>
+                </Text>
+                <Text variant="body" className="mt-2 text-slate-500">
+                  {statusLabel}
+                </Text>
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                variant="ghost"
+                size="sm"
+                shape="circle"
+                className="p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Close Smart Receipt"
               >
                 <X size={18} />
-              </button>
+              </Button>
             </header>
 
             {/* BODY (Scrollable) */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              <input
+              <Input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
@@ -127,12 +136,12 @@ function ReceiptOcrModal({
                   className="cursor-pointer rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center transition hover:border-primary/50 hover:bg-slate-100/70"
                 >
                   <Upload size={20} className="mx-auto text-slate-500" />
-                  <p className="mt-2 text-sm font-medium text-slate-700">
+                  <Text variant="body" weight="medium" className="mt-2 text-slate-700">
                     Drag and drop a receipt image
-                  </p>
-                  <p className="text-xs text-slate-500">
+                  </Text>
+                  <Text variant="caption" className="text-slate-500">
                     or click to browse
-                  </p>
+                  </Text>
                 </div>
               )}
 
@@ -147,22 +156,24 @@ function ReceiptOcrModal({
               )}
 
               {selectedFile && (
-                <p
-                  className="truncate text-xs text-slate-600"
+                <Text
+                  as="p"
+                  variant="caption"
+                  className="truncate text-slate-600"
                   title={selectedFile.name}
                 >
                   {selectedFile.name}
-                </p>
+                </Text>
               )}
 
               {isLoading && (
                 <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
                   <Loader2 size={16} className="animate-spin" />
-                  <span>
+                  <Text as="span" variant="body" weight="medium" className="text-slate-700">
                     {state === "uploading"
                       ? "Uploading..."
                       : "Processing..."}
-                  </span>
+                  </Text>
                 </div>
               )}
 
@@ -170,9 +181,9 @@ function ReceiptOcrModal({
                 <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
                     <CheckCircle2 size={16} />
-                    <span>
+                    <Text as="span" variant="body" weight="medium" className="text-emerald-700">
                       {extractedTransactions.length} extracted
-                    </span>
+                    </Text>
                   </div>
 
                   <ul className="max-h-42 space-y-2 overflow-auto pr-1 text-sm text-slate-700">
@@ -181,18 +192,18 @@ function ReceiptOcrModal({
                         key={transaction.id}
                         className="rounded-lg border border-slate-200 bg-white p-2"
                       >
-                        <p className="font-semibold text-slate-900">
+                        <Text variant="body" weight="bold" className="text-slate-900">
                           {transaction.description}
-                        </p>
-                        <p>
+                        </Text>
+                        <Text variant="body">
                           {transaction.amount} | {transaction.category}
-                        </p>
-                        <p>
+                        </Text>
+                        <Text variant="body">
                           {transaction.transaction_type ??
                             transaction.type ??
                             "expense"}{" "}
                           | {transaction.date ?? "N/A"}
-                        </p>
+                        </Text>
                       </li>
                     ))}
                   </ul>
@@ -201,44 +212,52 @@ function ReceiptOcrModal({
 
               {error && (
                 <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                  {error}
+                  <Text variant="body" className="text-rose-700">
+                    {error}
+                  </Text>
                 </div>
               )}
             </div>
 
             {/* FOOTER */}
             <footer className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/70 p-4">
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
                 disabled={isLoading}
-                className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                variant="secondary"
+                size="sm"
+                className="rounded-xl border-slate-300 bg-white px-4 py-2 text-sm text-slate-700"
               >
                 Cancel
-              </button>
+              </Button>
 
               {!showPreviewList && (
-                <button
+                <Button
                   type="button"
                   onClick={onProcess}
                   disabled={!selectedFile || state === "processing"}
-                  className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="primary"
+                  size="sm"
+                  className="rounded-xl px-4 py-2 text-sm"
                 >
                   {state === "processing"
                     ? "Processing..."
                     : "Extract Transactions"}
-                </button>
+                </Button>
               )}
 
               {showPreviewList && (
-                <button
+                <Button
                   type="button"
                   onClick={onConfirm}
                   disabled={isLoading}
-                  className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="primary"
+                  size="sm"
+                  className="rounded-xl px-4 py-2 text-sm"
                 >
                   Confirm Import
-                </button>
+                </Button>
               )}
             </footer>
           </motion.section>

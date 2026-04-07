@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
-import { sendChatbotMessage } from "../../../services/ai.api";
+import { sendChatMessageUseCase } from "../../../application/ai/send-chat-message.usecase";
+import { Button, Card, Input, Text } from "../../../shared/ui";
 
 interface Message {
     id: number;
@@ -24,7 +25,7 @@ const AI = () => {
         setLoading(true);
 
         try {
-            const response = await sendChatbotMessage(input);
+            const response = await sendChatMessageUseCase(input);
 
             const data = await response.json();
             const aiResponse =
@@ -52,10 +53,12 @@ const AI = () => {
 
     return (
         <section id="AI" className="max-w-3xl mx-auto">
-            <div className="border border-gray-300 bg-white rounded-lg shadow-md h-[550px] flex flex-col">
+            <Card variant="outline" padding="sm" className="shadow-md h-[550px] flex flex-col p-0 rounded-lg">
                 {/* Header */}
                 <div className="px-6 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
-                    <h2 className="text-lg font-semibold text-gray-800">Chat Agent</h2>
+                    <Text as="h2" variant="subtitle" weight="bold" className="text-gray-800">
+                        Chat Agent
+                    </Text>
                 </div>
 
                 {/* Messages */}
@@ -65,39 +68,45 @@ const AI = () => {
                             key={msg.id}
                             className={`max-w-[75%] px-4 py-2 rounded-lg ${msg.sender === "ai"
                                     ? "bg-gray-100 text-gray-800 self-start"
-                                    : "bg-blue-600 text-white self-end ml-auto"
+                                    : "bg-primary text-white self-end ml-auto"
                                 }`}
                         >
                             {msg.text}
                         </div>
                     ))}
                     {loading && (
-                        <div className="text-gray-400 text-sm">AI is typing...</div>
+                        <Text variant="body" className="text-gray-400">
+                            AI is typing...
+                        </Text>
                     )}
                 </div>
 
                 {/* Input */}
                 <div className="border-t border-gray-200 p-3 flex items-center gap-2 bg-gray-50 rounded-b-lg">
-                    <input
+                    <Input
                         type="text"
                         placeholder="Type your message..."
-                        className="flex-1 h-11 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 h-11"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         disabled={loading}
                     />
-                    <button
+                    <Button
                         onClick={handleSendMessage}
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded flex items-center justify-center disabled:opacity-50"
+                        variant="primary"
+                        size="sm"
                         disabled={loading}
+                        shape="circle"
+                        className="p-0"
                     >
                         <Send size={18} strokeWidth={1.75} />
-                    </button>
+                    </Button>
                 </div>
-            </div>
+            </Card>
         </section>
     );
 };
 
 export default AI;
+
