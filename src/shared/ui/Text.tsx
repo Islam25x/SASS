@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
 import type { TextVariant, TextWeight } from "./types";
 import { cn } from "./types";
@@ -32,13 +33,13 @@ function Text<T extends ElementType = "p">({
   ...props
 }: TextProps<T>) {
   const Component = (as ?? "p") as ElementType;
-  return (
-    <Component
-      className={cn(VARIANT_STYLES[variant], WEIGHT_STYLES[weight], className)}
-      {...props}
-    >
-      {children}
-    </Component>
+  return createElement(
+    Component,
+    {
+      className: cn(VARIANT_STYLES[variant], WEIGHT_STYLES[weight], className),
+      ...props,
+    } as ComponentPropsWithoutRef<T>,
+    children,
   );
 }
 
