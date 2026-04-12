@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Search, Laptop, Plane, HeartPulse, Smartphone, PiggyBank } from "lucide-react";
-import { Button, Input, PageHeader, Text } from "../../../shared/ui";
+import { Button, Input, PageHeader } from "../../../shared/ui";
 import GoalsSummaryCards, { type GoalsSummary } from "./GoalsSummaryCards";
 import GoalsListCard from "./GoalsListCard";
 import GoalsInsightsCard from "./GoalsInsightsCard";
