@@ -84,7 +84,7 @@ const DateRangeSelector = () => {
   return (
     <div
       ref={rangeRef}
-      className="relative"
+      className="relative z-50"
       onKeyDown={(event) => {
         if (event.key === "Escape") setIsOpen(false);
       }}
