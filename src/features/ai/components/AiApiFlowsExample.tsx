@@ -172,7 +172,11 @@ function AiApiFlowsExample({
         <Input
           type="file"
           accept="audio/*"
-          onChange={(event) => setVoiceFile(event.target.files?.[0] ?? null)}
+          onChange={(event) => {
+            const target = event.currentTarget;
+            const files = "files" in target ? target.files : null;
+            setVoiceFile(files?.[0] ?? null);
+          }}
           className="block w-full p-2 text-sm text-slate-700"
         />
         <Button
@@ -233,7 +237,11 @@ function AiApiFlowsExample({
         <Input
           type="file"
           accept="image/*"
-          onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
+          onChange={(event) => {
+            const target = event.currentTarget;
+            const files = "files" in target ? target.files : null;
+            setReceiptFile(files?.[0] ?? null);
+          }}
           className="block w-full p-2 text-sm text-slate-700"
         />
         <Button

@@ -122,7 +122,11 @@ function ReceiptOcrModal({
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(event) => handleDrop(event.target.files ?? [])}
+                onChange={(event) => {
+                  const target = event.currentTarget;
+                  const files = "files" in target ? target.files : null;
+                  handleDrop(files ?? []);
+                }}
               />
 
               {!previewUrl && (

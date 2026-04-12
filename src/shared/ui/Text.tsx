@@ -8,7 +8,7 @@ type TextProps<T extends ElementType> = {
   weight?: TextWeight;
   className?: string;
   children: ReactNode;
-} & ComponentPropsWithoutRef<T>;
+} & Omit<ComponentPropsWithoutRef<T>, "children">;
 
 const VARIANT_STYLES: Record<TextVariant, string> = {
   title: "text-2xl",

@@ -47,7 +47,9 @@ const AI = () => {
         }
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown: React.KeyboardEventHandler<
+        HTMLInputElement | HTMLTextAreaElement
+    > = (e) => {
         if (e.key === "Enter") handleSendMessage();
     };
 

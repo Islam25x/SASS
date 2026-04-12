@@ -19,7 +19,7 @@ interface AdminNavProps {
 }
 
 function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
-  const navItems = [
+  const navItems: { name: string; icon: LucideIcon; link?: string }[] = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Transactions", icon: Receipt },
     { name: "Goals", icon: BarChart3 },
@@ -27,7 +27,7 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     { name: "Setting", icon: Settings },
   ];
 
-  const bottomNav = [
+  const bottomNav: { name: string; icon: LucideIcon; link?: string }[] = [
     { name: "Help", icon: HelpCircle, link: "/support" },
     { name: "Log out", icon: LogOut, link: "/" },
   ];
