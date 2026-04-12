@@ -42,7 +42,7 @@ function GoalsListCard({ goals, totalCount }: GoalsListCardProps) {
 
           return (
             <Card key={goal.id} variant="outline" padding="sm" className="bg-white">
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 ">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">

@@ -14,7 +14,7 @@ import { Text } from "../../../shared/ui";
 const DashboardTop = () => {
   const dashboardItems = [
     {
-      titleKey: "Total balance",
+      titleKey: "Available Balance",
       icon: <FontAwesomeIcon icon={faCircle} className="text-green-500" />,
       value: 5000,
       pev: "12.5% vs last month",
@@ -37,7 +37,7 @@ const DashboardTop = () => {
       arrow: true
     },
     {
-      titleKey: "Total savings",
+      titleKey: "savings for this month",
       icon: <FontAwesomeIcon icon={faBell} className="text-yellow-500" />,
       value: 1800,
       pev: "3.2% vs last month",

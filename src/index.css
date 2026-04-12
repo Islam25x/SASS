@@ -9,8 +9,15 @@
   --color-primary: #0ea5e9;
   --color-primary-600: #0284c7;
   --color-primary-700: #0369a1;
+  --color-primary-hover: #0369a1;
 
   --color-skyAccent: #38bef8;
+  --color-bg: #f6f4ff;
+  --color-surface: #ffffff;
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #9ca3af;
+  --color-border: #e5e7eb;
 
   --shadow-blue-glow: 0 10px 30px rgba(56, 189, 248, 0.18),
     0 0 20px rgba(56, 189, 248, 0.08);

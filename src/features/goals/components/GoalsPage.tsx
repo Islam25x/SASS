@@ -143,7 +143,7 @@ function GoalsPage() {
                 onClick={() => setCurrentPage(page)}
                 variant={page === safePage ? "primary" : "secondary"}
                 size="sm"
-                className={`h-9 w-9 rounded-lg border text-sm font-medium ${
+                className={`h-9 w-9 rounded-lg text-sm font-medium ${
                   page === safePage
                     ? "border-primary"
                     : "border-gray-200 text-gray-600"
