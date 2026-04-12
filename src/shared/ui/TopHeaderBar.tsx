@@ -1,5 +1,6 @@
 import { Bell } from "lucide-react";
 import Button from "./Button";
+import DateRangeSelector from "./DateRangeSelector";
 import Text from "./Text";
 
 function TopHeaderBar() {
@@ -14,11 +15,7 @@ function TopHeaderBar() {
       >
         <Bell size={18} />
       </Button>
-      <div className="flex text-center align-middle border-1 border-gray-400 rounded-3xl py-2 px-4 border-solid">
-        <Text variant="body" className="m-auto text-sm text-gray-700">
-          this month
-        </Text>
-      </div>
+      <DateRangeSelector />
       <div className="flex items-center border-1 border-gray-400 rounded-3xl pe-6 border-solid">
         <img
           className="w-7 h-7 rounded-full object-cover m-2"

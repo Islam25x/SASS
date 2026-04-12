@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Search, Laptop, Plane, HeartPulse, Smartphone, PiggyBank } from "lucide-react";
-import { Button, Input, Text, TopHeaderBar } from "../../../shared/ui";
+import { Button, Input, PageHeader, Text } from "../../../shared/ui";
 import GoalsSummaryCards, { type GoalsSummary } from "./GoalsSummaryCards";
 import GoalsListCard from "./GoalsListCard";
 import GoalsInsightsCard from "./GoalsInsightsCard";
@@ -100,17 +100,7 @@ function GoalsPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <Text as="h1" variant="title" weight="bold">
-            Goals
-          </Text>
-          <Text variant="body" className="text-gray-500">
-            Stay consistent and hit your targets.
-          </Text>
-        </div>
-        <TopHeaderBar />
-      </div>
+      <PageHeader title="Goals" subtitle="Stay consistent and hit your targets." />
 
       <div className="relative w-full md:max-w-sm">
         <Search

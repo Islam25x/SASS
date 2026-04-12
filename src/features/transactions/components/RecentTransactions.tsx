@@ -35,9 +35,14 @@ function RecentTransactions() {
       />
 
       {isLoading && (
-        <Text variant="body" className="py-8 text-slate-500">
-          Loading transactions...
-        </Text>
+        <div className="space-y-3 py-6">
+          {[0, 1, 2].map((row) => (
+            <div
+              key={row}
+              className="h-9 w-full animate-pulse rounded-lg bg-slate-100"
+            />
+          ))}
+        </div>
       )}
 
       {isError && (

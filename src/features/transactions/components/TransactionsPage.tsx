@@ -10,7 +10,7 @@ import {
 import TransactionTable from "./TransactionTable";
 import TransactionsSummaryCards from "./TransactionsSummaryCards";
 import AIInsightsCard from "./AIInsightsCard";
-import { Button, Input, Text, TopHeaderBar } from "../../../shared/ui";
+import { Button, Input, PageHeader } from "../../../shared/ui";
 
 type FilterType = "all" | "income" | "expense";
 
@@ -68,17 +68,10 @@ function TransactionsPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <Text as="h1" variant="title" weight="bold">
-            Transactions
-          </Text>
-          <Text variant="body" className="text-gray-500">
-            Track every payment and income stream.
-          </Text>
-        </div>
-        <TopHeaderBar />
-      </div>
+      <PageHeader
+        title="Transactions"
+        subtitle="Track every payment and income stream."
+      />
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="relative w-full md:max-w-sm">
@@ -113,7 +106,7 @@ function TransactionsPage() {
         </div>
       </div>
 
-      <TransactionsSummaryCards summary={summary} />
+      <TransactionsSummaryCards summary={summary} isLoading={isLoading} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <div className="space-y-4">
@@ -146,7 +139,7 @@ function TransactionsPage() {
         </div>
 
         <div className="lg:self-start">
-          <AIInsightsCard insights={insights} />
+          <AIInsightsCard insights={insights} isLoading={isLoading} />
         </div>
       </div>
     </div>

@@ -7,9 +7,8 @@ import {
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import Header from "./Header";
 import DashboardSummaryCard from "./DashboardSummaryCard";
-import { Text } from "../../../shared/ui";
+import { PageHeader, Text } from "../../../shared/ui";
 
 const DashboardTop = () => {
   const dashboardItems = [
@@ -47,34 +46,34 @@ const DashboardTop = () => {
   ];
 
   return (
-    <>
-      <Header />
-      <section id="DashboardTop" className="container mt-5 px-3 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {dashboardItems.map((item, index) => (
-            <DashboardSummaryCard
-              key={index}
-              title={item.titleKey}
-              icon={item.icon}
-              value={item.value}
-              changeLabel={
-                <>
-                  <FontAwesomeIcon
-                    icon={item.isIncrease ? faArrowUp : faArrowDown}
-                  />
-                  <Text as="span" variant="body">
-                    {item.pev}
-                  </Text>
-                </>
-              }
-              isIncrease={item.isIncrease}
-              showArrow={item.arrow}
-            />
-          ))}
-        </div>
-      </section>
-    </>
-
+    <section id="DashboardTop" className="container mt-5 px-3 pb-8 space-y-5">
+      <PageHeader
+        title="Welcome back , Islam Salah"
+        subtitle="Welcome to your dashboard"
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {dashboardItems.map((item, index) => (
+          <DashboardSummaryCard
+            key={index}
+            title={item.titleKey}
+            icon={item.icon}
+            value={item.value}
+            changeLabel={
+              <>
+                <FontAwesomeIcon
+                  icon={item.isIncrease ? faArrowUp : faArrowDown}
+                />
+                <Text as="span" variant="body">
+                  {item.pev}
+                </Text>
+              </>
+            }
+            isIncrease={item.isIncrease}
+            showArrow={item.arrow}
+          />
+        ))}
+      </div>
+    </section>
   );
 };
 

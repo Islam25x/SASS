@@ -13,13 +13,30 @@ import { Text } from "../../../shared/ui";
 
 type TransactionsSummaryCardsProps = {
   summary: TransactionsSummary;
+  isLoading?: boolean;
 };
 
 function formatChange(value: number) {
   return `${Math.abs(value).toFixed(1)}% vs last month`;
 }
 
-function TransactionsSummaryCards({ summary }: TransactionsSummaryCardsProps) {
+function TransactionsSummaryCards({
+  summary,
+  isLoading = false,
+}: TransactionsSummaryCardsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={`summary-skeleton-${index}`}
+            className="h-28 rounded-2xl bg-slate-100 animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
+
   const cards = [
     {
       id: "balance",
