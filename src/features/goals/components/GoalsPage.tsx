@@ -114,7 +114,7 @@ function GoalsPage() {
             setQuery(event.target.value);
             setCurrentPage(1);
           }}
-          placeholder="Search..."
+          placeholder="Search Goals..."
           className="pl-10"
         />
       </div>
