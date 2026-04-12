@@ -1,5 +1,4 @@
 import { useEffect } from "react"
-import LoaderCanvas from "../three/canvas/LoaderCanvas"
 import Typewriter from "typewriter-effect"
 
 
@@ -19,11 +18,9 @@ const Loader: React.FC<LoaderProps> = ({ onFinish }) => {
 
     return (
         <div className="flex flex-col items-center justify-center h-screen w-screen bg-gradient-to-b from-gray-400 via-gray-500 to-gray-600 text-white">
-            {/* 3D Model */}
+            {/* Skeleton Loading */}
             <div className="flex items-center justify-center w-full">
-                <div className="w-[365px] h-[365px]">
-                    <LoaderCanvas />
-                </div>
+                <div className="w-[320px] h-[320px] rounded-3xl bg-white/10 border border-white/15 shadow-inner animate-pulse" />
             </div>
 
             {/* Logo / Brand */}
