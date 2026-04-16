@@ -9,8 +9,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import DashboardSummaryCard from "./DashboardSummaryCard";
 import { PageHeader, Text } from "../../../shared/ui";
+import { useUserProfile } from "../../../hooks/useUserProfile";
+import { getUserDisplayName } from "../../../application/user/user-profile";
 
 const DashboardTop = () => {
+  const { data: profile } = useUserProfile();
+  const displayName = profile ? getUserDisplayName(profile) : "Finexa User";
+
   const dashboardItems = [
     {
       titleKey: "Available Balance",
@@ -48,7 +53,7 @@ const DashboardTop = () => {
   return (
     <section id="DashboardTop" className="container mt-5 px-3 pb-8 space-y-5">
       <PageHeader
-        title="Welcome back , Islam Salah"
+        title={`Welcome back, ${displayName}`}
         subtitle="Welcome to your dashboard"
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -3,6 +3,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import AppRoutes from "./routes/AppRoutes";
 import { DateRangeProvider } from "./shared/ui";
+import { AuthProvider } from "./shared/auth/AuthProvider";
 
 function App() {
   useEffect(() => {
@@ -10,9 +11,11 @@ function App() {
   }, []);
 
   return (
-    <DateRangeProvider>
-      <AppRoutes />
-    </DateRangeProvider>
+    <AuthProvider>
+      <DateRangeProvider>
+        <AppRoutes />
+      </DateRangeProvider>
+    </AuthProvider>
   );
 }
 

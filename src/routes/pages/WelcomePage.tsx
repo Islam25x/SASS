@@ -11,8 +11,13 @@ import mobileLogoSrc from "../../assets/mobile view logo.png";
 import robotImageSrc from "../../assets/Finixa robot.png";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { pageMotion } from "../../shared/animations/pageMotion";
+import { useLogin } from "../../hooks/useLogin";
+import { useRegister } from "../../hooks/useRegister";
+import { buildAuthSession } from "../../application/auth/auth-session";
+import { useAuth } from "../../shared/auth/AuthContext";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const heroBenefits: BenefitItem[] = [
   { id: "voice-photo", label: "Track expenses by voice or photo" },
@@ -66,6 +71,11 @@ const MODAL_TRANSITION = {
   ease: "easeOut",
 } as const;
 
+type AuthBanner = {
+  tone: "success" | "error";
+  text: string;
+} | null;
+
 function StickyNavbar() {
   const shouldReduceMotion = Boolean(useReducedMotion());
 
@@ -99,10 +109,14 @@ function StickyNavbar() {
 export default function WelcomePage() {
   const shouldReduceMotion = Boolean(useReducedMotion());
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const [loginData, setLoginData] = useState({ name: "", password: "" });
-  const [loginErrors, setLoginErrors] = useState<{ name?: string; password?: string }>(
+  const [authBanner, setAuthBanner] = useState<AuthBanner>(null);
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
   const [registerData, setRegisterData] = useState({
@@ -118,6 +132,7 @@ export default function WelcomePage() {
     password?: string;
     confirmPassword?: string;
     agree?: string;
+    form?: string;
   }>({});
 
   useEffect(() => {
@@ -138,26 +153,39 @@ export default function WelcomePage() {
   const openLoginModal = () => {
     setAuthMode("login");
     setIsAuthOpen(true);
+    setAuthBanner(null);
     setLoginErrors({});
     setRegisterErrors({});
+    loginMutation.reset();
+    registerMutation.reset();
   };
 
   const closeAuthModal = () => {
     setIsAuthOpen(false);
+    setAuthBanner(null);
+    setLoginErrors({});
+    setRegisterErrors({});
+    loginMutation.reset();
+    registerMutation.reset();
   };
 
   const switchToSignup = () => {
     setAuthMode("signup");
+    setAuthBanner(null);
     setLoginErrors({});
+    loginMutation.reset();
   };
 
   const switchToLogin = () => {
     setAuthMode("login");
     setRegisterErrors({});
+    setAuthBanner(null);
   };
 
   const handleLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setAuthBanner(null);
+    setLoginErrors((prev) => ({ ...prev, [name]: undefined }));
     setLoginData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -165,12 +193,14 @@ export default function WelcomePage() {
     const { name, value, type } = e.target;
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    setAuthBanner((current) => (current?.tone === "error" ? null : current));
+    setRegisterErrors((prev) => ({ ...prev, [name]: undefined, form: undefined }));
     setRegisterData((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const validateLogin = () => {
-    const newErrors: { name?: string; password?: string } = {};
-    if (!loginData.name.trim()) newErrors.name = "Name is required";
+    const newErrors: { email?: string; password?: string } = {};
+    if (!loginData.email.trim()) newErrors.email = "Email is required";
     if (!loginData.password.trim()) {
       newErrors.password = "Password is required";
     } else if (loginData.password.length < 6) {
@@ -182,8 +212,19 @@ export default function WelcomePage() {
   const validateRegister = () => {
     const newErrors: typeof registerErrors = {};
     if (!registerData.username.trim()) newErrors.username = "Username is required";
-    if (!registerData.email.trim()) newErrors.email = "Email is required";
-    if (!registerData.password.trim()) newErrors.password = "Password is required";
+    if (!registerData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!EMAIL_REGEX.test(registerData.email.trim())) {
+      newErrors.email = "Enter a valid email address";
+    }
+    if (!registerData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (registerData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    if (!registerData.confirmPassword.trim()) {
+      newErrors.confirmPassword = "Please confirm your password";
+    }
     if (registerData.password !== registerData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
@@ -191,26 +232,78 @@ export default function WelcomePage() {
     return newErrors;
   };
 
-  const handleLoginSubmit = (e: FormEvent) => {
+  const handleLoginSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setAuthBanner(null);
     const validationErrors = validateLogin();
     if (Object.keys(validationErrors).length > 0) {
       setLoginErrors(validationErrors);
       return;
     }
-    setIsAuthOpen(false);
-    navigate("/dashboard");
+
+    try {
+      const response = await loginMutation.mutateAsync({
+        email: loginData.email.trim(),
+        password: loginData.password,
+      });
+      const session = buildAuthSession(response, loginData.email.trim());
+
+      if (!session) {
+        throw new Error("Login succeeded but no auth token was returned by the API.");
+      }
+
+      login(session);
+      setIsAuthOpen(false);
+      setLoginErrors({});
+      navigate("/dashboard");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Login failed. Please try again.";
+      setLoginErrors((prev) => ({ ...prev, password: message }));
+      setAuthBanner({ tone: "error", text: message });
+    }
   };
 
-  const handleRegisterSubmit = (e: FormEvent) => {
+  const handleRegisterSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setAuthBanner(null);
     const validationErrors = validateRegister();
     if (Object.keys(validationErrors).length > 0) {
       setRegisterErrors(validationErrors);
       return;
     }
-    setIsAuthOpen(false);
-    navigate("/welcome");
+
+    try {
+      const submittedEmail = registerData.email.trim();
+      const response = await registerMutation.mutateAsync({
+        email: submittedEmail,
+        username: registerData.username.trim(),
+        password: registerData.password,
+        confirmPassword: registerData.confirmPassword,
+      });
+
+      setRegisterErrors({});
+      setRegisterData({
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        agree: false,
+      });
+      setLoginData((prev) => ({ ...prev, email: submittedEmail }));
+      setAuthMode("login");
+      setAuthBanner({
+        tone: "success",
+        text:
+          response?.message ??
+          "Account created successfully. You can sign in as soon as login is connected.",
+      });
+      navigate("/welcome");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Registration failed. Please try again.";
+      setRegisterErrors((prev) => ({ ...prev, form: message }));
+      setAuthBanner({ tone: "error", text: message });
+    }
   };
 
   return (
@@ -308,13 +401,14 @@ export default function WelcomePage() {
                         <input
                           type="email"
                           id="modal-login-name"
-                          name="name"
-                          value={loginData.name}
+                          name="email"
+                          value={loginData.email}
                           onChange={handleLoginChange}
+                          disabled={loginMutation.isPending}
                           className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
                         />
-                        {loginErrors.name && (
-                          <p className="text-red-500 text-sm">{loginErrors.name}</p>
+                        {loginErrors.email && (
+                          <p className="text-red-500 text-sm">{loginErrors.email}</p>
                         )}
                       </div>
 
@@ -328,6 +422,7 @@ export default function WelcomePage() {
                           name="password"
                           value={loginData.password}
                           onChange={handleLoginChange}
+                          disabled={loginMutation.isPending}
                           className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
                         />
                         {loginErrors.password && (
@@ -353,9 +448,10 @@ export default function WelcomePage() {
 
                       <button
                         type="submit"
-                        className="w-full bg-primary-700 hover:bg-primary-600 text-white py-2 rounded-md transition-colors cursor-pointer"
+                        disabled={loginMutation.isPending}
+                        className="w-full bg-primary-700 hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400 text-white py-2 rounded-md transition-colors cursor-pointer"
                       >
-                        Sign In
+                        {loginMutation.isPending ? "Signing in..." : "Sign In"}
                       </button>
                     </form>
                   </>
@@ -370,6 +466,19 @@ export default function WelcomePage() {
                       </h2>
                     </div>
 
+                    {authBanner && (
+                      <div
+                        className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
+                          authBanner.tone === "success"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "border-red-200 bg-red-50 text-red-700"
+                        }`}
+                        aria-live="polite"
+                      >
+                        {authBanner.text}
+                      </div>
+                    )}
+
                     <form onSubmit={handleRegisterSubmit} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -382,6 +491,7 @@ export default function WelcomePage() {
                             name="username"
                             value={registerData.username}
                             onChange={handleRegisterChange}
+                            disabled={registerMutation.isPending}
                             className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
                           />
                           {registerErrors.username && (
@@ -399,6 +509,7 @@ export default function WelcomePage() {
                             name="email"
                             value={registerData.email}
                             onChange={handleRegisterChange}
+                            disabled={registerMutation.isPending}
                             className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
                           />
                           {registerErrors.email && (
@@ -418,6 +529,7 @@ export default function WelcomePage() {
                             name="password"
                             value={registerData.password}
                             onChange={handleRegisterChange}
+                            disabled={registerMutation.isPending}
                             className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
                           />
                           {registerErrors.password && (
@@ -438,6 +550,7 @@ export default function WelcomePage() {
                             name="confirmPassword"
                             value={registerData.confirmPassword}
                             onChange={handleRegisterChange}
+                            disabled={registerMutation.isPending}
                             className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
                           />
                           {registerErrors.confirmPassword && (
@@ -455,6 +568,7 @@ export default function WelcomePage() {
                           name="agree"
                           checked={registerData.agree}
                           onChange={handleRegisterChange}
+                          disabled={registerMutation.isPending}
                           className="h-4 w-4 text-primary-600 border-gray-300 rounded"
                         />
                         <label htmlFor="modal-register-agree" className="text-sm text-gray-700">
@@ -464,6 +578,11 @@ export default function WelcomePage() {
                       </div>
                       {registerErrors.agree && (
                         <p className="text-red-500 text-sm">{registerErrors.agree}</p>
+                      )}
+                      {registerErrors.form && (
+                        <p className="text-red-500 text-sm" aria-live="polite">
+                          {registerErrors.form}
+                        </p>
                       )}
 
                       <p className="text-sm">
@@ -479,9 +598,10 @@ export default function WelcomePage() {
 
                       <button
                         type="submit"
-                        className="w-full bg-primary-700 hover:bg-primary-600 text-white py-2 rounded-md transition-all cursor-pointer"
+                        disabled={registerMutation.isPending}
+                        className="w-full bg-primary-700 hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400 text-white py-2 rounded-md transition-all cursor-pointer"
                       >
-                        Register
+                        {registerMutation.isPending ? "Creating account..." : "Register"}
                       </button>
                     </form>
                   </>

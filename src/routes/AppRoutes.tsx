@@ -4,16 +4,19 @@ import SupportPage from "./pages/SupportPage";
 import AIPage from "./pages/AIPage";
 import ProfilePage from "./pages/ProfilePage";
 import WelcomePage from "./pages/WelcomePage";
+import RequireAuth from "./RequireAuth";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/ai" element={<AIPage />} />
-      <Route path="/support" element={<SupportPage />} />
       <Route path="/welcome" element={<WelcomePage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/" element={<WelcomePage />} />
+      <Route element={<RequireAuth />}>
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/ai" element={<AIPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Route>
       <Route path="/Profile" element={<Navigate to="/profile" replace />} />
       <Route path="/AI" element={<Navigate to="/ai" replace />} />
       <Route path="/Support" element={<Navigate to="/support" replace />} />

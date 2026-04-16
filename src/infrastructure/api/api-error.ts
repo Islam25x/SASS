@@ -2,6 +2,8 @@ export interface ApiErrorPayload {
   message?: string;
   error?: string;
   detail?: string;
+  title?: string;
+  errors?: Record<string, string[]>;
 }
 
 export class ApiError extends Error {
@@ -51,10 +53,18 @@ export function mapApiError(error: unknown): ApiError {
 export async function readErrorMessage(response: Response): Promise<string> {
   try {
     const payload = (await response.json()) as ApiErrorPayload;
+    const validationMessages = payload.errors
+      ? Object.values(payload.errors)
+          .flat()
+          .filter(Boolean)
+      : [];
+
     return (
       payload.message ??
       payload.error ??
       payload.detail ??
+      payload.title ??
+      validationMessages[0] ??
       `Request failed with status ${response.status}.`
     );
   } catch {

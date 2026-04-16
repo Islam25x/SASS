@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
-import { CircleUser, Mail, Phone, Calendar, Save } from "lucide-react";
+import { Calendar, CircleUser, Mail, Phone, Save } from "lucide-react";
+import { useUserProfile } from "../../hooks/useUserProfile";
+import { useUpdateUserProfile } from "../../hooks/useUpdateUserProfile";
 
 type FormDataType = {
   firstName: string;
   lastName: string;
   username: string;
   email: string;
-  phone?: string;
-  birth?: string;
+  phoneNumber: string;
+  dateOfBirth: string;
 };
 
 type ErrorsType = Partial<Record<keyof FormDataType, string>>;
@@ -24,31 +26,63 @@ type FieldType = {
   value?: string;
 };
 
+type FormNotice = {
+  tone: "success" | "error";
+  message: string;
+} | null;
+
 const ProfileInfo = () => {
+  const { data: profile, isLoading, isError, error } = useUserProfile();
+  const updateProfileMutation = useUpdateUserProfile();
   const [formData, setFormData] = useState<FormDataType>({
     firstName: "",
     lastName: "",
-    username: "Islam Ahmed",
+    username: "",
     email: "",
-    phone: "",
-    birth: "",
+    phoneNumber: "",
+    dateOfBirth: "",
   });
-
   const [errors, setErrors] = useState<ErrorsType>({});
+  const [notice, setNotice] = useState<FormNotice>(null);
+
+  useEffect(() => {
+    if (!profile) {
+      return;
+    }
+
+    setFormData({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      username: profile.username,
+      email: profile.email,
+      phoneNumber: profile.phoneNumber,
+      dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.slice(0, 10) : "",
+    });
+  }, [profile]);
 
   const validate = (): boolean => {
     const newErrors: ErrorsType = {};
-    const nameRegex = /^[A-Za-z]+$/;
+    const nameRegex = /^[A-Za-z\s'-]+$/;
     const phoneRegex = /^[0-9]+$/;
 
-    if (!nameRegex.test(formData.firstName)) {
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "First name is required";
+    } else if (!nameRegex.test(formData.firstName)) {
       newErrors.firstName = "First name must contain only letters";
     }
-    if (!nameRegex.test(formData.lastName)) {
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Last name is required";
+    } else if (!nameRegex.test(formData.lastName)) {
       newErrors.lastName = "Last name must contain only letters";
     }
-    if (formData.phone && !phoneRegex.test(formData.phone)) {
-      newErrors.phone = "Phone number must contain only numbers";
+
+    if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = "Phone number must contain only numbers";
+    }
+
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = "Date of birth is required";
     }
 
     setErrors(newErrors);
@@ -57,27 +91,54 @@ const ProfileInfo = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setNotice(null);
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validate()) {
-      console.log("✅ Form submitted successfully", formData);
+    setNotice(null);
+
+    if (!validate()) {
+      return;
+    }
+
+    try {
+      await updateProfileMutation.mutateAsync({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phoneNumber: formData.phoneNumber,
+        dateOfBirth: formData.dateOfBirth
+          ? new Date(`${formData.dateOfBirth}T00:00:00.000Z`).toISOString()
+          : "",
+      });
+
+      setNotice({
+        tone: "success",
+        message: "Profile updated successfully.",
+      });
+    } catch (submitError) {
+      setNotice({
+        tone: "error",
+        message:
+          submitError instanceof Error
+            ? submitError.message
+            : "Failed to update profile. Please try again.",
+      });
     }
   };
 
   const inputClass =
-    "flex h-10 w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40";
+    "flex h-9 w-full rounded-2xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-200";
 
-  // 🧩 تعريف الحقول كمصفوفة ثنائية
   const fields: FieldType[][] = [
     [
       {
         id: "firstName",
         label: "First Name",
         type: "text",
-        icon: <CircleUser size={20} />,
+        icon: <CircleUser size={18} />,
         placeholder: "First Name",
         required: true,
       },
@@ -94,31 +155,33 @@ const ProfileInfo = () => {
         id: "username",
         label: "Username",
         type: "text",
-        icon: <CircleUser size={20} />,
+        icon: <CircleUser size={18} />,
         disabled: true,
-        value: "Islam Ahmed",
+        value: formData.username,
       },
       {
         id: "email",
         label: "Email",
         type: "email",
-        icon: <Mail size={20} />,
+        icon: <Mail size={18} />,
         placeholder: "Email",
-        required: true,
+        disabled: true,
+        value: formData.email,
       },
     ],
     [
       {
-        id: "birth",
+        id: "dateOfBirth",
         label: "Date of Birth",
         type: "date",
-        icon: <Calendar size={20} />,
+        icon: <Calendar size={18} />,
+        required: true,
       },
       {
-        id: "phone",
+        id: "phoneNumber",
         label: "Phone",
         type: "tel",
-        icon: <Phone size={20} />,
+        icon: <Phone size={18} />,
         placeholder: "Phone",
       },
     ],
@@ -126,20 +189,40 @@ const ProfileInfo = () => {
 
   return (
     <section id="ProfileInfo">
-      <form
-        className="space-y-4"
-        data-aos="zoom-in"
-        data-aos-duration="500"
-        onSubmit={handleSubmit}
-      >
+      <div className="mb-3 flex flex-col gap-1">
+        <h3 className="text-xl font-semibold text-slate-900">Identity & details</h3>
+        <p className="text-sm leading-5 text-slate-500">
+          Update your personal information to keep your financial workspace accurate and
+          personalized.
+        </p>
+      </div>
+
+      {isLoading && (
+        <p className="mb-4 text-sm text-slate-500">Loading profile information...</p>
+      )}
+      {isError && <p className="mb-4 text-sm text-red-500">{error.message}</p>}
+      {notice && (
+        <div
+          className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
+            notice.tone === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-red-200 bg-red-50 text-red-700"
+          }`}
+          aria-live="polite"
+        >
+          {notice.message}
+        </div>
+      )}
+
+      <form className="space-y-3" data-aos="zoom-in" data-aos-duration="500" onSubmit={handleSubmit}>
         {fields.map((row, rowIndex) => (
-          <div key={rowIndex} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div key={rowIndex} className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {row.map((field) => (
-              <div key={field.id} className="space-y-2">
-                <label className="text-sm font-medium">{field.label}</label>
+              <div key={field.id} className="space-y-1">
+                <label className="text-sm font-medium text-slate-700">{field.label}</label>
                 <div className="relative">
                   {field.icon && (
-                    <span className="absolute top-2.5 left-2 text-gray-400">
+                    <span className="absolute left-3.5 top-2.5 text-slate-400">
                       {field.icon}
                     </span>
                   )}
@@ -150,13 +233,15 @@ const ProfileInfo = () => {
                     onChange={field.disabled ? undefined : handleChange}
                     placeholder={field.placeholder}
                     required={field.required}
-                    disabled={field.disabled}
+                    disabled={field.disabled || updateProfileMutation.isPending}
                     className={`${inputClass} ${field.icon ? "pl-10" : ""} ${
-                      field.disabled ? "opacity-70 cursor-not-allowed" : ""
+                      field.disabled
+                        ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                        : ""
                     }`}
                   />
                   {errors[field.id] && (
-                    <p className="text-red-500 text-sm">{errors[field.id]}</p>
+                    <p className="mt-1.5 text-sm text-red-500">{errors[field.id]}</p>
                   )}
                 </div>
               </div>
@@ -164,18 +249,19 @@ const ProfileInfo = () => {
           </div>
         ))}
 
-        {/* Save Button */}
-        <button
-          type="submit"
-          className="inline-flex items-center justify-center text-sm font-medium bg-primary text-white hover:bg-primary-700 rounded-md h-10 px-4 py-2 transition"
-        >
-          <Save size={20} className="mr-2" />
-          Update Profile
-        </button>
+        <div className="flex justify-start pt-0.5">
+          <button
+            type="submit"
+            disabled={updateProfileMutation.isPending}
+            className="inline-flex h-9 items-center justify-center rounded-2xl bg-gradient-to-r from-sky-400 to-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] transition hover:from-sky-500 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Save size={18} className="mr-2" />
+            {updateProfileMutation.isPending ? "Saving..." : "Update Profile"}
+          </button>
+        </div>
       </form>
     </section>
   );
 };
 
 export default ProfileInfo;
-

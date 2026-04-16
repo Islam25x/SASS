@@ -1,12 +1,23 @@
 import { ApiError, mapApiError, readErrorMessage } from "./api-error";
+import { readStoredAuthToken } from "../auth/auth-storage";
 
 const AI_API_BASE_URL = "https://stt-flax.vercel.app/api";
 
-export async function requestJson<T>(path: string, init: RequestInit): Promise<T> {
+interface RequestJsonOptions extends RequestInit {
+  baseUrl?: string;
+  withAuth?: boolean;
+}
+
+export async function requestJson<T>(
+  path: string,
+  init: RequestJsonOptions,
+): Promise<T> {
   try {
     const headers = new Headers(init.headers ?? {});
     const isFormData = init.body instanceof FormData;
     const hasBody = typeof init.body !== "undefined";
+    const baseUrl = init.baseUrl ?? AI_API_BASE_URL;
+    const token = init.withAuth ? readStoredAuthToken() : null;
 
     if (isFormData) {
       headers.delete("Content-Type");
@@ -14,7 +25,11 @@ export async function requestJson<T>(path: string, init: RequestInit): Promise<T
       headers.set("Content-Type", "application/json");
     }
 
-    const response = await fetch(`${AI_API_BASE_URL}${path}`, {
+    if (token && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(`${baseUrl}${path}`, {
       ...init,
       headers,
     });
@@ -24,7 +39,18 @@ export async function requestJson<T>(path: string, init: RequestInit): Promise<T
       throw new ApiError(message, response.status, "HTTP");
     }
 
-    return (await response.json()) as T;
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
+    const contentType = response.headers.get("content-type") ?? "";
+
+    if (contentType.includes("application/json")) {
+      return (await response.json()) as T;
+    }
+
+    const text = await response.text();
+    return text as T;
   } catch (error) {
     throw mapApiError(error);
   }

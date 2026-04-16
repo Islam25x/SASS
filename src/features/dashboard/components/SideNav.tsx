@@ -12,6 +12,7 @@ import {
 import logoSrc from "../../../assets/logo.png";
 import mobileLogoSrc from "../../../assets/mobile view logo.png";
 import { Button, Text, cn } from "../../../shared/ui";
+import { useAuth } from "../../../shared/auth/AuthContext";
 
 interface AdminNavProps {
   setActiveComponent: (component: string) => void;
@@ -19,6 +20,7 @@ interface AdminNavProps {
 }
 
 function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
+  const { logout } = useAuth();
   const navItems: { name: string; icon: LucideIcon; link?: string }[] = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Transactions", icon: Receipt },
@@ -27,15 +29,21 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     { name: "Setting", icon: Settings },
   ];
 
-  const bottomNav: { name: string; icon: LucideIcon; link?: string }[] = [
+  const bottomNav: {
+    name: string;
+    icon: LucideIcon;
+    link?: string;
+    onClick?: () => void;
+  }[] = [
     { name: "Help", icon: HelpCircle, link: "/support" },
-    { name: "Log out", icon: LogOut, link: "/" },
+    { name: "Log out", icon: LogOut, link: "/", onClick: logout },
   ];
 
   const renderNavItem = (
     name: string,
     Icon: LucideIcon,
-    link?: string
+    link?: string,
+    onClick?: () => void,
   ) => {
     const isActive = activeComponent === name;
     const baseClasses =
@@ -60,7 +68,10 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
       <Link
         key={name}
         to={link}
-        onClick={() => setActiveComponent(name)}
+        onClick={() => {
+          setActiveComponent(name);
+          onClick?.();
+        }}
         className={classes}
       >
         {content}
@@ -68,7 +79,10 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     ) : (
       <Button
         key={name}
-        onClick={() => setActiveComponent(name)}
+        onClick={() => {
+          setActiveComponent(name);
+          onClick?.();
+        }}
         className={classes}
         variant="ghost"
         size="md"
@@ -111,8 +125,8 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
         data-aos="fade-up"
         data-aos-once="true"
       >
-        {bottomNav.map(({ name, icon, link }) =>
-          renderNavItem(name, icon, link)
+        {bottomNav.map(({ name, icon, link, onClick }) =>
+          renderNavItem(name, icon, link, onClick)
         )}
       </div>
     </aside>
