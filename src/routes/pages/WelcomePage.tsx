@@ -13,7 +13,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { pageMotion } from "../../shared/animations/pageMotion";
 import { useLogin } from "../../hooks/useLogin";
 import { useRegister } from "../../hooks/useRegister";
-import { readRegisterMessage } from "../../auth/mappers/auth.mapper";
 import { useAuth } from "../../shared/auth/AuthContext";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
@@ -289,7 +288,7 @@ export default function WelcomePage() {
       setAuthBanner({
         tone: "success",
         text:
-          readRegisterMessage(response) ||
+          response.message ||
           "Account created successfully. You can sign in as soon as login is connected.",
       });
       navigate("/welcome");

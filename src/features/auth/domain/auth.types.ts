@@ -12,6 +12,10 @@ export interface RegisterPayload {
   confirmPassword: string;
 }
 
+export interface RegisterResult {
+  message: string;
+}
+
 export interface AuthSession {
   token: string;
   expiresAt: Date;

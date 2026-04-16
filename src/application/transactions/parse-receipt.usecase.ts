@@ -1,4 +1,4 @@
-import { ApiError } from "../../infrastructure/api/api-error";
+import { ApiError } from "../../shared/api/api-error";
 import { receiptOcrApi } from "../../infrastructure/api/ai.api";
 import { parseReceiptOcrResponse } from "../../domain/ai/ai.rules";
 import type { ReceiptOcrResponse } from "../../domain/ai/ai.types";

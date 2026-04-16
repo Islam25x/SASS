@@ -2,7 +2,7 @@ import {
   parseVoiceToTextResponse,
 } from "../../domain/ai/ai.rules";
 import type { VoiceToTextResponse } from "../../domain/ai/ai.types";
-import { ApiError } from "../../infrastructure/api/api-error";
+import { ApiError } from "../../shared/api/api-error";
 import { voiceToTextApi } from "../../infrastructure/api/ai.api";
 
 export async function voiceToTextUseCase(

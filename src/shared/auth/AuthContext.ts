@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
-import type { AuthSession } from "../../auth/domain/auth.types";
-import type { User } from "../../user/domain/user";
+import type { AuthSession } from "../../features/auth/domain/auth.types";
+import type { User } from "../../features/user/domain/user";
 
 export interface AuthContextValue {
   session: AuthSession | null;

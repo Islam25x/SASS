@@ -1,4 +1,4 @@
-import { requestJson } from "./http";
+import { requestJson } from "../../shared/api/http";
 
 export async function fetchTransactionsApi(
   options?: { signal?: AbortSignal },

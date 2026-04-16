@@ -1,5 +1,5 @@
-import type { AuthSession } from "../../auth/domain/auth.types";
-import type { User } from "../../user/domain/user";
+import type { AuthSession } from "../../features/auth/domain/auth.types";
+import type { User } from "../../features/user/domain/user";
 
 const AUTH_STORAGE_KEY = "finexa.auth.session";
 
@@ -30,7 +30,7 @@ function parseStoredUser(value: unknown): User | null {
     typeof candidate.firstName !== "string" ||
     typeof candidate.lastName !== "string" ||
     typeof candidate.phoneNumber !== "string" ||
-    typeof candidate.profileImageUrl !== "string"
+    (candidate.profileImageUrl !== null && typeof candidate.profileImageUrl !== "string")
   ) {
     return null;
   }
@@ -68,7 +68,7 @@ function parseLegacyStoredUser(value: {
     lastName: "",
     phoneNumber: "",
     dateOfBirth: null,
-    profileImageUrl: "",
+    profileImageUrl: null,
   };
 }
 

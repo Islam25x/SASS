@@ -1,15 +1,14 @@
-import { requestJson } from "../../infrastructure/api/http";
+import { requestJson } from "../../../shared/api/http";
+import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import type {
-  UpdateUserProfilePayload,
+  UpdateUserProfileRequestDto,
   UpdateUserProfileResponseDto,
-} from "../../user/domain/user";
-import type { UserProfileResponseDto } from "./user.dto";
-import { getAuthApiBaseUrl } from "./auth.api";
+} from "./user.dto";
 
 export async function fetchUserProfileApi(
   options?: { signal?: AbortSignal; accessToken?: string },
-): Promise<UserProfileResponseDto> {
-  return requestJson<UserProfileResponseDto>("/api/User/profile", {
+): Promise<unknown> {
+  return requestJson<unknown>("/api/User/profile", {
     method: "GET",
     signal: options?.signal,
     baseUrl: getAuthApiBaseUrl(),
@@ -23,7 +22,7 @@ export async function fetchUserProfileApi(
 }
 
 export async function updateUserProfileApi(
-  payload: UpdateUserProfilePayload,
+  payload: UpdateUserProfileRequestDto,
   options?: { signal?: AbortSignal },
 ): Promise<UpdateUserProfileResponseDto> {
   return requestJson<UpdateUserProfileResponseDto>("/api/User/profile", {

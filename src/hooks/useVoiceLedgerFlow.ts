@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createTransactionUseCase } from "../application/transactions/create-transaction.usecase";
 import type { ParsedTransaction } from "../domain/ai/ai.types";
 import type { Transaction } from "../domain/transactions/transaction.types";
-import { ApiError } from "../infrastructure/api/api-error";
+import { ApiError } from "../shared/api/api-error";
 import { useParseTransaction } from "./useParseTransaction";
 import { useVoiceToText } from "./useVoiceToText";
 

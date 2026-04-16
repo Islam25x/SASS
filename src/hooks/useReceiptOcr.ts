@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { parseReceiptUseCase } from "../application/transactions/parse-receipt.usecase";
 import type { ReceiptOcrResponse } from "../domain/ai/ai.types";
-import { ApiError } from "../infrastructure/api/api-error";
+import { ApiError } from "../shared/api/api-error";
 
 type ReceiptOcrMutation = UseMutationResult<ReceiptOcrResponse, ApiError, File>;
 

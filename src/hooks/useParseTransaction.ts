@@ -11,7 +11,7 @@ import {
 import type { ParsedTransaction } from "../domain/ai/ai.types";
 import {
   ApiError,
-} from "../infrastructure/api/api-error";
+} from "../shared/api/api-error";
 
 const DEFAULT_TRANSACTIONS_QUERY_KEY: QueryKey = ["transactions"];
 

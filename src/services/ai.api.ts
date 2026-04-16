@@ -10,7 +10,7 @@ import type {
   VoiceToTextResponse,
 } from "../domain/ai/ai.types";
 import type { Transaction } from "../domain/transactions/transaction.types";
-export { ApiError } from "../infrastructure/api/api-error";
+export { ApiError } from "../shared/api/api-error";
 
 export type {
   ParsedTransaction,

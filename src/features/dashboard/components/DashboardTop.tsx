@@ -10,7 +10,7 @@ import {
 import DashboardSummaryCard from "./DashboardSummaryCard";
 import { PageHeader, Text } from "../../../shared/ui";
 import { useUserProfile } from "../../../hooks/useUserProfile";
-import { getUserDisplayName } from "../../../application/user/user-profile";
+import { getUserDisplayName } from "../../../features/user/application/user.selectors";
 
 const DashboardTop = () => {
   const { data: profile } = useUserProfile();

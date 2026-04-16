@@ -1,5 +1,5 @@
-import { ApiError, mapApiError, readErrorMessage } from "./api-error";
-import { getAiApiBaseUrl, requestJson } from "./http";
+import { ApiError, mapApiError, readErrorMessage } from "../../shared/api/api-error";
+import { getAiApiBaseUrl, requestJson } from "../../shared/api/http";
 
 export async function voiceToTextApi(
   blob: Blob,

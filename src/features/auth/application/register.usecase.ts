@@ -1,12 +1,12 @@
-import type { RegisterPayload } from "../domain/auth.types";
-import type { RegisterResponseDto } from "../api/auth.dto";
 import { registerApi } from "../api/auth.api";
+import type { RegisterPayload, RegisterResult } from "../domain/auth.types";
+import { extractRegisterData, mapRegisterDtoToResult } from "../mappers/auth.mapper";
 
 export async function registerUseCase(
   payload: RegisterPayload,
   options?: { signal?: AbortSignal },
-): Promise<RegisterResponseDto> {
-  return registerApi(
+): Promise<RegisterResult> {
+  const response = await registerApi(
     {
       email: payload.email.trim(),
       username: payload.username.trim(),
@@ -15,4 +15,6 @@ export async function registerUseCase(
     },
     options,
   );
+
+  return mapRegisterDtoToResult(extractRegisterData(response));
 }

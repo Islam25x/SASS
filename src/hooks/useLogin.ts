@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { loginUseCase } from "../auth/application/login.usecase";
-import type { AuthSession, LoginPayload } from "../auth/domain/auth.types";
-import { ApiError } from "../infrastructure/api/api-error";
+import { loginUseCase } from "../features/auth/application/login.usecase";
+import type { AuthSession, LoginPayload } from "../features/auth/domain/auth.types";
+import { ApiError } from "../shared/api/api-error";
 
 type LoginMutation = UseMutationResult<AuthSession, ApiError, LoginPayload>;
 

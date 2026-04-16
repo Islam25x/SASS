@@ -1,15 +1,15 @@
-export interface User {
+export interface UserProfileDto {
   id: string;
   email: string;
-  username: string;
+  userName: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  dateOfBirth: Date | null;
-  profileImageUrl: string;
+  dateOfBirth: string | null;
+  profileImageUrl: string | null;
 }
 
-export interface UpdateUserProfilePayload {
+export interface UpdateUserProfileRequestDto {
   firstName: string;
   lastName: string;
   phoneNumber: string;

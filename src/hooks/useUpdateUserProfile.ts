@@ -4,18 +4,17 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import { updateUserProfileUseCase } from "../auth/application/update-profile.usecase";
-import type {
-  UpdateUserProfilePayload,
-  UpdateUserProfileResponseDto,
-} from "../user/domain/user";
-import { ApiError } from "../infrastructure/api/api-error";
+import {
+  updateUserProfileUseCase,
+  type UpdateUserProfileInput,
+} from "../features/user/application/update-profile.usecase";
+import { ApiError } from "../shared/api/api-error";
 import { USER_PROFILE_QUERY_KEY } from "./useUserProfile";
 
 type UpdateUserProfileMutation = UseMutationResult<
-  UpdateUserProfileResponseDto,
+  void,
   ApiError,
-  UpdateUserProfilePayload
+  UpdateUserProfileInput
 >;
 
 type UseUpdateUserProfileResult = UpdateUserProfileMutation & {
@@ -27,9 +26,9 @@ export function useUpdateUserProfile(): UseUpdateUserProfileResult {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const mutation = useMutation<
-    UpdateUserProfileResponseDto,
+    void,
     ApiError,
-    UpdateUserProfilePayload
+    UpdateUserProfileInput
   >({
     mutationKey: ["user", "profile", "update"],
     mutationFn: async (payload) => {

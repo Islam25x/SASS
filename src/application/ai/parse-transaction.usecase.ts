@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { parseParsedTransaction } from "../../domain/ai/ai.rules";
 import type { ParsedTransaction } from "../../domain/ai/ai.types";
-import { ApiError } from "../../infrastructure/api/api-error";
+import { ApiError } from "../../shared/api/api-error";
 import { parseTransactionApi } from "../../infrastructure/api/ai.api";
 
 const ParseTransactionInputSchema = z.string().min(1);

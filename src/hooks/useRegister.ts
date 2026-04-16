@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { registerUseCase } from "../auth/application/register.usecase";
-import type { RegisterResponseDto } from "../auth/api/auth.dto";
-import type { RegisterPayload } from "../auth/domain/auth.types";
-import { ApiError } from "../infrastructure/api/api-error";
+import { registerUseCase } from "../features/auth/application/register.usecase";
+import type { RegisterPayload, RegisterResult } from "../features/auth/domain/auth.types";
+import { ApiError } from "../shared/api/api-error";
 
 type RegisterMutation = UseMutationResult<
-  RegisterResponseDto,
+  RegisterResult,
   ApiError,
   RegisterPayload
 >;
@@ -18,7 +17,7 @@ type UseRegisterResult = RegisterMutation & {
 export function useRegister(): UseRegisterResult {
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const mutation = useMutation<RegisterResponseDto, ApiError, RegisterPayload>({
+  const mutation = useMutation<RegisterResult, ApiError, RegisterPayload>({
     mutationKey: ["auth", "register"],
     mutationFn: async (payload) => {
       abortControllerRef.current?.abort();

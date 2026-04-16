@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { voiceToTextUseCase } from "../application/ai/voice-to-text.usecase";
 import type { VoiceToTextResponse } from "../domain/ai/ai.types";
-import { ApiError } from "../infrastructure/api/api-error";
+import { ApiError } from "../shared/api/api-error";
 
 type VoiceToTextMutation = UseMutationResult<
   VoiceToTextResponse,

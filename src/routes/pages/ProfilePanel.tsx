@@ -16,7 +16,10 @@ import Preferences from "./Preferences";
 import { useTransactions } from "../../hooks/useTransactions";
 import BackgroundCanvas from "../../three/canvas/BackgroundCanvas";
 import { useUserProfile } from "../../hooks/useUserProfile";
-import { getUserDisplayName, getUserInitial } from "../../application/user/user-profile";
+import {
+    getUserDisplayName,
+    getUserInitial,
+} from "../../features/user/application/user.selectors";
 import {
     selectTransactionsInsights,
     type TransactionsInsights,
@@ -168,7 +171,7 @@ const Profile = () => {
             { label: "email", value: profile?.email },
             { label: "phone number", value: profile?.phoneNumber },
             { label: "date of birth", value: profile?.dateOfBirth?.toISOString() },
-            { label: "profile photo", value: profile?.profileImageUrl },
+            { label: "profile photo", value: profile?.profileImageUrl ?? undefined },
         ];
         const completedFields = completionFields.filter((field) => field.value?.trim()).length;
         const totalFields = completionFields.length;

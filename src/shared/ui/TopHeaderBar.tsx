@@ -4,7 +4,10 @@ import Button from "./Button";
 import DateRangeSelector from "./DateRangeSelector";
 import Text from "./Text";
 import { useUserProfile } from "../../hooks/useUserProfile";
-import { getUserDisplayName, getUserInitial } from "../../application/user/user-profile";
+import {
+  getUserDisplayName,
+  getUserInitial,
+} from "../../features/user/application/user.selectors";
 
 function TopHeaderBar() {
   const { data: profile } = useUserProfile();

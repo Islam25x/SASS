@@ -1,5 +1,5 @@
+import { readStoredAuthToken } from "../../infrastructure/auth/auth-storage";
 import { ApiError, mapApiError, readErrorMessage } from "./api-error";
-import { readStoredAuthToken } from "../auth/auth-storage";
 
 const AI_API_BASE_URL = "https://stt-flax.vercel.app/api";
 
