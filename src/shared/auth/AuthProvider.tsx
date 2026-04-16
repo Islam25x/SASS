@@ -16,6 +16,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
       writeStoredAuthSession(nextSession);
       setSession(nextSession);
     },
+    setUser: (user) => {
+      setSession((currentSession) => {
+        if (!currentSession) {
+          return currentSession;
+        }
+
+        const nextSession = {
+          ...currentSession,
+          user,
+        };
+
+        writeStoredAuthSession(nextSession);
+        return nextSession;
+      });
+    },
     logout: () => {
       clearStoredAuthSession();
       setSession(null);

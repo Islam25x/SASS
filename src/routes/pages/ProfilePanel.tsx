@@ -167,8 +167,8 @@ const Profile = () => {
             { label: "username", value: profile?.username },
             { label: "email", value: profile?.email },
             { label: "phone number", value: profile?.phoneNumber },
-            { label: "date of birth", value: profile?.dateOfBirth },
-            { label: "profile photo", value: profile?.imageUrl },
+            { label: "date of birth", value: profile?.dateOfBirth?.toISOString() },
+            { label: "profile photo", value: profile?.profileImageUrl },
         ];
         const completedFields = completionFields.filter((field) => field.value?.trim()).length;
         const totalFields = completionFields.length;

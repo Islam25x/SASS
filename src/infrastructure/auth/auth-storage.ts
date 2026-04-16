@@ -1,6 +1,76 @@
-import type { AuthSession } from "../../domain/auth/auth.types";
+import type { AuthSession } from "../../auth/domain/auth.types";
+import type { User } from "../../user/domain/user";
 
 const AUTH_STORAGE_KEY = "finexa.auth.session";
+
+function isValidDate(value: Date): boolean {
+  return !Number.isNaN(value.getTime());
+}
+
+function parseStoredUser(value: unknown): User | null {
+  if (typeof value !== "object" || value === null) {
+    return null;
+  }
+
+  const candidate = value as {
+    id?: unknown;
+    email?: unknown;
+    username?: unknown;
+    firstName?: unknown;
+    lastName?: unknown;
+    phoneNumber?: unknown;
+    dateOfBirth?: unknown;
+    profileImageUrl?: unknown;
+  };
+
+  if (
+    typeof candidate.id !== "string" ||
+    typeof candidate.email !== "string" ||
+    typeof candidate.username !== "string" ||
+    typeof candidate.firstName !== "string" ||
+    typeof candidate.lastName !== "string" ||
+    typeof candidate.phoneNumber !== "string" ||
+    typeof candidate.profileImageUrl !== "string"
+  ) {
+    return null;
+  }
+
+  const dateOfBirth =
+    typeof candidate.dateOfBirth === "string" && candidate.dateOfBirth
+      ? new Date(candidate.dateOfBirth)
+      : null;
+
+  if (dateOfBirth && !isValidDate(dateOfBirth)) {
+    return null;
+  }
+
+  return {
+    id: candidate.id,
+    email: candidate.email,
+    username: candidate.username,
+    firstName: candidate.firstName,
+    lastName: candidate.lastName,
+    phoneNumber: candidate.phoneNumber,
+    dateOfBirth,
+    profileImageUrl: candidate.profileImageUrl,
+  };
+}
+
+function parseLegacyStoredUser(value: {
+  email?: unknown;
+  username?: unknown;
+}): User {
+  return {
+    id: "",
+    email: typeof value.email === "string" ? value.email : "",
+    username: typeof value.username === "string" ? value.username : "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    dateOfBirth: null,
+    profileImageUrl: "",
+  };
+}
 
 export function readStoredAuthSession(): AuthSession | null {
   if (typeof window === "undefined") {
@@ -13,13 +83,31 @@ export function readStoredAuthSession(): AuthSession | null {
   }
 
   try {
-    const parsed = JSON.parse(rawValue) as AuthSession;
-    if (!parsed?.token || typeof parsed.token !== "string") {
+    const parsed = JSON.parse(rawValue) as {
+      token?: unknown;
+      expiresAt?: unknown;
+      user?: unknown;
+      email?: unknown;
+      username?: unknown;
+    };
+    const user = parseStoredUser(parsed.user) ?? parseLegacyStoredUser(parsed);
+    const expiresAt =
+      typeof parsed.expiresAt === "string" ? new Date(parsed.expiresAt) : null;
+
+    if (
+      typeof parsed.token !== "string" ||
+      !parsed.token ||
+      !user
+    ) {
       clearStoredAuthSession();
       return null;
     }
 
-    return parsed;
+    return {
+      token: parsed.token,
+      expiresAt: expiresAt && isValidDate(expiresAt) ? expiresAt : new Date(0),
+      user,
+    };
   } catch {
     clearStoredAuthSession();
     return null;

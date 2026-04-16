@@ -31,6 +31,17 @@ type FormNotice = {
   message: string;
 } | null;
 
+function formatDateForInput(value: Date | null): string {
+  if (!value) {
+    return "";
+  }
+
+  const year = value.getUTCFullYear();
+  const month = `${value.getUTCMonth() + 1}`.padStart(2, "0");
+  const day = `${value.getUTCDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 const ProfileInfo = () => {
   const { data: profile, isLoading, isError, error } = useUserProfile();
   const updateProfileMutation = useUpdateUserProfile();
@@ -56,7 +67,7 @@ const ProfileInfo = () => {
       username: profile.username,
       email: profile.email,
       phoneNumber: profile.phoneNumber,
-      dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.slice(0, 10) : "",
+      dateOfBirth: formatDateForInput(profile.dateOfBirth),
     });
   }, [profile]);
 

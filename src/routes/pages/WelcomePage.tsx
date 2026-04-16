@@ -13,7 +13,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { pageMotion } from "../../shared/animations/pageMotion";
 import { useLogin } from "../../hooks/useLogin";
 import { useRegister } from "../../hooks/useRegister";
-import { buildAuthSession } from "../../application/auth/auth-session";
+import { readRegisterMessage } from "../../auth/mappers/auth.mapper";
 import { useAuth } from "../../shared/auth/AuthContext";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
@@ -242,15 +242,10 @@ export default function WelcomePage() {
     }
 
     try {
-      const response = await loginMutation.mutateAsync({
+      const session = await loginMutation.mutateAsync({
         email: loginData.email.trim(),
         password: loginData.password,
       });
-      const session = buildAuthSession(response, loginData.email.trim());
-
-      if (!session) {
-        throw new Error("Login succeeded but no auth token was returned by the API.");
-      }
 
       login(session);
       setIsAuthOpen(false);
@@ -294,7 +289,7 @@ export default function WelcomePage() {
       setAuthBanner({
         tone: "success",
         text:
-          response?.message ??
+          readRegisterMessage(response) ||
           "Account created successfully. You can sign in as soon as login is connected.",
       });
       navigate("/welcome");
@@ -614,4 +609,3 @@ export default function WelcomePage() {
     </motion.main>
   );
 }
-

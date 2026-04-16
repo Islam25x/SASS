@@ -11,7 +11,7 @@ function TopHeaderBar() {
   const [hasImageError, setHasImageError] = useState(false);
   const username = profile?.username || (profile ? getUserDisplayName(profile) : "Finexa User");
   const email = profile?.email || "No email available";
-  const imageUrl = !hasImageError ? profile?.imageUrl : "";
+  const imageUrl = !hasImageError ? profile?.profileImageUrl : "";
   const initial = profile ? getUserInitial(profile) : "F";
 
   return (
