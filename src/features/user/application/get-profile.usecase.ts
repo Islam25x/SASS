@@ -3,7 +3,7 @@ import type { User } from "../domain/user";
 import { extractUserData, mapUserDtoToUser } from "../mappers/user.mapper";
 
 export async function getUserProfileUseCase(
-  options?: { signal?: AbortSignal },
+  options?: { signal?: AbortSignal; accessToken?: string },
 ): Promise<User> {
   const response = await fetchUserProfileApi(options);
   const userData = extractUserData(response);

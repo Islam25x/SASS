@@ -1,0 +1,75 @@
+import { ApiError } from "../../../shared/api/api-error";
+import { addTransactionApi } from "../api/add-transaction.api";
+import type {
+  AddTransactionInput,
+  AddTransactionPayload,
+  AddTransactionType,
+  AddTransactionTypeInput,
+} from "../domain/add-transaction.types";
+
+function normalizeOccurredAt(value: string): string {
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new ApiError("Transaction date is invalid.", 400, "INVALID_RESPONSE");
+  }
+
+  return parsedDate.toISOString();
+}
+
+function normalizeTransactionType(value: AddTransactionTypeInput): AddTransactionType {
+  if (value === "Expense" || value === "Income") {
+    return value;
+  }
+
+  if (value === "expense") {
+    return "Expense";
+  }
+
+  if (value === "income") {
+    return "Income";
+  }
+
+  throw new ApiError("Transaction type is invalid.", 400, "INVALID_RESPONSE");
+}
+
+export function mapTransactionInputToPayload(input: AddTransactionInput): AddTransactionPayload {
+  const transactionName = input.transactionName.trim();
+  const normalizedType = normalizeTransactionType(input.type);
+  const normalizedCategoryType = normalizeTransactionType(input.categoryType);
+
+  if (!transactionName) {
+    throw new ApiError("Transaction name is required.", 400, "INVALID_RESPONSE");
+  }
+
+  if (!Number.isFinite(input.amount) || input.amount <= 0) {
+    throw new ApiError("Amount must be greater than zero.", 400, "INVALID_RESPONSE");
+  }
+
+  if (!input.categoryId.trim()) {
+    throw new ApiError("Category is required.", 400, "INVALID_RESPONSE");
+  }
+
+  if (normalizedCategoryType !== normalizedType) {
+    throw new ApiError(
+      "Selected category does not match the transaction type.",
+      400,
+      "INVALID_RESPONSE",
+    );
+  }
+
+  return {
+    amount: input.amount,
+    type: normalizedType,
+    categoryId: input.categoryId.trim(),
+    notes: transactionName,
+    occurredAt: normalizeOccurredAt(input.occurredAt),
+  };
+}
+
+export async function addTransactionUseCase(
+  input: AddTransactionInput,
+  options?: { signal?: AbortSignal },
+): Promise<void> {
+  await addTransactionApi(mapTransactionInputToPayload(input), options);
+}

@@ -1,6 +1,6 @@
 import { currencyFormatter } from "../../../application/transactions/transactions.formatters";
 import type { NormalizedTransactionType } from "../../../application/transactions/transactions.selectors";
-import { TransactionType } from "../../../domain/transactions/transaction.enums";
+import { TransactionType } from "../domain/transaction.enums";
 import { Text } from "../../../shared/ui";
 
 type AmountTextProps = {

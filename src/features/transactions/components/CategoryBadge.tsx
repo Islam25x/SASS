@@ -1,4 +1,4 @@
-import { TransactionCategory } from "../../../domain/transactions/transaction.enums";
+import { TransactionCategory } from "../domain/transaction.enums";
 import { Text } from "../../../shared/ui";
 
 type CategoryBadgeProps = {

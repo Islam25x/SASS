@@ -2,13 +2,15 @@ import type { TransactionRowData } from "../../../application/transactions/trans
 import { formatTransactionDate } from "../../../application/transactions/transactions.formatters";
 import AmountText from "./AmountText";
 import CategoryBadge from "./CategoryBadge";
-import { Text } from "../../../shared/ui";
+import { Button, Text } from "../../../shared/ui";
+import type { Transaction } from "../domain/transaction.types";
 
 type TransactionRowProps = {
   transaction: TransactionRowData;
+  onOpenDetails: (transaction: Transaction) => void;
 };
 
-function TransactionRow({ transaction }: TransactionRowProps) {
+function TransactionRow({ transaction, onOpenDetails }: TransactionRowProps) {
   const typeLabel =
     transaction.type === "unknown"
       ? "N/A"
@@ -39,6 +41,17 @@ function TransactionRow({ transaction }: TransactionRowProps) {
           category={transaction.category}
           label={transaction.rawCategory ?? transaction.category}
         />
+      </td>
+      <td className="py-3 text-sm">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="rounded-full px-3 py-1 text-xs"
+          onClick={() => onOpenDetails(transaction.transaction)}
+        >
+          Details
+        </Button>
       </td>
     </tr>
   );

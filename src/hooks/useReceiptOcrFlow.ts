@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { normalizeReceiptTransactionsUseCase } from "../application/transactions/normalize-receipt-transactions.usecase";
-import type { Transaction } from "../domain/transactions/transaction.types";
+import type { Transaction } from "../features/transactions/domain/transaction.types";
 import { useReceiptOcr } from "./useReceiptOcr";
 
 export type ReceiptOcrState =
@@ -14,8 +14,7 @@ export type ReceiptOcrState =
 interface ReceiptOcrUiTransaction extends Transaction {
   quantity: number;
   issued_at: string;
-  type: "expense";
-  transaction_type: "expense";
+  type: "Expense";
   method: "receipt";
 }
 
@@ -97,8 +96,7 @@ export function useReceiptOcrFlow(
       const normalized = normalizedItems.map((item, index) => ({
         ...item,
         quantity: data.items[index]?.quantity ?? 1,
-        type: "expense" as const,
-        transaction_type: "expense" as const,
+        type: "Expense" as const,
         method: "receipt" as const,
         issued_at: data.issued_at ?? item.date ?? new Date().toISOString(),
       }));

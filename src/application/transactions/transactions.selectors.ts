@@ -1,5 +1,8 @@
-import type { Transaction } from "../../domain/transactions/transaction.types";
-import { TransactionCategory, TransactionType } from "../../domain/transactions/transaction.enums";
+import type { Transaction } from "../../features/transactions/domain/transaction.types";
+import {
+  TransactionCategory,
+  TransactionType,
+} from "../../features/transactions/domain/transaction.enums";
 
 export type NormalizedTransactionType = TransactionType | "unknown";
 
@@ -11,6 +14,7 @@ export type TransactionRowData = {
   type: NormalizedTransactionType;
   category: TransactionCategory;
   rawCategory?: string;
+  transaction: Transaction;
 };
 
 export type TransactionsSummary = {
@@ -36,15 +40,15 @@ const DEFAULT_TIP = "Reduce delivery - save $120";
 const normalizeAmount = (amount: number) => Math.abs(amount);
 
 export function normalizeTransactionType(transaction: Transaction): NormalizedTransactionType {
-  const raw = `${transaction.transaction_type ?? transaction.type ?? ""}`
+  const raw = `${transaction.type ?? ""}`
     .toLowerCase()
     .trim();
 
-  if (raw === TransactionType.Income) {
+  if (raw === TransactionType.Income.toLowerCase()) {
     return TransactionType.Income;
   }
 
-  if (raw === TransactionType.Expense || raw === "expence") {
+  if (raw === TransactionType.Expense.toLowerCase() || raw === "expence") {
     return TransactionType.Expense;
   }
 
@@ -81,6 +85,7 @@ export function mapTransactionsForTable(transactions: Transaction[]): Transactio
     type: normalizeTransactionType(transaction),
     category: normalizeTransactionCategory(transaction.category),
     rawCategory: transaction.category,
+    transaction,
   }));
 }
 

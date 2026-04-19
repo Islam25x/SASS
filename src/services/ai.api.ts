@@ -9,8 +9,10 @@ import type {
   ReceiptOcrResponse,
   VoiceToTextResponse,
 } from "../domain/ai/ai.types";
-import type { Transaction } from "../domain/transactions/transaction.types";
+import type { Transaction } from "../features/transactions/domain/transaction.types";
+import { readStoredAuthSession } from "../infrastructure/auth/auth-storage";
 export { ApiError } from "../shared/api/api-error";
+import type { TransactionsFilters } from "../features/transactions/domain/transactions-filter.types";
 
 export type {
   ParsedTransaction,
@@ -42,9 +44,18 @@ export async function receiptOcr(
 }
 
 export async function fetchTransactions(
+  filters?: TransactionsFilters,
   options?: { signal?: AbortSignal },
 ): Promise<Transaction[]> {
-  return fetchTransactionsUseCase(options);
+  const session = readStoredAuthSession();
+
+  return fetchTransactionsUseCase(
+    {
+      accessToken: session?.token,
+      filters,
+    },
+    options,
+  );
 }
 
 export async function sendChatbotMessage(

@@ -13,11 +13,7 @@ export async function fetchUserProfileApi(
     signal: options?.signal,
     baseUrl: getAuthApiBaseUrl(),
     withAuth: true,
-    headers: options?.accessToken
-      ? {
-          Authorization: `Bearer ${options.accessToken}`,
-        }
-      : undefined,
+    accessToken: options?.accessToken,
   });
 }
 

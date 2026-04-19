@@ -4,24 +4,34 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import { loginUseCase } from "../features/auth/application/login.usecase";
-import type { AuthSession, LoginPayload } from "../features/auth/domain/auth.types";
+import { createCategoryUseCase } from "../features/transactions/application/create-category.usecase";
+import type {
+  CreateTransactionCategoryInput,
+  TransactionCategory,
+} from "../features/transactions/domain/category.types";
 import { ApiError } from "../shared/api/api-error";
 import { TRANSACTION_CATEGORIES_QUERY_KEY } from "./useCategories";
-import { USER_PROFILE_QUERY_KEY } from "./useUserProfile";
 
-type LoginMutation = UseMutationResult<AuthSession, ApiError, LoginPayload>;
+type CreateCategoryMutation = UseMutationResult<
+  TransactionCategory | null,
+  ApiError,
+  CreateTransactionCategoryInput
+>;
 
-type UseLoginResult = LoginMutation & {
+type UseCreateCategoryResult = CreateCategoryMutation & {
   cancel: () => void;
 };
 
-export function useLogin(): UseLoginResult {
+export function useCreateCategory(): UseCreateCategoryResult {
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const mutation = useMutation<AuthSession, ApiError, LoginPayload>({
-    mutationKey: ["auth", "login"],
+  const mutation = useMutation<
+    TransactionCategory | null,
+    ApiError,
+    CreateTransactionCategoryInput
+  >({
+    mutationKey: ["transactions", "categories", "create"],
     mutationFn: async (payload) => {
       abortControllerRef.current?.abort();
 
@@ -29,7 +39,9 @@ export function useLogin(): UseLoginResult {
       abortControllerRef.current = controller;
 
       try {
-        return await loginUseCase(payload, { signal: controller.signal });
+        return await createCategoryUseCase(payload, {
+          signal: controller.signal,
+        });
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;
@@ -37,11 +49,9 @@ export function useLogin(): UseLoginResult {
       }
     },
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY }),
-        queryClient.invalidateQueries({ queryKey: ["transactions"] }),
-        queryClient.invalidateQueries({ queryKey: TRANSACTION_CATEGORIES_QUERY_KEY }),
-      ]);
+      await queryClient.invalidateQueries({
+        queryKey: TRANSACTION_CATEGORIES_QUERY_KEY,
+      });
     },
     retry: 0,
   });

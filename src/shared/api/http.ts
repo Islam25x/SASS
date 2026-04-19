@@ -2,10 +2,20 @@ import { readStoredAuthToken } from "../../infrastructure/auth/auth-storage";
 import { ApiError, mapApiError, readErrorMessage } from "./api-error";
 
 const AI_API_BASE_URL = "https://stt-flax.vercel.app/api";
+export const API_UNAUTHORIZED_EVENT = "app:api-unauthorized";
 
 interface RequestJsonOptions extends RequestInit {
   baseUrl?: string;
   withAuth?: boolean;
+  accessToken?: string;
+}
+
+function dispatchUnauthorizedEvent(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.dispatchEvent(new CustomEvent(API_UNAUTHORIZED_EVENT));
 }
 
 export async function requestJson<T>(
@@ -17,7 +27,7 @@ export async function requestJson<T>(
     const isFormData = init.body instanceof FormData;
     const hasBody = typeof init.body !== "undefined";
     const baseUrl = init.baseUrl ?? AI_API_BASE_URL;
-    const token = init.withAuth ? readStoredAuthToken() : null;
+    const token = init.withAuth ? init.accessToken ?? readStoredAuthToken() : null;
 
     if (isFormData) {
       headers.delete("Content-Type");
@@ -36,6 +46,9 @@ export async function requestJson<T>(
 
     if (!response.ok) {
       const message = await readErrorMessage(response);
+      if (response.status === 401) {
+        dispatchUnauthorizedEvent();
+      }
       throw new ApiError(message, response.status, "HTTP");
     }
 

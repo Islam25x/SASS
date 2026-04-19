@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Loader2, Upload, X } from "lucide-react";
 import type { ReceiptOcrState } from "../../../hooks/useReceiptOcrFlow";
-import type { Transaction } from "../../../domain/transactions/transaction.types";
+import type { Transaction } from "../../transactions/domain/transaction.types";
 import { Button, Input, Text } from "../../../shared/ui";
 
 interface ReceiptOcrModalProps {
@@ -10,7 +10,7 @@ interface ReceiptOcrModalProps {
   state: ReceiptOcrState;
   selectedFile: File | null;
   previewUrl: string | null;
-  extractedTransactions: (Transaction & { type?: string; method?: "receipt" })[];
+  extractedTransactions: (Transaction & { method?: "receipt" })[];
   isLoading: boolean;
   error: string | null;
   onClose: () => void;
@@ -203,9 +203,7 @@ function ReceiptOcrModal({
                           {transaction.amount} | {transaction.category}
                         </Text>
                         <Text variant="body">
-                          {transaction.transaction_type ??
-                            transaction.type ??
-                            "expense"}{" "}
+                          {transaction.type}{" "}
                           | {transaction.date ?? "N/A"}
                         </Text>
                       </li>

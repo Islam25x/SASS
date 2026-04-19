@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { parseParsedTransaction } from "../ai/ai.rules";
+import { parseParsedTransaction } from "../../../domain/ai/ai.rules";
 import {
   TransactionListSchema,
   TransactionSchema,
   type Transaction,
 } from "./transaction.schema";
-import type { ReceiptOcrResponse } from "../ai/ai.schema";
+import type { ReceiptOcrResponse } from "../../../domain/ai/ai.schema";
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;

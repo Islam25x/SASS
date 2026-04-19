@@ -10,17 +10,21 @@ import {
 import TransactionTable from "./TransactionTable";
 import TransactionsSummaryCards from "./TransactionsSummaryCards";
 import AIInsightsCard from "./AIInsightsCard";
+import AddTransactionModal from "./AddTransactionModal";
 import { Button, Input, PageHeader } from "../../../shared/ui";
-
-type FilterType = "all" | "income" | "expense";
+import type { TransactionsTypeUiFilter } from "../domain/transactions-filter.types";
+import type { Transaction } from "../domain/transaction.types";
 
 const PAGE_SIZE = 6;
 
 function TransactionsPage() {
-  const { data, isLoading, isError, error } = useTransactions();
+  const [filterType, setFilterType] = useState<TransactionsTypeUiFilter>("all");
+  const { data, isLoading, isError, error } = useTransactions({ typeFilter: filterType });
   const [searchValue, setSearchValue] = useState("");
-  const [filterType, setFilterType] = useState<FilterType>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const transactions = useMemo(() => data ?? [], [data]);
   const summary = useMemo(() => selectTransactionsSummary(transactions), [transactions]);
@@ -38,12 +42,10 @@ function TransactionsPage() {
         !query ||
         row.merchant.toLowerCase().includes(query) ||
         (row.rawCategory ?? "").toLowerCase().includes(query);
-      const matchesType =
-        filterType === "all" || row.type === filterType;
 
-      return matchesQuery && matchesType;
+      return matchesQuery;
     });
-  }, [tableRows, searchValue, filterType]);
+  }, [tableRows, searchValue]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);
@@ -56,7 +58,7 @@ function TransactionsPage() {
     setCurrentPage(page);
   };
 
-  const handleFilterChange = (value: FilterType) => {
+  const handleFilterChange = (value: TransactionsTypeUiFilter) => {
     setFilterType(value);
     setCurrentPage(1);
   };
@@ -64,6 +66,16 @@ function TransactionsPage() {
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setCurrentPage(1);
+  };
+
+  const handleOpenDetails = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsEditOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTransaction(null);
+    setIsEditOpen(false);
   };
 
   return (
@@ -116,6 +128,8 @@ function TransactionsPage() {
             isError={isError}
             errorMessage={error?.message}
             count={transactions.length}
+            onAddTransaction={() => setIsAddTransactionOpen(true)}
+            onOpenDetails={handleOpenDetails}
           />
 
           <div className="flex items-center justify-center gap-2">
@@ -142,6 +156,18 @@ function TransactionsPage() {
           <AIInsightsCard insights={insights} isLoading={isLoading} />
         </div>
       </div>
+
+      <AddTransactionModal
+        isOpen={isAddTransactionOpen}
+        onClose={() => setIsAddTransactionOpen(false)}
+        mode="create"
+      />
+      <AddTransactionModal
+        isOpen={isEditOpen}
+        onClose={handleCloseEdit}
+        mode="edit"
+        initialData={selectedTransaction ?? undefined}
+      />
     </div>
   );
 }

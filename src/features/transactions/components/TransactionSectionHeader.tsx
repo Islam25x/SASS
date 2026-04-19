@@ -2,9 +2,13 @@ import { Button, Text } from "../../../shared/ui";
 
 type TransactionSectionHeaderProps = {
   count: number;
+  onAddTransaction?: () => void;
 };
 
-function TransactionSectionHeader({ count }: TransactionSectionHeaderProps) {
+function TransactionSectionHeader({
+  count,
+  onAddTransaction,
+}: TransactionSectionHeaderProps) {
   return (
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3">
@@ -21,8 +25,10 @@ function TransactionSectionHeader({ count }: TransactionSectionHeaderProps) {
         </Text>
       </div>
       <Button
+        type="button"
         variant="primary"
         size="sm"
+        onClick={onAddTransaction}
         className="flex items-center gap-2 rounded-full px-4 py-2 text-xs shadow-sm"
       >
         <span className="text-base leading-none">+</span>

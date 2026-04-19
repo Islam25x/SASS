@@ -1,6 +1,6 @@
 export const TransactionType = {
-  Income: "income",
-  Expense: "expense",
+  Income: "Income",
+  Expense: "Expense",
 } as const;
 
 export type TransactionType =

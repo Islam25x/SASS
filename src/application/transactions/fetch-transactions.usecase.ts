@@ -1,15 +1,26 @@
-import { parseTransactionList } from "../../domain/transactions/transaction.rules";
-import type { Transaction } from "../../domain/transactions/transaction.types";
+import type { Transaction } from "../../features/transactions/domain/transaction.types";
 import { ApiError } from "../../shared/api/api-error";
-import { fetchTransactionsApi } from "../../infrastructure/api/transactions.api";
+import { fetchTransactionsApi } from "../../features/transactions/api/transactions.api";
+import { mapTransactionsResponseToTransactions } from "../../features/transactions/application/transaction.mapping";
+import type { TransactionsFilters } from "../../features/transactions/domain/transactions-filter.types";
 
 export async function fetchTransactionsUseCase(
+  input: { accessToken?: string; filters?: TransactionsFilters },
   options?: { signal?: AbortSignal },
 ): Promise<Transaction[]> {
-  const payload = await fetchTransactionsApi(options);
+  const accessToken = input.accessToken?.trim();
+
+  if (!accessToken) {
+    throw new ApiError("Auth token is required to fetch transactions.", 401, "INVALID_RESPONSE");
+  }
+
+  const response = await fetchTransactionsApi(input.filters ?? {}, {
+    signal: options?.signal,
+    accessToken,
+  });
 
   try {
-    return parseTransactionList(payload);
+    return mapTransactionsResponseToTransactions(response);
   } catch (error) {
     throw new ApiError("Invalid transactions response.", 500, "INVALID_RESPONSE", undefined, error);
   }

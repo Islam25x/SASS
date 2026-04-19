@@ -1,109 +1,100 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTransactions } from "../../../hooks/useTransactions";
 import {
-  normalizeTransactionType,
+  mapTransactionsForTable,
   selectRecentTransactions,
 } from "../../../application/transactions/transactions.selectors";
-import { currencyFormatter, formatTransactionDate } from "../../../application/transactions/transactions.formatters";
-import { TransactionType } from "../../../domain/transactions/transaction.enums";
+import type { Transaction } from "../domain/transaction.types";
 import { Button, PanelCard, PanelHeader, Text } from "../../../shared/ui";
+import TransactionsList from "./TransactionsList";
+import AddTransactionModal from "./AddTransactionModal";
 
 function RecentTransactions() {
   const { data, isLoading, isError, error } = useTransactions();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
   const transactions = useMemo(() => data ?? [], [data]);
   const visibleTransactions = useMemo(
     () => selectRecentTransactions(transactions, 3),
     [transactions]
   );
+  const rows = useMemo(
+    () => mapTransactionsForTable(visibleTransactions),
+    [visibleTransactions],
+  );
+
+  const handleOpenDetails = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsEditOpen(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTransaction(null);
+    setIsEditOpen(false);
+  };
 
   return (
-    <PanelCard className="!w-full">
-      <PanelHeader
-        title="Recent transactions"
-        right={
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="rounded-full px-3 py-1 text-sm text-gray-600 border-gray-200"
-            >
-              All accounts
-            </Button>
+    <>
+      <PanelCard className="!w-full">
+        <PanelHeader
+          title="Recent transactions"
+          right={
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={() => setIsCreateOpen(true)}
+                className="rounded-full px-4 py-1 text-sm"
+              >
+                + Add Transaction
+              </Button>
+            </div>
+          }
+        />
+
+        {isLoading && (
+          <div className="space-y-3 py-6">
+            {[0, 1, 2].map((row) => (
+              <div
+                key={row}
+                className="h-9 w-full animate-pulse rounded-lg bg-slate-100"
+              />
+            ))}
           </div>
-        }
+        )}
+
+        {isError && (
+          <Text variant="body" className="py-8 text-rose-600">
+            {error?.message ?? "Failed to load transactions."}
+          </Text>
+        )}
+
+        {!isLoading && !isError && transactions.length === 0 && (
+          <Text variant="body" className="py-8 text-slate-500">
+            No transactions yet.
+          </Text>
+        )}
+
+        {!isLoading && !isError && visibleTransactions.length > 0 && (
+          <TransactionsList rows={rows} onOpenDetails={handleOpenDetails} />
+        )}
+      </PanelCard>
+
+      <AddTransactionModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        mode="create"
       />
-
-      {isLoading && (
-        <div className="space-y-3 py-6">
-          {[0, 1, 2].map((row) => (
-            <div
-              key={row}
-              className="h-9 w-full animate-pulse rounded-lg bg-slate-100"
-            />
-          ))}
-        </div>
-      )}
-
-      {isError && (
-        <Text variant="body" className="py-8 text-rose-600">
-          {error?.message ?? "Failed to load transactions."}
-        </Text>
-      )}
-
-      {!isLoading && !isError && transactions.length === 0 && (
-        <Text variant="body" className="py-8 text-slate-500">
-          No transactions yet.
-        </Text>
-      )}
-
-      {!isLoading && !isError && visibleTransactions.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="text-gray-500">
-                <th className="py-2">DATE</th>
-                <th className="py-2">AMOUNT</th>
-                <th className="py-2">merchant</th>
-                <th className="py-2">TYPE</th>
-                <th className="py-2">CATEGORY</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visibleTransactions.map((transaction) => (
-                <tr key={transaction.id} className="border-t">
-                  <td className="py-3">
-                    {formatTransactionDate(transaction.date)}
-                  </td>
-                  {(() => {
-                    const normalizedType = normalizeTransactionType(transaction);
-                    const isIncome = normalizedType === TransactionType.Income;
-                    const isExpense = normalizedType === TransactionType.Expense;
-                    const amountPrefix = isIncome ? "+" : isExpense ? "-" : "";
-                    const amountColor = isIncome
-                      ? "text-emerald-600"
-                      : isExpense
-                        ? "text-rose-600"
-                        : "text-slate-700";
-
-                    return (
-                      <td className={`py-3 font-medium ${amountColor}`}>
-                        {amountPrefix} {currencyFormatter.format(Math.abs(transaction.amount))}
-                      </td>
-                    );
-                  })()}
-                  <td className="py-3">{transaction.description}</td>
-                  <td className="py-3 text-gray-600">
-                    {transaction.transaction_type ?? "N/A"}
-                  </td>
-                  <td className="py-3 text-gray-600">{transaction.category}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </PanelCard>
+      <AddTransactionModal
+        isOpen={isEditOpen}
+        onClose={handleCloseEdit}
+        mode="edit"
+        initialData={selectedTransaction ?? undefined}
+      />
+    </>
   );
 }
 

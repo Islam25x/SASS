@@ -1,9 +1,10 @@
 import type { TransactionRowData } from "../../../application/transactions/transactions.selectors";
-import TransactionRow from "./TransactionRow";
 import TransactionSectionHeader from "./TransactionSectionHeader";
 import EmptyState from "./EmptyState";
 import { PanelCard } from "../../../shared/ui";
 import { Text } from "../../../shared/ui";
+import TransactionsList from "./TransactionsList";
+import type { Transaction } from "../domain/transaction.types";
 
 type TransactionTableProps = {
   rows: TransactionRowData[];
@@ -11,6 +12,8 @@ type TransactionTableProps = {
   isError: boolean;
   errorMessage?: string;
   count: number;
+  onAddTransaction?: () => void;
+  onOpenDetails: (transaction: Transaction) => void;
 };
 
 function TransactionTable({
@@ -19,10 +22,12 @@ function TransactionTable({
   isError,
   errorMessage,
   count,
+  onAddTransaction,
+  onOpenDetails,
 }: TransactionTableProps) {
   return (
     <PanelCard>
-      <TransactionSectionHeader count={count} />
+      <TransactionSectionHeader count={count} onAddTransaction={onAddTransaction} />
 
       {isLoading && (
         <div className="space-y-3 py-6">
@@ -44,24 +49,7 @@ function TransactionTable({
       {!isLoading && !isError && rows.length === 0 && <EmptyState />}
 
       {!isLoading && !isError && rows.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="text-gray-500">
-                <th className="py-2">DATE</th>
-                <th className="py-2">AMOUNT</th>
-                <th className="py-2">MERCHANT</th>
-                <th className="py-2">TYPE</th>
-                <th className="py-2">CATEGORY</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((transaction) => (
-                <TransactionRow key={transaction.id} transaction={transaction} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TransactionsList rows={rows} onOpenDetails={onOpenDetails} />
       )}
     </PanelCard>
   );

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
@@ -21,6 +21,7 @@ interface AdminNavProps {
 
 function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const navItems: { name: string; icon: LucideIcon; link?: string }[] = [
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Transactions", icon: Receipt },
@@ -36,7 +37,14 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     onClick?: () => void;
   }[] = [
     { name: "Help", icon: HelpCircle, link: "/support" },
-    { name: "Log out", icon: LogOut, link: "/", onClick: logout },
+    {
+      name: "Log out",
+      icon: LogOut,
+      onClick: () => {
+        logout();
+        navigate("/welcome", { replace: true });
+      },
+    },
   ];
 
   const renderNavItem = (

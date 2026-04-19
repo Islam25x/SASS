@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ParsedTransactionSchema } from "../ai/ai.schema";
+import { ParsedTransactionSchema } from "../../../domain/ai/ai.schema";
 
 export const TransactionSchema = z.object({
   id: z.string().min(1),
@@ -7,8 +7,7 @@ export const TransactionSchema = z.object({
   category: z.string().min(1),
   description: z.string().min(1),
   date: z.string().optional(),
-  transaction_type: z.string().optional(),
-  type: z.string().optional(),
+  type: z.enum(["Income", "Expense"]),
   method: z.enum(["voice", "receipt"]).optional(),
 });
 

@@ -249,7 +249,7 @@ export default function WelcomePage() {
       login(session);
       setIsAuthOpen(false);
       setLoginErrors({});
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Login failed. Please try again.";
       setLoginErrors((prev) => ({ ...prev, password: message }));
@@ -268,12 +268,17 @@ export default function WelcomePage() {
 
     try {
       const submittedEmail = registerData.email.trim();
-      const response = await registerMutation.mutateAsync({
+      await registerMutation.mutateAsync({
         email: submittedEmail,
         username: registerData.username.trim(),
         password: registerData.password,
         confirmPassword: registerData.confirmPassword,
       });
+      const session = await loginMutation.mutateAsync({
+        email: submittedEmail,
+        password: registerData.password,
+      });
+      login(session);
 
       setRegisterErrors({});
       setRegisterData({
@@ -283,15 +288,9 @@ export default function WelcomePage() {
         confirmPassword: "",
         agree: false,
       });
-      setLoginData((prev) => ({ ...prev, email: submittedEmail }));
-      setAuthMode("login");
-      setAuthBanner({
-        tone: "success",
-        text:
-          response.message ||
-          "Account created successfully. You can sign in as soon as login is connected.",
-      });
-      navigate("/welcome");
+      setLoginData({ email: "", password: "" });
+      setIsAuthOpen(false);
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Registration failed. Please try again.";
