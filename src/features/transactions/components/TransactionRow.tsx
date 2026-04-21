@@ -3,7 +3,7 @@ import { formatTransactionDate } from "../../../application/transactions/transac
 import AmountText from "./AmountText";
 import CategoryBadge from "./CategoryBadge";
 import { Button, Text } from "../../../shared/ui";
-import type { Transaction } from "../domain/transaction.types";
+import type { Transaction } from "../types/transaction.types";
 
 type TransactionRowProps = {
   transaction: TransactionRowData;

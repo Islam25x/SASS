@@ -1,6 +1,6 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { AddTransactionType } from "../domain/add-transaction.types";
+import type { AddTransactionType } from "../types/add-transaction.types";
 
 interface CreateCategoryRequestDto {
   name: string;

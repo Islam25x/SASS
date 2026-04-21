@@ -1,6 +1,6 @@
 import type { ReceiptOcrResponse } from "../../domain/ai/ai.types";
-import { buildTransactionsFromReceipt } from "../../features/transactions/domain/transaction.rules";
-import type { Transaction } from "../../features/transactions/domain/transaction.types";
+import { buildTransactionsFromReceipt } from "../../features/transactions/utils/transaction.parser";
+import type { Transaction } from "../../features/transactions/types/transaction.types";
 
 export async function normalizeReceiptTransactionsUseCase(
   response: ReceiptOcrResponse,

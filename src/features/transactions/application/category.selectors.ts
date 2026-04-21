@@ -1,5 +1,5 @@
-import type { AddTransactionType } from "../domain/add-transaction.types";
-import type { TransactionCategory } from "../domain/category.types";
+import type { AddTransactionType } from "../types/add-transaction.types";
+import type { TransactionCategory } from "../types/category.types";
 
 export function selectCategoriesByType(
   categories: TransactionCategory[],

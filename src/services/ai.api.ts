@@ -9,10 +9,10 @@ import type {
   ReceiptOcrResponse,
   VoiceToTextResponse,
 } from "../domain/ai/ai.types";
-import type { Transaction } from "../features/transactions/domain/transaction.types";
+import type { Transaction } from "../features/transactions/types/transaction.types";
 import { readStoredAuthSession } from "../infrastructure/auth/auth-storage";
 export { ApiError } from "../shared/api/api-error";
-import type { TransactionsFilters } from "../features/transactions/domain/transactions-filter.types";
+import type { TransactionsFilters } from "../features/transactions/types/transactions-filter.types";
 
 export type {
   ParsedTransaction,

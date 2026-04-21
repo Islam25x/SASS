@@ -8,7 +8,7 @@ import { createCategoryUseCase } from "../features/transactions/application/crea
 import type {
   CreateTransactionCategoryInput,
   TransactionCategory,
-} from "../features/transactions/domain/category.types";
+} from "../features/transactions/types/category.types";
 import { ApiError } from "../shared/api/api-error";
 import { TRANSACTION_CATEGORIES_QUERY_KEY } from "./useCategories";
 

@@ -1,6 +1,6 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { TransactionsFilters } from "../domain/transactions-filter.types";
+import type { TransactionsFilters } from "../types/transactions-filter.types";
 
 function buildTransactionsQuery(filters: TransactionsFilters): string {
   const params = new URLSearchParams();

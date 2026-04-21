@@ -1,74 +1,31 @@
 import { useMemo, useState } from "react";
-import { Search, Laptop, Plane, HeartPulse, Smartphone, PiggyBank } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button, Input, PageHeader } from "../../../shared/ui";
 import GoalsSummaryCards, { type GoalsSummary } from "./GoalsSummaryCards";
 import GoalsListCard from "./GoalsListCard";
 import GoalsInsightsCard from "./GoalsInsightsCard";
-import type { Goal } from "./goals.types";
-
-const goalsData: Goal[] = [
-  {
-    id: "goal-1",
-    title: "Buy a new laptop",
-    saved: 700,
-    target: 1000,
-    deadline: "15 Aug",
-    status: "In Progress",
-    icon: <Laptop size={18} />,
-  },
-  {
-    id: "goal-2",
-    title: "Vacation trip",
-    saved: 900,
-    target: 2000,
-    deadline: "05 Sept",
-    status: "In Progress",
-    icon: <Plane size={18} />,
-  },
-  {
-    id: "goal-3",
-    title: "Emergency fund",
-    saved: 1500,
-    target: 1500,
-    deadline: "15 Aug",
-    status: "Completed",
-    icon: <HeartPulse size={18} />,
-  },
-  {
-    id: "goal-4",
-    title: "New smartphone",
-    saved: 0,
-    target: 800,
-    deadline: "20 Sept",
-    status: "Not Started",
-    icon: <Smartphone size={18} />,
-  },
-  {
-    id: "goal-5",
-    title: "Family savings",
-    saved: 0,
-    target: 750,
-    deadline: "30 Sept",
-    status: "Not Started",
-    icon: <PiggyBank size={18} />,
-  },
-];
+import { useGoals } from "../../../hooks/useGoals";
+import CreateGoalModal from "./CreateGoalModal";
 
 const PAGE_SIZE = 2;
 
 function GoalsPage() {
+  const { data, isLoading } = useGoals();
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const goals = useMemo(() => data ?? [], [data]);
 
   const filteredGoals = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) {
-      return goalsData;
+      return goals;
     }
-    return goalsData.filter((goal) =>
-      goal.title.toLowerCase().includes(normalized)
+    return goals.filter((goal) =>
+      goal.title.toLowerCase().includes(normalized) ||
+      goal.description.toLowerCase().includes(normalized)
     );
-  }, [query]);
+  }, [goals, query]);
 
   const totalPages = Math.max(1, Math.ceil(filteredGoals.length / PAGE_SIZE));
   const safePage = Math.min(currentPage, totalPages);
@@ -78,25 +35,26 @@ function GoalsPage() {
   );
 
   const summary: GoalsSummary = useMemo(() => {
-    const totalGoals = goalsData.length;
-    const completedGoals = goalsData.filter((goal) => goal.status === "Completed").length;
-    const inProgressGoals = goalsData.filter((goal) => goal.status === "In Progress").length;
-    const totalSaved = goalsData.reduce((acc, goal) => acc + goal.saved, 0);
-    const totalTarget = goalsData.reduce((acc, goal) => acc + goal.target, 0);
-    const completedPercent = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
-    const inProgressPercent = totalGoals > 0 ? (inProgressGoals / totalGoals) * 100 : 0;
-    const savedChange = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
+    const totalGoals = goals.length;
+    const totalTargetAmount = goals.reduce((acc, goal) => acc + goal.targetAmount, 0);
+    const totalMonthlyAmount = goals.reduce((acc, goal) => acc + goal.monthlyAmount, 0);
+    const averageDuration =
+      totalGoals > 0
+        ? goals.reduce((acc, goal) => acc + goal.durationValue, 0) / totalGoals
+        : 0;
+    const longestDuration = goals.reduce(
+      (acc, goal) => Math.max(acc, goal.durationValue),
+      0,
+    );
 
     return {
       totalGoals,
-      completedGoals,
-      inProgressGoals,
-      totalSaved,
-      completedPercent,
-      inProgressPercent,
-      savedChange,
+      totalTargetAmount,
+      totalMonthlyAmount,
+      averageDuration,
+      longestDuration,
     };
-  }, []);
+  }, [goals]);
 
   return (
     <div className="space-y-5">
@@ -123,7 +81,22 @@ function GoalsPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <div className="space-y-4">
-          <GoalsListCard goals={pagedGoals} totalCount={filteredGoals.length} />
+          {isLoading ? (
+            <div className="space-y-3">
+              {[0, 1].map((row) => (
+                <div
+                  key={row}
+                  className="h-28 w-full animate-pulse rounded-2xl bg-slate-100"
+                />
+              ))}
+            </div>
+          ) : (
+            <GoalsListCard
+              goals={pagedGoals}
+              totalCount={filteredGoals.length}
+              onAddGoal={() => setIsCreateOpen(true)}
+            />
+          )}
 
           <div className="flex items-center justify-center gap-2">
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
@@ -144,8 +117,13 @@ function GoalsPage() {
             ))}
           </div>
         </div>
-        <GoalsInsightsCard goals={goalsData} />
+        <GoalsInsightsCard goals={goals} />
       </div>
+
+      <CreateGoalModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+      />
     </div>
   );
 }

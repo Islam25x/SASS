@@ -1,4 +1,4 @@
-import type { Transaction } from "../domain/transaction.types";
+import type { Transaction } from "../types/transaction.types";
 import type { TransactionRowData } from "../../../application/transactions/transactions.selectors";
 import TransactionRow from "./TransactionRow";
 

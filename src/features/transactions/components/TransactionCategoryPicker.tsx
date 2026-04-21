@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Button, Input } from "../../../shared/ui";
-import type { TransactionCategory } from "../domain/category.types";
+import type { TransactionCategory } from "../types/category.types";
 
 type TransactionCategoryPickerProps = {
   options: TransactionCategory[];
@@ -72,18 +72,16 @@ function TransactionCategoryPicker({
               key={option.id}
               type="button"
               onClick={() => onSelect(option.id)}
-              className={`rounded-xl border px-3 py-3 text-left transition ${
-                isSelected
+              className={`rounded-xl border px-3 py-3 text-left transition ${isSelected
                   ? "border-primary bg-primary/10 shadow-sm"
                   : "border-border bg-surface hover:border-primary/30 hover:bg-primary/5"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-text-secondary">{option.name}</p>
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${
-                    isSelected ? "bg-primary" : "bg-gray-300"
-                  }`}
+                  className={`h-2.5 w-2.5 rounded-full ${isSelected ? "bg-primary" : "bg-gray-300"
+                    }`}
                 />
               </div>
             </button>

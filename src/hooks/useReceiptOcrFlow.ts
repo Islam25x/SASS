@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { normalizeReceiptTransactionsUseCase } from "../application/transactions/normalize-receipt-transactions.usecase";
-import type { Transaction } from "../features/transactions/domain/transaction.types";
+import type { Transaction } from "../features/transactions/types/transaction.types";
 import { useReceiptOcr } from "./useReceiptOcr";
 
 export type ReceiptOcrState =

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createTransactionUseCase } from "../application/transactions/create-transaction.usecase";
 import type { ParsedTransaction } from "../domain/ai/ai.types";
-import type { Transaction } from "../features/transactions/domain/transaction.types";
+import type { Transaction } from "../features/transactions/types/transaction.types";
 import { ApiError } from "../shared/api/api-error";
 import { useParseTransaction } from "./useParseTransaction";
 import { useVoiceToText } from "./useVoiceToText";

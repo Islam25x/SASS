@@ -1,5 +1,5 @@
 import { PanelCard, PanelHeader, Text } from "../../../shared/ui";
-import type { Goal } from "./goals.types";
+import type { Goal } from "../../../domain/goals/goal.schema";
 import { Lightbulb, Target, TrendingUp } from "lucide-react";
 
 type GoalsInsightsCardProps = {
@@ -8,9 +8,6 @@ type GoalsInsightsCardProps = {
 
 function GoalsInsightsCard({ goals }: GoalsInsightsCardProps) {
   const activeGoal = goals[0];
-  const savedPercent =
-    activeGoal && activeGoal.target > 0 ? (activeGoal.saved / activeGoal.target) * 100 : 0;
-  const remaining = activeGoal ? Math.max(activeGoal.target - activeGoal.saved, 0) : 0;
 
   return (
     <PanelCard>
@@ -30,10 +27,10 @@ function GoalsInsightsCard({ goals }: GoalsInsightsCardProps) {
           </span>
           <div>
             <Text variant="body" weight="bold" className="text-gray-900">
-              You&apos;re {savedPercent.toFixed(0)}% closer to your goal
+              Save ${activeGoal?.monthlyAmount.toFixed(2) ?? "0.00"} each month
             </Text>
             <Text variant="body" className="text-gray-500">
-              Keep the momentum going.
+              Consistency is the fastest way to hit your target.
             </Text>
           </div>
         </div>
@@ -44,10 +41,10 @@ function GoalsInsightsCard({ goals }: GoalsInsightsCardProps) {
           </span>
           <div>
             <Text variant="body" weight="bold" className="text-gray-900">
-              You need ${remaining}
+              Reach it in {activeGoal?.durationValue.toFixed(2) ?? "0.00"} months
             </Text>
             <Text variant="body" className="text-gray-500">
-              To hit your target.
+              Based on your current plan.
             </Text>
           </div>
         </div>
@@ -61,7 +58,7 @@ function GoalsInsightsCard({ goals }: GoalsInsightsCardProps) {
               Tip
             </Text>
             <Text variant="body" className="text-gray-500">
-              Automate a weekly transfer.
+              Pick a monthly amount you can sustain without missing a month.
             </Text>
           </div>
         </div>
@@ -73,13 +70,13 @@ function GoalsInsightsCard({ goals }: GoalsInsightsCardProps) {
             Goal: {activeGoal?.title ?? "N/A"}
           </Text>
           <Text as="span" variant="body">
-            ${activeGoal?.target.toLocaleString() ?? "0"}
+            ${activeGoal?.targetAmount.toLocaleString() ?? "0"}
           </Text>
         </div>
         <div className="mt-3 h-20 rounded-lg bg-gray-200" aria-hidden="true" />
         <Text variant="body" className="mt-3 text-gray-500">
-          ${activeGoal?.saved.toLocaleString() ?? "0"} / $
-          {activeGoal?.target.toLocaleString() ?? "0"} Saved
+          ${activeGoal?.monthlyAmount.toLocaleString() ?? "0"} per month for{" "}
+          {activeGoal?.durationValue.toFixed(2) ?? "0.00"} months
         </Text>
       </div>
     </PanelCard>

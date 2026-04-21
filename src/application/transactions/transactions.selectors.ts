@@ -1,8 +1,8 @@
-import type { Transaction } from "../../features/transactions/domain/transaction.types";
+import type { Transaction } from "../../features/transactions/types/transaction.types";
 import {
   TransactionCategory,
   TransactionType,
-} from "../../features/transactions/domain/transaction.enums";
+} from "../../features/transactions/types/transaction.enums";
 
 export type NormalizedTransactionType = TransactionType | "unknown";
 
@@ -199,19 +199,19 @@ export function selectTransactionsInsights(transactions: Transaction[]): Transac
   const currentMonthExpenses = summarize(
     latestMonthKey
       ? transactions.filter(
-          (transaction) =>
-            normalizeTransactionType(transaction) === TransactionType.Expense &&
-            getMonthKey(transaction.date) === latestMonthKey
-        )
+        (transaction) =>
+          normalizeTransactionType(transaction) === TransactionType.Expense &&
+          getMonthKey(transaction.date) === latestMonthKey
+      )
       : []
   ).totalExpenses;
   const previousMonthExpenses = summarize(
     previousMonthKey
       ? transactions.filter(
-          (transaction) =>
-            normalizeTransactionType(transaction) === TransactionType.Expense &&
-            getMonthKey(transaction.date) === previousMonthKey
-        )
+        (transaction) =>
+          normalizeTransactionType(transaction) === TransactionType.Expense &&
+          getMonthKey(transaction.date) === previousMonthKey
+      )
       : []
   ).totalExpenses;
 

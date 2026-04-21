@@ -4,7 +4,7 @@ import EmptyState from "./EmptyState";
 import { PanelCard } from "../../../shared/ui";
 import { Text } from "../../../shared/ui";
 import TransactionsList from "./TransactionsList";
-import type { Transaction } from "../domain/transaction.types";
+import type { Transaction } from "../types/transaction.types";
 
 type TransactionTableProps = {
   rows: TransactionRowData[];

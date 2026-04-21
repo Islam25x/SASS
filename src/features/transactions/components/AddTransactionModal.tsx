@@ -21,8 +21,8 @@ import {
 import type {
   AddTransactionInput,
   AddTransactionType,
-} from "../domain/add-transaction.types";
-import type { Transaction } from "../domain/transaction.types";
+} from "../types/add-transaction.types";
+import type { Transaction } from "../types/transaction.types";
 import TransactionCategoryPicker from "./TransactionCategoryPicker";
 
 type AddTransactionModalProps = {

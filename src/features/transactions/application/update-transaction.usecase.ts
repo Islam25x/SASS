@@ -1,5 +1,5 @@
 import { ApiError } from "../../../shared/api/api-error";
-import type { AddTransactionInput } from "../domain/add-transaction.types";
+import type { AddTransactionInput } from "../types/add-transaction.types";
 import { updateTransactionApi } from "../api/update-transaction.api";
 import { mapTransactionInputToPayload } from "./add-transaction.usecase";
 

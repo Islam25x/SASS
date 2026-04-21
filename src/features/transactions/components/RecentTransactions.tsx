@@ -4,7 +4,7 @@ import {
   mapTransactionsForTable,
   selectRecentTransactions,
 } from "../../../application/transactions/transactions.selectors";
-import type { Transaction } from "../domain/transaction.types";
+import type { Transaction } from "../types/transaction.types";
 import { Button, PanelCard, PanelHeader, Text } from "../../../shared/ui";
 import TransactionsList from "./TransactionsList";
 import AddTransactionModal from "./AddTransactionModal";

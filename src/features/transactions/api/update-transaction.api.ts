@@ -1,6 +1,6 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { AddTransactionPayload } from "../domain/add-transaction.types";
+import type { AddTransactionPayload } from "../types/add-transaction.types";
 
 export async function updateTransactionApi(
   transactionId: string,

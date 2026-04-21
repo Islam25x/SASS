@@ -1,5 +1,5 @@
 import { ApiError } from "../../../shared/api/api-error";
-import type { TransactionCategory } from "../domain/category.types";
+import type { TransactionCategory } from "../types/category.types";
 
 type CategoryDto = {
   id?: unknown;

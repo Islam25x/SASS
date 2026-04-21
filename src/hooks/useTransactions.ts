@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTransactionsUseCase } from "../application/transactions/fetch-transactions.usecase";
-import type { Transaction } from "../features/transactions/domain/transaction.types";
+import type { Transaction } from "../features/transactions/types/transaction.types";
 import { ApiError } from "../shared/api/api-error";
 import { useAuth } from "../shared/auth/AuthContext";
 import type {
   TransactionsFilters,
   TransactionsTypeUiFilter,
-} from "../features/transactions/domain/transactions-filter.types";
+} from "../features/transactions/types/transactions-filter.types";
 
 type UseTransactionsOptions = {
   typeFilter?: TransactionsTypeUiFilter;

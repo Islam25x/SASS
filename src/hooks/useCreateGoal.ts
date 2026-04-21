@@ -4,22 +4,25 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import { addTransactionUseCase } from "../features/transactions/application/add-transaction.usecase";
-import type { AddTransactionInput } from "../features/transactions/types/add-transaction.types";
+import {
+  createGoalUseCase,
+  type CreateGoalFormInput,
+} from "../features/goals/application/create-goal.usecase";
 import { ApiError } from "../shared/api/api-error";
+import { GOALS_QUERY_KEY } from "./useGoals";
 
-type AddTransactionMutation = UseMutationResult<void, ApiError, AddTransactionInput>;
+type CreateGoalMutation = UseMutationResult<void, ApiError, CreateGoalFormInput>;
 
-type UseAddTransactionResult = AddTransactionMutation & {
+type UseCreateGoalResult = CreateGoalMutation & {
   cancel: () => void;
 };
 
-export function useAddTransaction(): UseAddTransactionResult {
+export function useCreateGoal(): UseCreateGoalResult {
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const mutation = useMutation<void, ApiError, AddTransactionInput>({
-    mutationKey: ["transactions", "add"],
+  const mutation = useMutation<void, ApiError, CreateGoalFormInput>({
+    mutationKey: ["goals", "create"],
     mutationFn: async (payload) => {
       abortControllerRef.current?.abort();
 
@@ -27,7 +30,9 @@ export function useAddTransaction(): UseAddTransactionResult {
       abortControllerRef.current = controller;
 
       try {
-        return await addTransactionUseCase(payload, { signal: controller.signal });
+        return await createGoalUseCase(payload, {
+          signal: controller.signal,
+        });
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;
@@ -36,7 +41,7 @@ export function useAddTransaction(): UseAddTransactionResult {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
+        queryKey: GOALS_QUERY_KEY,
       });
     },
     retry: 0,

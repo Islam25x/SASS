@@ -5,7 +5,7 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import { updateTransactionUseCase } from "../features/transactions/application/update-transaction.usecase";
-import type { AddTransactionInput } from "../features/transactions/domain/add-transaction.types";
+import type { AddTransactionInput } from "../features/transactions/types/add-transaction.types";
 import { ApiError } from "../shared/api/api-error";
 
 type UpdateTransactionPayload = {

@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getCategoriesUseCase } from "../features/transactions/application/get-categories.usecase";
-import type { TransactionCategory } from "../features/transactions/domain/category.types";
+import type { TransactionCategory } from "../features/transactions/types/category.types";
 import { ApiError } from "../shared/api/api-error";
 import { useAuth } from "../shared/auth/AuthContext";
 

@@ -12,8 +12,8 @@ import TransactionsSummaryCards from "./TransactionsSummaryCards";
 import AIInsightsCard from "./AIInsightsCard";
 import AddTransactionModal from "./AddTransactionModal";
 import { Button, Input, PageHeader } from "../../../shared/ui";
-import type { TransactionsTypeUiFilter } from "../domain/transactions-filter.types";
-import type { Transaction } from "../domain/transaction.types";
+import type { TransactionsTypeUiFilter } from "../types/transactions-filter.types";
+import type { Transaction } from "../types/transaction.types";
 
 const PAGE_SIZE = 6;
 
@@ -108,9 +108,8 @@ function TransactionsPage() {
               onClick={() => handleFilterChange(type)}
               variant={filterType === type ? "primary" : "secondary"}
               size="sm"
-              className={`rounded-full px-4 py-1 text-sm font-medium ${
-                filterType === type ? "border-primary" : "border-gray-200 text-gray-600"
-              }`}
+              className={`rounded-full px-4 py-1 text-sm font-medium ${filterType === type ? "border-primary" : "border-gray-200 text-gray-600"
+                }`}
             >
               {type === "all" ? "All" : type.charAt(0).toUpperCase() + type.slice(1)}
             </Button>
@@ -140,11 +139,10 @@ function TransactionsPage() {
                 onClick={() => handlePageChange(page)}
                 variant={page === safePage ? "primary" : "secondary"}
                 size="sm"
-                className={`h-9 w-9 rounded-lg border text-sm font-medium ${
-                  page === safePage
-                    ? "border-primary"
-                    : "border-gray-200 text-gray-600"
-                }`}
+                className={`h-9 w-9 rounded-lg border text-sm font-medium ${page === safePage
+                  ? "border-primary"
+                  : "border-gray-200 text-gray-600"
+                  }`}
               >
                 {page}
               </Button>

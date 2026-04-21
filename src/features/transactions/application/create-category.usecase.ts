@@ -4,7 +4,7 @@ import { isObjectRecord, mapCategoryDto } from "./category.mapping";
 import type {
   CreateTransactionCategoryInput,
   TransactionCategory,
-} from "../domain/category.types";
+} from "../types/category.types";
 
 type CategoryEnvelope = {
   data?: unknown;

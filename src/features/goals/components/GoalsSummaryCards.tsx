@@ -12,12 +12,10 @@ import { Text } from "../../../shared/ui";
 
 type GoalsSummary = {
   totalGoals: number;
-  completedGoals: number;
-  inProgressGoals: number;
-  totalSaved: number;
-  completedPercent: number;
-  inProgressPercent: number;
-  savedChange: number;
+  totalTargetAmount: number;
+  totalMonthlyAmount: number;
+  averageDuration: number;
+  longestDuration: number;
 };
 
 type GoalsSummaryCardsProps = {
@@ -31,32 +29,32 @@ function GoalsSummaryCards({ summary }: GoalsSummaryCardsProps) {
       title: "Total Goals",
       icon: <FontAwesomeIcon icon={faBullseye} className="text-primary" />,
       value: summary.totalGoals,
-      label: `${summary.completedPercent.toFixed(1)}% completed`,
+      label: "Tracked from your current plan",
       isIncrease: true,
     },
     {
-      id: "completed",
-      title: "Completed",
+      id: "target",
+      title: "Target Amount",
       icon: <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />,
-      value: summary.completedGoals,
-      label: `${summary.completedPercent.toFixed(1)}%`,
+      value: summary.totalTargetAmount,
+      label: "Combined goal target",
       isIncrease: true,
     },
     {
-      id: "in-progress",
-      title: "In Progress",
+      id: "monthly",
+      title: "Monthly Total",
       icon: <FontAwesomeIcon icon={faSpinner} className="text-primary" />,
-      value: summary.inProgressGoals,
-      label: `${summary.inProgressPercent.toFixed(1)}%`,
+      value: summary.totalMonthlyAmount,
+      label: `${summary.averageDuration.toFixed(1)} average months`,
       isIncrease: true,
     },
     {
-      id: "savings",
-      title: "Total savings",
+      id: "duration",
+      title: "Longest Duration",
       icon: <FontAwesomeIcon icon={faBell} className="text-yellow-500" />,
-      value: summary.totalSaved,
-      label: `${Math.abs(summary.savedChange).toFixed(1)}% vs last month`,
-      isIncrease: summary.savedChange >= 0,
+      value: summary.longestDuration,
+      label: "Months to finish the longest goal",
+      isIncrease: true,
     },
   ];
 

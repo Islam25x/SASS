@@ -1,8 +1,8 @@
-import type { Transaction } from "../../features/transactions/domain/transaction.types";
+import type { Transaction } from "../../features/transactions/types/transaction.types";
 import { ApiError } from "../../shared/api/api-error";
 import { fetchTransactionsApi } from "../../features/transactions/api/transactions.api";
 import { mapTransactionsResponseToTransactions } from "../../features/transactions/application/transaction.mapping";
-import type { TransactionsFilters } from "../../features/transactions/domain/transactions-filter.types";
+import type { TransactionsFilters } from "../../features/transactions/types/transactions-filter.types";
 
 export async function fetchTransactionsUseCase(
   input: { accessToken?: string; filters?: TransactionsFilters },

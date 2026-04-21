@@ -1,7 +1,7 @@
 import { ApiError } from "../../../shared/api/api-error";
 import { getCategoriesApi } from "../api/get-categories.api";
 import { isObjectRecord, mapCategoryDto } from "./category.mapping";
-import type { TransactionCategory } from "../domain/category.types";
+import type { TransactionCategory } from "../types/category.types";
 
 type CategoryEnvelope = {
   data?: unknown;

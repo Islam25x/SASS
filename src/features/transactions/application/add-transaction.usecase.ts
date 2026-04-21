@@ -5,7 +5,7 @@ import type {
   AddTransactionPayload,
   AddTransactionType,
   AddTransactionTypeInput,
-} from "../domain/add-transaction.types";
+} from "../types/add-transaction.types";
 
 function normalizeOccurredAt(value: string): string {
   const parsedDate = new Date(value);

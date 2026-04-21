@@ -1,12 +1,12 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { AddTransactionPayload } from "../types/add-transaction.types";
+import type { CreateGoalInput } from "../../../domain/goals/goal.schema";
 
-export async function addTransactionApi(
-  payload: AddTransactionPayload,
+export async function createGoalApi(
+  payload: CreateGoalInput,
   options?: { signal?: AbortSignal },
 ): Promise<void> {
-  await requestJson<unknown>("/api/Transaction/add-transaction", {
+  await requestJson<unknown>("/api/Goal/create-goal", {
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,

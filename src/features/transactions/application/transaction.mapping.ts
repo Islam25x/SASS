@@ -2,8 +2,8 @@ import { ApiError } from "../../../shared/api/api-error";
 import {
   TransactionSchema,
   type Transaction,
-} from "../domain/transaction.schema";
-import type { TransactionResponseDto } from "../domain/transaction.dto";
+} from "../utils/transaction.schema";
+import type { TransactionResponseDto } from "../types/transaction.dto";
 
 type TransactionsResponseEnvelope = {
   data?: unknown;

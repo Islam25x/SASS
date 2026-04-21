@@ -14,7 +14,6 @@ import ProfileInfo from "./ProfileInfo";
 import Security from "./Security";
 import Preferences from "./Preferences";
 import { useTransactions } from "../../hooks/useTransactions";
-import BackgroundCanvas from "../../three/canvas/BackgroundCanvas";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import {
     getUserDisplayName,
@@ -196,9 +195,6 @@ const Profile = () => {
 
     return (
         <section id="Support" className={PAGE_SHELL_CLASS}>
-            <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.06]">
-                <BackgroundCanvas />
-            </div>
             <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
                 <div className="absolute left-[-10%] top-[-15%] h-56 w-56 rounded-full bg-sky-200/40 blur-3xl" />
                 <div className="absolute bottom-[-10%] right-[-5%] h-72 w-72 rounded-full bg-blue-100/70 blur-3xl" />
