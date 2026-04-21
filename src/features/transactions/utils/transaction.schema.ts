@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ParsedTransactionSchema } from "../../../domain/ai/ai.schema";
+import { ParsedTransactionSchema } from "../../ai/types/ai.types";
 
 export const TransactionSchema = z.object({
   id: z.string().min(1),

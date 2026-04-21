@@ -9,8 +9,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import DashboardSummaryCard from "./DashboardSummaryCard";
 import { PageHeader, Text } from "../../../shared/ui";
-import { useUserProfile } from "../../../hooks/useUserProfile";
-import { getUserDisplayName } from "../../../features/user/application/user.selectors";
+import { useUserProfile } from "../../../features/user/hooks/useUserProfile";
+import { getUserDisplayName } from "../../../features/user/utils/user.selectors";
 
 const DashboardTop = () => {
   const { data: profile } = useUserProfile();

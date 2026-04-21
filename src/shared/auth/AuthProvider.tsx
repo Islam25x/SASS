@@ -5,7 +5,7 @@ import {
   readStoredAuthSession,
   writeStoredAuthSession,
 } from "../../infrastructure/auth/auth-storage";
-import type { User } from "../../features/user/domain/user";
+import type { User } from "../../features/user/types/user.types";
 import { API_UNAUTHORIZED_EVENT } from "../api/http";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
 

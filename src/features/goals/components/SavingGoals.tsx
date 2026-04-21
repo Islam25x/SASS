@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { PanelCard, PanelHeader, Text } from "../../../shared/ui";
-import { useGoals } from "../../../hooks/useGoals";
+import { useGoals } from "../hooks/useGoals";
+import GoalCard from "./GoalCard";
 
 const SavingGoals = () => {
   const { data } = useGoals();
-  const goals = useMemo(() => (data ?? []).slice(0, 3), [data]);
+  const goals = useMemo(() => (data ?? []).slice(0, 2), [data]);
 
   return (
     <PanelCard className="h-full !w-full">
@@ -17,25 +18,7 @@ const SavingGoals = () => {
           </Text>
         )}
         {goals.map((goal) => (
-          <div key={goal.id}>
-            <div className="flex justify-between mb-1">
-              <Text as="span" variant="body" weight="medium" className="text-gray-700">
-                {goal.title}
-              </Text>
-              <Text as="span" variant="body" className="text-gray-500">
-                {goal.durationValue.toFixed(2)} mo
-              </Text>
-            </div>
-
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-primary-600 h-3 rounded-full"
-                style={{
-                  width: `${Math.min((goal.monthlyAmount / goal.targetAmount) * 100, 100)}%`,
-                }}
-              />
-            </div>
-          </div>
+          <GoalCard key={goal.id} goal={goal} variant="dashboard" />
         ))}
       </div>
     </PanelCard>

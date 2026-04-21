@@ -1,5 +1,5 @@
 import { Sparkles, TrendingDown, TrendingUp } from "lucide-react";
-import type { TransactionsInsights } from "../../../application/transactions/transactions.selectors";
+import type { TransactionsInsights } from "../utils/transaction.selectors";
 import { PanelCard, PanelHeader, Text } from "../../../shared/ui";
 
 type AIInsightsCardProps = {

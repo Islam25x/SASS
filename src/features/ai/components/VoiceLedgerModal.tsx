@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { CheckCircle2, Mic, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { ParsedTransaction } from "../../../domain/ai/ai.types";
-import type { VoiceLedgerState } from "../../../hooks/useVoiceLedgerFlow";
+import type { ParsedTransaction } from "../types/ai.types";
+import type { VoiceLedgerState } from "../hooks/useVoiceLedgerFlow";
 import { Button, Input, Text } from "../../../shared/ui";
 
 interface VoiceLedgerModalProps {

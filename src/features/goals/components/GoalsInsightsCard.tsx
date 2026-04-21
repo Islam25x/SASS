@@ -1,5 +1,5 @@
 import { PanelCard, PanelHeader, Text } from "../../../shared/ui";
-import type { Goal } from "../../../domain/goals/goal.schema";
+import type { Goal } from "../types/goal.types";
 import { Lightbulb, Target, TrendingUp } from "lucide-react";
 
 type GoalsInsightsCardProps = {

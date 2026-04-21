@@ -1,5 +1,5 @@
-import { currencyFormatter } from "../../../application/transactions/transactions.formatters";
-import type { NormalizedTransactionType } from "../../../application/transactions/transactions.selectors";
+import { currencyFormatter } from "../utils/transaction.formatters";
+import type { NormalizedTransactionType } from "../utils/transaction.selectors";
 import { TransactionType } from "../types/transaction.enums";
 import { Text } from "../../../shared/ui";
 

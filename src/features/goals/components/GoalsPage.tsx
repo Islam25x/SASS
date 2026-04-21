@@ -4,10 +4,10 @@ import { Button, Input, PageHeader } from "../../../shared/ui";
 import GoalsSummaryCards, { type GoalsSummary } from "./GoalsSummaryCards";
 import GoalsListCard from "./GoalsListCard";
 import GoalsInsightsCard from "./GoalsInsightsCard";
-import { useGoals } from "../../../hooks/useGoals";
+import { useGoals } from "../hooks/useGoals";
 import CreateGoalModal from "./CreateGoalModal";
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 6;
 
 function GoalsPage() {
   const { data, isLoading } = useGoals();
@@ -86,7 +86,7 @@ function GoalsPage() {
               {[0, 1].map((row) => (
                 <div
                   key={row}
-                  className="h-28 w-full animate-pulse rounded-2xl bg-slate-100"
+                  className="h-72 w-full animate-pulse rounded-2xl bg-slate-100"
                 />
               ))}
             </div>

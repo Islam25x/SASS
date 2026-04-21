@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
-import { sendChatMessageUseCase } from "../../../application/ai/send-chat-message.usecase";
+import { sendChatbotMessageApi } from "../api/ai.api";
 import { Button, Card, Input, Text } from "../../../shared/ui";
 
 interface Message {
@@ -25,7 +25,7 @@ const AI = () => {
         setLoading(true);
 
         try {
-            const response = await sendChatMessageUseCase(input);
+            const response = await sendChatbotMessageApi(input);
 
             const data = await response.json();
             const aiResponse =

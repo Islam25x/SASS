@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Loader2, Upload, X } from "lucide-react";
-import type { ReceiptOcrState } from "../../../hooks/useReceiptOcrFlow";
+import type { ReceiptOcrState } from "../hooks/useReceiptOcrFlow";
 import type { Transaction } from "../../transactions/types/transaction.types";
 import { Button, Input, Text } from "../../../shared/ui";
 

@@ -13,16 +13,16 @@ import {
 import ProfileInfo from "./ProfileInfo";
 import Security from "./Security";
 import Preferences from "./Preferences";
-import { useTransactions } from "../../hooks/useTransactions";
-import { useUserProfile } from "../../hooks/useUserProfile";
+import { useTransactions } from "../../features/transactions/hooks/useTransactions";
+import { useUserProfile } from "../../features/user/hooks/useUserProfile";
 import {
     getUserDisplayName,
     getUserInitial,
-} from "../../features/user/application/user.selectors";
+} from "../../features/user/utils/user.selectors";
 import {
     selectTransactionsInsights,
     type TransactionsInsights,
-} from "../../application/transactions/transactions.selectors";
+} from "../../features/transactions/utils/transaction.selectors";
 import { Text } from "../../shared/ui";
 
 const PAGE_SHELL_CLASS =

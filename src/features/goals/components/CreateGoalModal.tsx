@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "
 import { Target, Wallet, X } from "lucide-react";
 import { Button, Input } from "../../../shared/ui";
 import { ApiError } from "../../../shared/api/api-error";
-import { useCreateGoal } from "../../../hooks/useCreateGoal";
-import type { CreateGoalFormInput } from "../application/create-goal.usecase";
+import { useCreateGoal } from "../hooks/useCreateGoal";
+import type { CreateGoalFormInput } from "../types/goal.types";
 
 type GoalCalculationMode = "monthly" | "duration";
 

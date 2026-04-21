@@ -1,4 +1,4 @@
-import type { TransactionRowData } from "../../../application/transactions/transactions.selectors";
+import type { TransactionRowData } from "../utils/transaction.selectors";
 import TransactionSectionHeader from "./TransactionSectionHeader";
 import EmptyState from "./EmptyState";
 import { PanelCard } from "../../../shared/ui";

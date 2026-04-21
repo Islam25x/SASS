@@ -1,5 +1,5 @@
 import type { Transaction } from "../types/transaction.types";
-import type { TransactionRowData } from "../../../application/transactions/transactions.selectors";
+import type { TransactionRowData } from "../utils/transaction.selectors";
 import TransactionRow from "./TransactionRow";
 
 type TransactionsListProps = {

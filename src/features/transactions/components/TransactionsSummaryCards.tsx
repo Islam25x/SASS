@@ -7,7 +7,7 @@ import {
   faCircle,
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
-import type { TransactionsSummary } from "../../../application/transactions/transactions.selectors";
+import type { TransactionsSummary } from "../utils/transaction.selectors";
 import DashboardSummaryCard from "../../dashboard/components/DashboardSummaryCard";
 import { Text } from "../../../shared/ui";
 

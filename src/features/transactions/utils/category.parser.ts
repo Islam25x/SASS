@@ -1,0 +1,93 @@
+import { ApiError } from "../../../shared/api/api-error";
+import type { TransactionCategoryDto } from "../types/category.dto";
+import type { TransactionCategory } from "../types/category.types";
+
+type CategoryEnvelope = {
+  data?: unknown;
+  result?: unknown;
+  payload?: unknown;
+  categories?: unknown;
+  category?: unknown;
+};
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function readTrimmedString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function parseCategoryType(value: unknown): TransactionCategory["categoryType"] {
+  const normalized = readTrimmedString(value).toLowerCase();
+
+  if (normalized === "expense") {
+    return "Expense";
+  }
+
+  if (normalized === "income") {
+    return "Income";
+  }
+
+  throw new ApiError("Category type is invalid.", 500, "INVALID_RESPONSE");
+}
+
+export function parseCategory(dto: unknown): TransactionCategory {
+  if (!isObject(dto)) {
+    throw new ApiError("Category item is invalid.", 500, "INVALID_RESPONSE");
+  }
+
+  const categoryDto = dto as TransactionCategoryDto;
+  const id = readTrimmedString(categoryDto.id);
+  const name = readTrimmedString(categoryDto.name);
+
+  if (!id) {
+    throw new ApiError("Category id is missing.", 500, "INVALID_RESPONSE");
+  }
+
+  if (!name) {
+    throw new ApiError("Category name is missing.", 500, "INVALID_RESPONSE");
+  }
+
+  return {
+    id,
+    name,
+    categoryType: parseCategoryType(categoryDto.categoryType ?? categoryDto.type),
+  };
+}
+
+export function parseCategories(response: unknown): TransactionCategory[] {
+  if (Array.isArray(response)) {
+    return response.map(parseCategory);
+  }
+
+  if (!isObject(response)) {
+    throw new ApiError("Categories response is invalid.", 500, "INVALID_RESPONSE");
+  }
+
+  const envelope = response as CategoryEnvelope;
+  const candidate =
+    envelope.data ?? envelope.result ?? envelope.payload ?? envelope.categories;
+
+  if (!Array.isArray(candidate)) {
+    throw new ApiError("Categories response is invalid.", 500, "INVALID_RESPONSE");
+  }
+
+  return candidate.map(parseCategory);
+}
+
+export function parseCreatedCategory(response: unknown): TransactionCategory | null {
+  if (typeof response === "undefined" || response === null || response === "") {
+    return null;
+  }
+
+  if (!isObject(response)) {
+    return parseCategory(response);
+  }
+
+  const envelope = response as CategoryEnvelope;
+  const candidate =
+    envelope.data ?? envelope.result ?? envelope.payload ?? envelope.category ?? response;
+
+  return parseCategory(candidate);
+}

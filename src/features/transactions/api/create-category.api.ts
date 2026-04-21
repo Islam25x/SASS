@@ -1,11 +1,6 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { AddTransactionType } from "../types/add-transaction.types";
-
-interface CreateCategoryRequestDto {
-  name: string;
-  type: AddTransactionType;
-}
+import type { CreateCategoryRequestDto } from "../types/category.dto";
 
 export async function createCategoryApi(
   payload: CreateCategoryRequestDto,

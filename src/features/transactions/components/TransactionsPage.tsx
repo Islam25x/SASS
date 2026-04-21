@@ -1,12 +1,12 @@
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useTransactions } from "../../../hooks/useTransactions";
+import { useTransactions } from "../hooks/useTransactions";
 import {
   mapTransactionsForTable,
   selectTransactionsInsights,
   selectTransactionsSummary,
   type TransactionRowData,
-} from "../../../application/transactions/transactions.selectors";
+} from "../utils/transaction.selectors";
 import TransactionTable from "./TransactionTable";
 import TransactionsSummaryCards from "./TransactionsSummaryCards";
 import AIInsightsCard from "./AIInsightsCard";

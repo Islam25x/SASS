@@ -1,5 +1,5 @@
-import type { AuthSession } from "../../features/auth/domain/auth.types";
-import type { User } from "../../features/user/domain/user";
+import type { AuthSession } from "../../features/auth/types/auth.types";
+import type { User } from "../../features/user/types/user.types";
 
 const AUTH_STORAGE_KEY = "finexa.auth.session";
 

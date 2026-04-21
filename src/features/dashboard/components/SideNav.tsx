@@ -26,7 +26,6 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
     { name: "Dashboard", icon: LayoutDashboard },
     { name: "Transactions", icon: Receipt },
     { name: "Goals", icon: BarChart3 },
-    { name: "Transverse", icon: Layers },
     { name: "Setting", icon: Settings },
   ];
 

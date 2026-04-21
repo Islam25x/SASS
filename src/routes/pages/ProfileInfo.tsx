@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { Calendar, CircleUser, Mail, Phone, Save } from "lucide-react";
-import { useUserProfile } from "../../hooks/useUserProfile";
-import { useUpdateUserProfile } from "../../hooks/useUpdateUserProfile";
+import { useUserProfile } from "../../features/user/hooks/useUserProfile";
+import { useUpdateUserProfile } from "../../features/user/hooks/useUpdateUserProfile";
 
 type FormDataType = {
   firstName: string;

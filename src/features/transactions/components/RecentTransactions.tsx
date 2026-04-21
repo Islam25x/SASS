@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { useTransactions } from "../../../hooks/useTransactions";
+import { useTransactions } from "../hooks/useTransactions";
 import {
   mapTransactionsForTable,
   selectRecentTransactions,
-} from "../../../application/transactions/transactions.selectors";
+} from "../utils/transaction.selectors";
 import type { Transaction } from "../types/transaction.types";
 import { Button, PanelCard, PanelHeader, Text } from "../../../shared/ui";
 import TransactionsList from "./TransactionsList";

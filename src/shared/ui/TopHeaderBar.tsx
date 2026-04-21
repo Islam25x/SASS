@@ -3,11 +3,11 @@ import { Bell } from "lucide-react";
 import Button from "./Button";
 import DateRangeSelector from "./DateRangeSelector";
 import Text from "./Text";
-import { useUserProfile } from "../../hooks/useUserProfile";
+import { useUserProfile } from "../../features/user/hooks/useUserProfile";
 import {
   getUserDisplayName,
   getUserInitial,
-} from "../../features/user/application/user.selectors";
+} from "../../features/user/utils/user.selectors";
 
 function TopHeaderBar() {
   const { data: profile } = useUserProfile();

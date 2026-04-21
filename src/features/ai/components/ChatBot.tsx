@@ -1,7 +1,7 @@
 import { X, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { sendChatMessageUseCase } from "../../../application/ai/send-chat-message.usecase";
+import { sendChatbotMessageApi } from "../api/ai.api";
 import { Button, Input, Text } from "../../../shared/ui";
 
 interface ChatBotProps {
@@ -33,7 +33,7 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
 
         try {
             // 🔹 إرسال الطلب للباكند
-            const res = await sendChatMessageUseCase(userMessage);
+            const res = await sendChatbotMessageApi(userMessage);
 
             const data = await res.json();
 

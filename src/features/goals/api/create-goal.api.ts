@@ -1,6 +1,6 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { CreateGoalInput } from "../../../domain/goals/goal.schema";
+import type { CreateGoalInput } from "../types/goal.types";
 
 export async function createGoalApi(
   payload: CreateGoalInput,

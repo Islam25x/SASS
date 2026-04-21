@@ -11,8 +11,8 @@ import mobileLogoSrc from "../../assets/mobile view logo.png";
 import robotImageSrc from "../../assets/Finixa robot.png";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { pageMotion } from "../../shared/animations/pageMotion";
-import { useLogin } from "../../hooks/useLogin";
-import { useRegister } from "../../hooks/useRegister";
+import { useLogin } from "../../features/auth/hooks/useLogin";
+import { useRegister } from "../../features/auth/hooks/useRegister";
 import { useAuth } from "../../shared/auth/AuthContext";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";

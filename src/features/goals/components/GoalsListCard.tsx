@@ -1,5 +1,5 @@
 import { Button, PanelCard, PanelHeader, Text } from "../../../shared/ui";
-import type { Goal } from "../../../domain/goals/goal.schema";
+import type { Goal } from "../types/goal.types";
 import GoalsList from "./GoalsList";
 
 type GoalsListCardProps = {

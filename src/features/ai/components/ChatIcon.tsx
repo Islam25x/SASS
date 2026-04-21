@@ -4,8 +4,8 @@ import { Brain, Mic, ReceiptText } from "lucide-react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import ChatBot from "./ChatBot";
 import VoiceLedgerModal from "./VoiceLedgerModal";
-import { useVoiceLedgerFlow } from "../../../hooks/useVoiceLedgerFlow";
-import { useReceiptOcrFlow } from "../../../hooks/useReceiptOcrFlow";
+import { useVoiceLedgerFlow } from "../hooks/useVoiceLedgerFlow";
+import { useReceiptOcrFlow } from "../hooks/useReceiptOcrFlow";
 import ReceiptOcrModal from "./ReceiptOcrModal";
 import { Button, Text } from "../../../shared/ui";
 

@@ -1,5 +1,5 @@
-import type { TransactionRowData } from "../../../application/transactions/transactions.selectors";
-import { formatTransactionDate } from "../../../application/transactions/transactions.formatters";
+import type { TransactionRowData } from "../utils/transaction.selectors";
+import { formatTransactionDate } from "../utils/transaction.formatters";
 import AmountText from "./AmountText";
 import CategoryBadge from "./CategoryBadge";
 import { Button, Text } from "../../../shared/ui";

@@ -9,15 +9,15 @@ import {
 import { CalendarDays, DollarSign, ReceiptText, Wallet, X } from "lucide-react";
 import { Button, Input } from "../../../shared/ui";
 import { ApiError } from "../../../shared/api/api-error";
-import { useAddTransaction } from "../../../hooks/useAddTransaction";
-import { useCategories } from "../../../hooks/useCategories";
-import { useCreateCategory } from "../../../hooks/useCreateCategory";
-import { useUpdateTransaction } from "../../../hooks/useUpdateTransaction";
-import { useDeleteTransaction } from "../../../hooks/useDeleteTransaction";
+import { useAddTransaction } from "../hooks/useAddTransaction";
+import { useCategories } from "../hooks/useCategories";
+import { useCreateCategory } from "../hooks/useCreateCategory";
+import { useUpdateTransaction } from "../hooks/useUpdateTransaction";
+import { useDeleteTransaction } from "../hooks/useDeleteTransaction";
 import {
   findCategoryByName,
   selectCategoriesByType,
-} from "../application/category.selectors";
+} from "../utils/category.selectors";
 import type {
   AddTransactionInput,
   AddTransactionType,
