@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useConfirmEmail } from "../../features/auth/hooks/useConfirmEmail";
-import { useResendConfirmation } from "../../features/auth/hooks/useResendConfirmation";
 import {
   clearStoredPendingConfirmationEmail,
   readStoredPendingConfirmationEmail,
@@ -40,11 +39,20 @@ const successHighlights = [
   },
 ] as const;
 
+function isInvalidOrExpiredConfirmationError(message: string) {
+  return (
+    message.includes("expire") ||
+    message.includes("invalid") ||
+    message.includes("not valid") ||
+    message.includes("verification token") ||
+    message.includes("confirmation token")
+  );
+}
+
 export default function ConfirmEmailPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
-  const resendConfirmationMutation = useResendConfirmation();
   const redirectTimeoutRef = useRef<number | null>(null);
   const successHandledRef = useRef(false);
   const confirmationEmail =
@@ -71,15 +79,17 @@ export default function ConfirmEmailPage() {
   const confirmationQuery = useConfirmEmail(confirmationPayload);
   const isMissingParams = !confirmationPayload;
   const confirmationErrorMessage = confirmationQuery.error?.message.toLowerCase() ?? "";
-  const isExpiredState =
+  const confirmationErrorStatus = confirmationQuery.error?.status;
+  const isInvalidOrExpiredState =
+    !isMissingParams &&
     confirmationQuery.isError &&
-    (confirmationErrorMessage.includes("expire") ||
-      confirmationErrorMessage.includes("invalid token") ||
-      confirmationErrorMessage.includes("token is invalid") ||
-      confirmationErrorMessage.includes("token invalid"));
-  const isLoading = !isMissingParams && !isExpiredState && confirmationQuery.isPending;
+    (confirmationErrorStatus === 400 ||
+      confirmationErrorStatus === 404 ||
+      confirmationErrorStatus === 410) &&
+    isInvalidOrExpiredConfirmationError(confirmationErrorMessage);
+  const isLoading = !isMissingParams && !isInvalidOrExpiredState && confirmationQuery.isPending;
   const isSuccess = !isMissingParams && confirmationQuery.isSuccess;
-  const isError = !isExpiredState && (isMissingParams || confirmationQuery.isError);
+  const isGenericError = !isMissingParams && confirmationQuery.isError && !isInvalidOrExpiredState;
 
   useEffect(() => {
     successHandledRef.current = false;
@@ -100,7 +110,7 @@ export default function ConfirmEmailPage() {
 
     redirectTimeoutRef.current = window.setTimeout(() => {
       navigate("/login", { replace: true });
-    }, 1800);
+    }, 1500);
 
     return () => {
       if (redirectTimeoutRef.current) {
@@ -117,16 +127,6 @@ export default function ConfirmEmailPage() {
       }
     };
   }, []);
-
-  const handleResendConfirmation = () => {
-    if (!confirmationEmail) {
-      return;
-    }
-
-    void resendConfirmationMutation.mutateAsync({
-      email: confirmationEmail,
-    });
-  };
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#F8FAFF] px-4 py-10 text-slate-900 sm:px-6">
@@ -214,7 +214,7 @@ export default function ConfirmEmailPage() {
         </Card>
       )}
 
-      {isExpiredState && (
+      {isInvalidOrExpiredState && (
         <Card
           variant="elevated"
           padding="lg"
@@ -224,37 +224,31 @@ export default function ConfirmEmailPage() {
             <AlertTriangle className="h-12 w-12" strokeWidth={1.8} />
           </div>
           <h1 className="mt-8 text-3xl font-bold tracking-[-0.03em] text-slate-900">
-            This link has expired
+            Invalid or expired link
           </h1>
           <p className="mt-3 text-base leading-7 text-slate-500">
-            Your confirmation link is no longer valid. Request a new email to continue verifying
-            your account.
+            This confirmation link is no longer valid. Try the link again, or continue to login if
+            your account has already been verified.
           </p>
-
-          {!confirmationEmail && (
-            <p className="mt-4 text-sm text-slate-500">
-              We couldn&apos;t identify your email address from this link. Sign in again to request
-              a new confirmation email.
-            </p>
-          )}
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button
               type="button"
+              variant="secondary"
               size="lg"
-              loading={resendConfirmationMutation.isPending}
-              disabled={!confirmationEmail}
-              onClick={handleResendConfirmation}
-              className="h-12 rounded-xl bg-[#1D5CE8] px-6 text-white hover:bg-[#184CC0]"
+              onClick={() => {
+                successHandledRef.current = false;
+                void confirmationQuery.refetch();
+              }}
+              className="h-12 rounded-xl border border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
             >
-              Resend confirmation email
+              Try Again
             </Button>
             <Button
               type="button"
-              variant="secondary"
               size="lg"
               onClick={() => navigate("/login", { replace: true })}
-              className="h-12 rounded-xl border border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
+              className="h-12 rounded-xl bg-[#1D5CE8] px-6 text-white hover:bg-[#184CC0]"
             >
               Go to Login
             </Button>
@@ -262,7 +256,7 @@ export default function ConfirmEmailPage() {
         </Card>
       )}
 
-      {isError && (
+      {isMissingParams && (
         <Card
           variant="elevated"
           padding="lg"
@@ -275,25 +269,53 @@ export default function ConfirmEmailPage() {
             Invalid or expired link
           </h1>
           <p className="mt-3 text-base leading-7 text-slate-500">
-            This confirmation link is missing required data or is no longer valid. Try opening the
-            latest email, or continue to login if your account is already verified.
+            This confirmation link is missing required data. Open the latest email and try again,
+            or continue to login if your account is already verified.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            {!isMissingParams && (
-              <Button
-                type="button"
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  successHandledRef.current = false;
-                  void confirmationQuery.refetch();
-                }}
-                className="h-12 rounded-xl border border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
-              >
-                Try Again
-              </Button>
-            )}
+            <Button
+              type="button"
+              size="lg"
+              onClick={() => navigate("/login", { replace: true })}
+              className="h-12 rounded-xl bg-[#1D5CE8] px-6 text-white hover:bg-[#184CC0]"
+            >
+              Go to Login
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {isGenericError && (
+        <Card
+          variant="elevated"
+          padding="lg"
+          className="relative z-10 w-full max-w-xl rounded-[30px] border border-white/80 bg-white/92 text-center shadow-[0_30px_90px_rgba(59,130,246,0.14)]"
+        >
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-[#FFF4ED] text-[#EA580C]">
+            <AlertTriangle className="h-12 w-12" strokeWidth={1.8} />
+          </div>
+          <h1 className="mt-8 text-3xl font-bold tracking-[-0.03em] text-slate-900">
+            We couldn&apos;t confirm your email
+          </h1>
+          <p className="mt-3 text-base leading-7 text-slate-500">
+            A network or server error interrupted the verification request. Please try again in a
+            moment.
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={() => {
+                successHandledRef.current = false;
+                void confirmationQuery.refetch();
+              }}
+              className="h-12 rounded-xl border border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50"
+            >
+              Try Again
+            </Button>
             <Button
               type="button"
               size="lg"
