@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTransactionsApi } from "../api/transactions.api";
-import type { Transaction } from "../types/transaction.types";
-import { mapTransactionsResponseToTransactions } from "../utils/transaction.parser";
+import {
+  mapTransactionsResponseToPage,
+  type TransactionsPage,
+} from "../utils/transaction.parser";
 import { ApiError } from "../../../shared/api/api-error";
 import { useAuth } from "../../../shared/auth/AuthContext";
+import { useDateRange } from "../../../shared/ui";
 import type {
-  TransactionsFilters,
   TransactionsTypeUiFilter,
 } from "../types/transactions-filter.types";
 
@@ -18,45 +20,57 @@ type UseTransactionsOptions = {
   pageSize?: number;
 };
 
-function mapUiFilterToTransactionsFilters(
-  options?: UseTransactionsOptions,
-): TransactionsFilters {
-  const typeFilter = options?.typeFilter ?? "all";
-
-  return {
-    type:
-      typeFilter === "income"
-        ? "Income"
-        : typeFilter === "expense"
-          ? "Expense"
-          : null,
-    categoryId: options?.categoryId ?? null,
-    fromDate: options?.fromDate ?? null,
-    toDate: options?.toDate ?? null,
-    pageNumber: options?.pageNumber,
-    pageSize: options?.pageSize,
-  };
-}
-
 export function useTransactions(options?: UseTransactionsOptions) {
   const { session } = useAuth();
+  const { selectedRange } = useDateRange();
   const token = session?.token ?? "";
-  const filters = mapUiFilterToTransactionsFilters(options);
+  const typeFilter = options?.typeFilter ?? "all";
+  const type =
+    typeFilter === "income"
+      ? "Income"
+      : typeFilter === "expense"
+        ? "Expense"
+        : null;
+  const categoryId = options?.categoryId ?? null;
+  const fromDate = options?.fromDate ?? null;
+  const toDate = options?.toDate ?? null;
+  const pageNumber = options?.pageNumber;
+  const pageSize = 4;
 
-  return useQuery<Transaction[], ApiError>({
-    queryKey: ["transactions", filters],
+  return useQuery<TransactionsPage, ApiError>({
+    queryKey: [
+      "transactions",
+      selectedRange,
+      type,
+      categoryId,
+      fromDate,
+      toDate,
+      pageNumber,
+      pageSize,
+    ],
     queryFn: async ({ signal }) => {
+      console.log({ pageNumber: pageNumber ?? 1 });
+
       if (!token) {
         throw new ApiError("Auth token is required to fetch transactions.", 401, "INVALID_RESPONSE");
       }
 
-      const response = await fetchTransactionsApi(filters, {
+      const response = await fetchTransactionsApi(
+        selectedRange,
+        type,
+        categoryId,
+        fromDate,
+        toDate,
+        pageNumber,
+        pageSize,
+        {
         signal,
         accessToken: token,
-      });
+        },
+      );
 
       try {
-        return mapTransactionsResponseToTransactions(response);
+        return mapTransactionsResponseToPage(response);
       } catch (error) {
         throw new ApiError("Invalid transactions response.", 500, "INVALID_RESPONSE", undefined, error);
       }

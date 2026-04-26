@@ -8,6 +8,9 @@ export interface AddTransactionInput {
   categoryId: string;
   categoryType: AddTransactionTypeInput;
   occurredAt: string;
+  notes?: string;
+  merchant?: string;
+  item?: string;
 }
 
 export interface AddTransactionPayload {
@@ -15,5 +18,7 @@ export interface AddTransactionPayload {
   type: AddTransactionType;
   categoryId: string;
   notes: string;
+  merchant?: string;
+  item?: string;
   occurredAt: string;
 }

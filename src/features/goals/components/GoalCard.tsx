@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
-import { CalendarDays } from "lucide-react";
-import { Card, Text } from "../../../shared/ui";
+import { CalendarDays, History, Plus, Trash2 } from "lucide-react";
+import { Button, Card, Text } from "../../../shared/ui";
 import type { Goal } from "../types/goal.types";
 
 type GoalCardProps = {
   goal: Goal;
   variant?: "default" | "compact" | "dashboard";
+  onAddMoney?: (goal: Goal) => void;
+  onOpenHistory?: (goal: Goal) => void;
+  onCancelGoal?: (goal: Goal) => void;
 };
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -15,7 +18,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 function formatCurrency(value: number): string {
-  return currencyFormatter.format(value).replace(/\s+/g, " ");
+  return currencyFormatter.format(Number.isFinite(value) ? value : 0).replace(/\s+/g, " ");
 }
 
 function formatDuration(value: number): string {
@@ -24,6 +27,14 @@ function formatDuration(value: number): string {
 
 function clampProgress(value: number): number {
   return Math.max(0, Math.min(value, 100));
+}
+
+function calculateProgress(current: number, target: number): number {
+  if (!target) {
+    return 0;
+  }
+
+  return clampProgress((current / target) * 100);
 }
 
 function formatProgress(value: number): string {
@@ -71,14 +82,32 @@ export function getGoalIcon(title: string): ReactNode {
   return <span aria-hidden="true">{icon}</span>;
 }
 
-function GoalCard({ goal, variant = "default" }: GoalCardProps) {
+function GoalCard({
+  goal,
+  variant = "default",
+  onAddMoney,
+  onOpenHistory,
+  onCancelGoal,
+}: GoalCardProps) {
   const isDashboard = variant === "dashboard";
   const isSmall = variant === "dashboard" || variant === "compact";
+  const safeCurrent = Number.isFinite(goal.currentAmount) ? goal.currentAmount : 0;
+  const safeMonthly = Number.isFinite(goal.monthlyAmount) ? goal.monthlyAmount : 0;
+  const safeTarget = Number.isFinite(goal.targetAmount) ? goal.targetAmount : 0;
+  const safeProgressPercentage =
+    typeof goal.progressPercentage === "number" && Number.isFinite(goal.progressPercentage)
+      ? goal.progressPercentage
+      : 0;
   const title = goal.title.trim();
   const description = goal.description.trim() || "No description provided";
-  const monthlySaving = formatCurrency(goal.monthlyAmount);
-  const targetAmount = formatCurrency(goal.targetAmount);
-  const progressValue = clampProgress((goal.monthlyAmount / goal.targetAmount) * 100);
+  const currentSaving = formatCurrency(safeCurrent);
+  const monthlySaving = formatCurrency(safeMonthly);
+  const targetAmount = formatCurrency(safeTarget);
+  const progressValue = clampProgress(
+    safeProgressPercentage > 0
+      ? safeProgressPercentage
+      : calculateProgress(safeCurrent, safeTarget)
+  );
   const progressLabel = formatProgress(progressValue);
   const durationLabel = formatDuration(goal.durationValue);
   const targetDateLabel = getTargetDateLabel(goal);
@@ -184,11 +213,11 @@ function GoalCard({ goal, variant = "default" }: GoalCardProps) {
         >
           <div className="flex items-baseline gap-1.5">
             <Text as="p" variant={statsTextVariant} weight="bold" className="text-primary">
-              {monthlySaving}
+              {currentSaving}
             </Text>
             {showStatLabels && (
               <Text variant="caption" className="text-text-secondary">
-                Saved / mo
+                Saved
               </Text>
             )}
           </div>
@@ -230,7 +259,48 @@ function GoalCard({ goal, variant = "default" }: GoalCardProps) {
             style={{ width: `${progressValue}%` }}
           />
         </div>
+                {!isDashboard && (
+          <Text variant="caption" className="text-text-secondary">
+            Monthly plan: {monthlySaving} / mo
+          </Text>
+        )}
+
+        {!isDashboard && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="rounded-xl border-primary/30 bg-white px-3 text-primary hover:bg-primary/5"
+              onClick={() => onAddMoney?.(goal)}
+            >
+              <Plus size={14} />
+              Add Money
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="rounded-xl px-3"
+              onClick={() => onOpenHistory?.(goal)}
+            >
+              <History size={14} />
+              History
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="rounded-xl border-rose-200 bg-white px-3 text-rose-500 hover:bg-rose-50"
+              onClick={() => onCancelGoal?.(goal)}
+            >
+              <Trash2 size={14} />
+              Cancel Goal
+            </Button>
+          </div>
+        )}
       </div>
+      
     </Card>
   );
 }

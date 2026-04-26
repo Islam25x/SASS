@@ -4,6 +4,9 @@ import type { LoginRequestDto, RegisterRequestDto } from "./auth.dto";
 const AUTH_API_BASE_URL =
   import.meta.env.VITE_FINEXA_API_BASE_URL?.trim() || "https://finexa.runasp.net";
 
+export const REGISTER_SUCCESS_MESSAGE =
+  "Registration successful. Please check your email to confirm your account.";
+
 export async function registerApi(
   payload: RegisterRequestDto,
   options?: { signal?: AbortSignal },

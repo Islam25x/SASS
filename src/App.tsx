@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import AOS from "aos";
 import "aos/dist/aos.css";
 import AppRoutes from "./routes/AppRoutes";
-import { DateRangeProvider } from "./shared/ui";
+import { DateRangeProvider, ToastProvider } from "./shared/ui";
 import { AuthProvider } from "./shared/auth/AuthProvider";
 
 function App() {
@@ -12,9 +12,11 @@ function App() {
 
   return (
     <AuthProvider>
-      <DateRangeProvider>
-        <AppRoutes />
-      </DateRangeProvider>
+      <ToastProvider>
+        <DateRangeProvider>
+          <AppRoutes />
+        </DateRangeProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

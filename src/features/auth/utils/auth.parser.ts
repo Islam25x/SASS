@@ -93,10 +93,24 @@ function parseLoginResponseDto(data: unknown): LoginResponseDto {
 }
 
 function parseRegisterResponseDto(data: unknown): RegisterResponseDto {
+  if (typeof data === "string") {
+    const message = safeTrim(data);
+    if (!message) {
+      throw createInvalidResponseError(
+        "INVALID_REGISTER_MESSAGE",
+        "Register response did not include a confirmation message.",
+      );
+    }
+
+    return {
+      message,
+    };
+  }
+
   if (!isObject(data)) {
     throw createInvalidResponseError(
       "INVALID_REGISTER_RESPONSE",
-      "Register response payload is not a valid object.",
+      "Register response did not include a confirmation message.",
     );
   }
 

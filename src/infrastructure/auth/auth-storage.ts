@@ -2,6 +2,7 @@ import type { AuthSession } from "../../features/auth/types/auth.types";
 import type { User } from "../../features/user/types/user.types";
 
 const AUTH_STORAGE_KEY = "finexa.auth.session";
+const PENDING_CONFIRMATION_EMAIL_STORAGE_KEY = "finexa.auth.pending-confirmation-email";
 
 function isValidDate(value: Date): boolean {
   return !Number.isNaN(value.getTime());
@@ -132,4 +133,35 @@ export function clearStoredAuthSession(): void {
 
 export function readStoredAuthToken(): string | null {
   return readStoredAuthSession()?.token ?? null;
+}
+
+export function readStoredPendingConfirmationEmail(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const value = window.localStorage.getItem(PENDING_CONFIRMATION_EMAIL_STORAGE_KEY)?.trim();
+  return value || null;
+}
+
+export function writeStoredPendingConfirmationEmail(email: string): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const normalizedEmail = email.trim();
+  if (!normalizedEmail) {
+    window.localStorage.removeItem(PENDING_CONFIRMATION_EMAIL_STORAGE_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(PENDING_CONFIRMATION_EMAIL_STORAGE_KEY, normalizedEmail);
+}
+
+export function clearStoredPendingConfirmationEmail(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(PENDING_CONFIRMATION_EMAIL_STORAGE_KEY);
 }

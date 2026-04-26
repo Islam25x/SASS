@@ -6,10 +6,12 @@ export const GoalSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   description: z.string(),
-  targetAmount: z.number().positive(),
-  durationValue: z.number().positive(),
+  targetAmount: z.number().nonnegative(),
+  currentAmount: z.number().nonnegative(),
+  progressPercentage: z.number().nonnegative().max(100).optional(),
+  durationValue: z.number().nonnegative(),
   durationUnit: GoalDurationUnitSchema,
-  monthlyAmount: z.number().positive(),
+  monthlyAmount: z.number().nonnegative(),
 });
 
 export const GoalListSchema = z.array(GoalSchema);
@@ -33,6 +35,19 @@ export const CreateGoalInputSchema = z.object({
 export type Goal = z.infer<typeof GoalSchema>;
 export type GoalDurationUnit = z.infer<typeof GoalDurationUnitSchema>;
 export type CreateGoalInput = z.infer<typeof CreateGoalInputSchema>;
+
+export type GoalHistoryEntry = {
+  id: string;
+  amount: number;
+  occurredAt: string;
+};
+
+export type GoalHistoryPage = {
+  items: GoalHistoryEntry[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+};
 
 export type CreateGoalFormInput = {
   title: string;

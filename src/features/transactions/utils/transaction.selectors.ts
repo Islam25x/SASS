@@ -8,6 +8,7 @@ export type NormalizedTransactionType = TransactionType | "unknown";
 
 export type TransactionRowData = {
   id: string;
+  item: string;
   date?: string;
   amount: number;
   merchant: string;
@@ -65,6 +66,7 @@ export function normalizeTransactionCategory(value?: string): TransactionCategor
   if (["food", "restaurant", "groceries"].includes(normalized)) return TransactionCategory.Food;
   if (["transport", "ride", "uber", "taxi"].includes(normalized)) return TransactionCategory.Transport;
   if (["shopping", "retail"].includes(normalized)) return TransactionCategory.Shopping;
+  if (["goals", "goal"].includes(normalized)) return TransactionCategory.Other;
   if (["utilities", "bills"].includes(normalized)) return TransactionCategory.Utilities;
   if (["entertainment", "streaming"].includes(normalized)) {
     return TransactionCategory.Entertainment;
@@ -78,12 +80,17 @@ export function normalizeTransactionCategory(value?: string): TransactionCategor
 export function mapTransactionsForTable(transactions: Transaction[]): TransactionRowData[] {
   return transactions.map((transaction) => ({
     id: transaction.id,
+    item:
+      transaction.item ||
+      transaction.merchant ||
+      transaction.category ||
+      "Transaction",
     date: transaction.date,
     amount: transaction.amount,
-    merchant: transaction.description,
+    merchant: transaction.merchant || "",
     type: normalizeTransactionType(transaction),
     category: normalizeTransactionCategory(transaction.category),
-    rawCategory: transaction.category,
+    rawCategory: transaction.category || "Other",
     transaction,
   }));
 }

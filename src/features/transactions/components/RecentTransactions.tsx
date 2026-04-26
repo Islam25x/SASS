@@ -15,7 +15,7 @@ function RecentTransactions() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
-  const transactions = useMemo(() => data ?? [], [data]);
+  const transactions = useMemo(() => data?.items ?? [], [data]);
   const visibleTransactions = useMemo(
     () => selectRecentTransactions(transactions, 3),
     [transactions]

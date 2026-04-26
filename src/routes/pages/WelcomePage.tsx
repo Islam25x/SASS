@@ -1,6 +1,6 @@
 import { Camera, Lightbulb, Mic, Target, TrendingUp, Wallet, X } from "lucide-react";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CTASection from "../../components/landing/CTASection";
 import FeatureSection from "../../components/landing/FeatureSection";
 import GoalsSection from "../../components/landing/GoalsSection";
@@ -11,9 +11,16 @@ import mobileLogoSrc from "../../assets/mobile view logo.png";
 import robotImageSrc from "../../assets/Finixa robot.png";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { pageMotion } from "../../shared/animations/pageMotion";
+import { REGISTER_SUCCESS_MESSAGE } from "../../features/auth/api/auth.api";
 import { useLogin } from "../../features/auth/hooks/useLogin";
 import { useRegister } from "../../features/auth/hooks/useRegister";
+import {
+  clearStoredPendingConfirmationEmail,
+  writeStoredPendingConfirmationEmail,
+} from "../../infrastructure/auth/auth-storage";
 import { useAuth } from "../../shared/auth/AuthContext";
+import { useToast } from "../../shared/ui";
+import { CheckEmailPanel } from "./CheckEmailPage";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,12 +114,15 @@ function StickyNavbar() {
 
 export default function WelcomePage() {
   const shouldReduceMotion = Boolean(useReducedMotion());
+  const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { showToast } = useToast();
   const loginMutation = useLogin();
   const registerMutation = useRegister();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [authMode, setAuthMode] = useState<"login" | "signup" | "check-email">("login");
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   const [authBanner, setAuthBanner] = useState<AuthBanner>(null);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>(
@@ -141,7 +151,7 @@ export default function WelcomePage() {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsAuthOpen(false);
+        closeAuthModal();
       }
     };
 
@@ -149,7 +159,22 @@ export default function WelcomePage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isAuthOpen]);
 
+  useEffect(() => {
+    if (location.pathname !== "/login") {
+      return;
+    }
+
+    setAuthMode("login");
+    setIsAuthOpen(true);
+    setAuthBanner(null);
+    setLoginErrors({});
+    setRegisterErrors({});
+    loginMutation.reset();
+    registerMutation.reset();
+  }, [location.pathname]);
+
   const openLoginModal = () => {
+    setConfirmationEmail("");
     setAuthMode("login");
     setIsAuthOpen(true);
     setAuthBanner(null);
@@ -160,6 +185,10 @@ export default function WelcomePage() {
   };
 
   const closeAuthModal = () => {
+    if (location.pathname === "/login") {
+      navigate("/welcome", { replace: true });
+    }
+
     setIsAuthOpen(false);
     setAuthBanner(null);
     setLoginErrors({});
@@ -169,6 +198,7 @@ export default function WelcomePage() {
   };
 
   const switchToSignup = () => {
+    setConfirmationEmail("");
     setAuthMode("signup");
     setAuthBanner(null);
     setLoginErrors({});
@@ -176,9 +206,25 @@ export default function WelcomePage() {
   };
 
   const switchToLogin = () => {
+    setConfirmationEmail("");
     setAuthMode("login");
     setRegisterErrors({});
     setAuthBanner(null);
+  };
+
+  const openCheckEmailModal = (email: string) => {
+    const normalizedEmail = email.trim();
+
+    if (normalizedEmail) {
+      writeStoredPendingConfirmationEmail(normalizedEmail);
+    }
+
+    setConfirmationEmail(normalizedEmail);
+    setAuthMode("check-email");
+    setIsAuthOpen(true);
+    setAuthBanner(null);
+    setLoginErrors({});
+    setRegisterErrors({});
   };
 
   const handleLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -246,12 +292,24 @@ export default function WelcomePage() {
         password: loginData.password,
       });
 
+      clearStoredPendingConfirmationEmail();
       login(session);
       setIsAuthOpen(false);
       setLoginErrors({});
       navigate("/dashboard", { replace: true });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Login failed. Please try again.";
+      if (message.toLowerCase().includes("confirm")) {
+        const submittedEmail = loginData.email.trim();
+        openCheckEmailModal(submittedEmail);
+        showToast({
+          id: `auth-login-confirm:${submittedEmail.toLowerCase()}`,
+          message: "Please confirm your email. We've sent you a new confirmation link.",
+          tone: "warning",
+        });
+        return;
+      }
+
       setLoginErrors((prev) => ({ ...prev, password: message }));
       setAuthBanner({ tone: "error", text: message });
     }
@@ -274,11 +332,6 @@ export default function WelcomePage() {
         password: registerData.password,
         confirmPassword: registerData.confirmPassword,
       });
-      const session = await loginMutation.mutateAsync({
-        email: submittedEmail,
-        password: registerData.password,
-      });
-      login(session);
 
       setRegisterErrors({});
       setRegisterData({
@@ -289,13 +342,22 @@ export default function WelcomePage() {
         agree: false,
       });
       setLoginData({ email: "", password: "" });
-      setIsAuthOpen(false);
-      navigate("/dashboard", { replace: true });
+      showToast({
+        id: "auth-register-success",
+        message: REGISTER_SUCCESS_MESSAGE,
+        tone: "success",
+      });
+      openCheckEmailModal(submittedEmail);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Registration failed. Please try again.";
       setRegisterErrors((prev) => ({ ...prev, form: message }));
       setAuthBanner({ tone: "error", text: message });
+      showToast({
+        id: "auth-register-error",
+        message,
+        tone: "error",
+      });
     }
   };
 
@@ -362,20 +424,37 @@ export default function WelcomePage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.97 }}
               transition={MODAL_TRANSITION}
-              className="w-full max-w-2xl"
+              className={`w-full ${authMode === "check-email" ? "max-w-4xl" : "max-w-2xl"}`}
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="form relative bg-white">
-                <button
-                  type="button"
-                  onClick={closeAuthModal}
-                  className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/70 hover:text-slate-700"
-                  aria-label="Close authentication modal"
-                >
-                  <X size={18} />
-                </button>
+              {authMode === "check-email" ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={closeAuthModal}
+                    className="absolute right-5 top-5 z-10 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/70 hover:text-slate-700"
+                    aria-label="Close authentication modal"
+                  >
+                    <X size={18} />
+                  </button>
+                  <CheckEmailPanel
+                    email={confirmationEmail}
+                    embedded
+                    onGoToLogin={switchToLogin}
+                  />
+                </div>
+              ) : (
+                <div className="form relative bg-white">
+                  <button
+                    type="button"
+                    onClick={closeAuthModal}
+                    className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/70 hover:text-slate-700"
+                    aria-label="Close authentication modal"
+                  >
+                    <X size={18} />
+                  </button>
 
-                {authMode === "login" ? (
+                  {authMode === "login" ? (
                   <>
                     <div className="text-center mb-6">
                       <h2
@@ -448,7 +527,7 @@ export default function WelcomePage() {
                       </button>
                     </form>
                   </>
-                ) : (
+                  ) : (
                   <>
                     <div className="text-center mb-6">
                       <h2
@@ -572,11 +651,7 @@ export default function WelcomePage() {
                       {registerErrors.agree && (
                         <p className="text-red-500 text-sm">{registerErrors.agree}</p>
                       )}
-                      {registerErrors.form && (
-                        <p className="text-red-500 text-sm" aria-live="polite">
-                          {registerErrors.form}
-                        </p>
-                      )}
+                      
 
                       <p className="text-sm">
                         Already have an account?{" "}
@@ -598,8 +673,9 @@ export default function WelcomePage() {
                       </button>
                     </form>
                   </>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </motion.section>
           </motion.div>
         )}

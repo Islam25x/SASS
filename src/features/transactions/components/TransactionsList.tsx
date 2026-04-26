@@ -15,8 +15,8 @@ function TransactionsList({ rows, onOpenDetails }: TransactionsListProps) {
           <tr className="text-gray-500">
             <th className="py-2">DATE</th>
             <th className="py-2">AMOUNT</th>
+            <th className="py-2">ITEM</th>
             <th className="py-2">MERCHANT</th>
-            <th className="py-2">TYPE</th>
             <th className="py-2">CATEGORY</th>
             <th className="py-2">DETAILS</th>
           </tr>

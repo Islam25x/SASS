@@ -4,9 +4,12 @@ import GoalCard from "./GoalCard";
 
 type GoalsListProps = {
   goals: Goal[];
+  onAddMoney?: (goal: Goal) => void;
+  onOpenHistory?: (goal: Goal) => void;
+  onCancelGoal?: (goal: Goal) => void;
 };
 
-function GoalsList({ goals }: GoalsListProps) {
+function GoalsList({ goals, onAddMoney, onOpenHistory, onCancelGoal }: GoalsListProps) {
   if (goals.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-surface px-5 py-8 text-center">
@@ -23,7 +26,13 @@ function GoalsList({ goals }: GoalsListProps) {
   return (
     <div className="space-y-4">
       {goals.map((goal) => (
-        <GoalCard key={goal.id} goal={goal} />
+        <GoalCard
+          key={goal.id}
+          goal={goal}
+          onAddMoney={onAddMoney}
+          onOpenHistory={onOpenHistory}
+          onCancelGoal={onCancelGoal}
+        />
       ))}
     </div>
   );

@@ -2,6 +2,18 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Environment
+
+The app reads the auth API base URL from `VITE_FINEXA_API_BASE_URL`.
+
+For local development, `.env` points to:
+
+```env
+VITE_FINEXA_API_BASE_URL=http://localhost:5001
+```
+
+Restart `npm run dev` after adding or changing env files so Vite reloads the updated variables.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh

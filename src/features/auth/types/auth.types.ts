@@ -16,6 +16,19 @@ export interface RegisterResult {
   message: string;
 }
 
+export interface ConfirmEmailPayload {
+  userId: string;
+  token: string;
+}
+
+export interface ResendConfirmationPayload {
+  email: string;
+}
+
+export interface ResendConfirmationResult {
+  message: string;
+}
+
 export interface AuthSession {
   token: string;
   expiresAt: Date;

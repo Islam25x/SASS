@@ -51,8 +51,10 @@ export function mapApiError(error: unknown): ApiError {
 }
 
 export async function readErrorMessage(response: Response): Promise<string> {
+  const jsonResponse = response.clone();
+
   try {
-    const payload = (await response.json()) as ApiErrorPayload;
+    const payload = (await jsonResponse.json()) as ApiErrorPayload;
     const validationMessages = payload.errors
       ? Object.values(payload.errors)
           .flat()
@@ -68,6 +70,7 @@ export async function readErrorMessage(response: Response): Promise<string> {
       `Request failed with status ${response.status}.`
     );
   } catch {
-    return `Request failed with status ${response.status}.`;
+    const text = (await response.text()).trim();
+    return text || `Request failed with status ${response.status}.`;
   }
 }

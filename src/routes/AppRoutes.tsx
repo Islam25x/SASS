@@ -4,6 +4,8 @@ import SupportPage from "./pages/SupportPage";
 import AIPage from "./pages/AIPage";
 import ProfilePage from "./pages/ProfilePage";
 import WelcomePage from "./pages/WelcomePage";
+import CheckEmailPage from "./pages/CheckEmailPage";
+import ConfirmEmailPage from "./pages/ConfirmEmailPage";
 import ProtectedRoute from "../shared/auth/ProtectedRoute";
 import PublicRoute from "../shared/auth/PublicRoute";
 
@@ -25,6 +27,22 @@ const AppRoutes = () => {
             <WelcomePage />
           </PublicRoute>
         }
+      />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <WelcomePage />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/check-email"
+        element={<CheckEmailPage />}
+      />
+      <Route
+        path="/confirm-email"
+        element={<ConfirmEmailPage />}
       />
       <Route
         path="/profile"
@@ -62,6 +80,7 @@ const AppRoutes = () => {
       <Route path="/AI" element={<Navigate to="/ai" replace />} />
       <Route path="/Support" element={<Navigate to="/support" replace />} />
       <Route path="/Welcome" element={<Navigate to="/welcome" replace />} />
+      <Route path="/Login" element={<Navigate to="/login" replace />} />
       <Route path="/Dashboard" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

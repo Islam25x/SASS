@@ -1,47 +1,69 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
-import type { TransactionsFilters } from "../types/transactions-filter.types";
+import type {
+  TransactionsApiTypeFilter,
+  TransactionsFilters,
+} from "../types/transactions-filter.types";
 
-function buildTransactionsQuery(filters: TransactionsFilters): string {
+function buildTransactionsQuery(
+  period: TransactionsFilters["period"],
+  type: TransactionsApiTypeFilter | null | undefined,
+  categoryId: string | null | undefined,
+  fromDate: string | null | undefined,
+  toDate: string | null | undefined,
+  pageNumber: number | undefined,
+  pageSize: number,
+): string {
   const params = new URLSearchParams();
 
-  if (filters.type) {
-    params.set("type", filters.type);
+  if (period) {
+    params.set("Period", period);
   }
 
-  if (filters.categoryId) {
-    params.set("categoryId", filters.categoryId);
+  if (type) {
+    params.set("type", type);
   }
 
-  if (filters.fromDate) {
-    params.set("fromDate", filters.fromDate);
+  if (categoryId) {
+    params.set("categoryId", categoryId);
   }
 
-  if (filters.toDate) {
-    params.set("toDate", filters.toDate);
+  if (fromDate) {
+    params.set("fromDate", fromDate);
   }
 
-  if (typeof filters.pageNumber === "number") {
-    params.set("pageNumber", String(filters.pageNumber));
+  if (toDate) {
+    params.set("toDate", toDate);
   }
 
-  if (typeof filters.pageSize === "number") {
-    params.set("pageSize", String(filters.pageSize));
+  if (typeof pageNumber === "number") {
+    params.set("pageNumber", String(pageNumber));
   }
+
+  params.set("PageSize", String(pageSize));
 
   const queryString = params.toString();
   return queryString ? `/api/Transaction/get-transactions?${queryString}` : "/api/Transaction/get-transactions";
 }
 
 export async function fetchTransactionsApi(
-  filters: TransactionsFilters,
+  period: TransactionsFilters["period"],
+  type: TransactionsApiTypeFilter | null | undefined,
+  categoryId: string | null | undefined,
+  fromDate: string | null | undefined,
+  toDate: string | null | undefined,
+  pageNumber: number | undefined,
+  pageSize: number,
   options?: { signal?: AbortSignal; accessToken?: string },
 ): Promise<unknown> {
-  return requestJson<unknown>(buildTransactionsQuery(filters), {
+  return requestJson<unknown>(
+    buildTransactionsQuery(period, type, categoryId, fromDate, toDate, pageNumber, pageSize),
+    {
     method: "GET",
     signal: options?.signal,
     baseUrl: getAuthApiBaseUrl(),
     withAuth: true,
     accessToken: options?.accessToken,
-  });
+    },
+  );
 }

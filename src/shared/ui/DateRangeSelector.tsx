@@ -2,15 +2,17 @@ import { ChevronDown } from "lucide-react";
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
+  useEffect,
   type ReactNode,
 } from "react";
 import Text from "./Text";
 
-type DateRangeValue = "today" | "week" | "month" | "year";
+export type DateRangeValue = "Today" | "Week" | "Month" | "Year" | "Custom";
+
+export const DASHBOARD_PERIOD_STORAGE_KEY = "dashboard_period";
 
 type DateRangeContextValue = {
   selectedRange: DateRangeValue;
@@ -19,17 +21,48 @@ type DateRangeContextValue = {
 
 const DateRangeContext = createContext<DateRangeContextValue | null>(null);
 
+function readStoredRange(): DateRangeValue {
+  if (typeof window === "undefined") {
+    return "Month";
+  }
+
+  const storedValue = window.localStorage.getItem(DASHBOARD_PERIOD_STORAGE_KEY);
+  switch (storedValue) {
+    case "Today":
+    case "Week":
+    case "Month":
+    case "Year":
+    case "Custom":
+      return storedValue;
+    default:
+      return "Month";
+  }
+}
+
 export const DateRangeProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedRange, setSelectedRange] = useState<DateRangeValue>("month");
+  const [selectedRange, setSelectedRange] = useState<DateRangeValue>(() => readStoredRange());
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(DASHBOARD_PERIOD_STORAGE_KEY, selectedRange);
+  }, [selectedRange]);
+
+  const value = useMemo(
+    () => ({ selectedRange, setSelectedRange }),
+    [selectedRange],
+  );
 
   return (
-    <DateRangeContext.Provider value={{ selectedRange, setSelectedRange }}>
+    <DateRangeContext.Provider value={value}>
       {children}
     </DateRangeContext.Provider>
   );
 };
 
-const useDateRange = () => {
+export const useDateRange = () => {
   const context = useContext(DateRangeContext);
   if (!context) {
     throw new Error("DateRangeSelector must be used within DateRangeProvider");
@@ -55,10 +88,11 @@ const buildRangeOptions = () => {
   const startOfYear = new Date(now.getFullYear(), 0, 1);
 
   return [
-    { value: "today", label: "Today", range: formatLong(now) },
-    { value: "week", label: "This week", range: `${formatShort(startOfWeek)} - Now` },
-    { value: "month", label: "This month", range: `${formatShort(startOfMonth)} - Now` },
-    { value: "year", label: "This year", range: `${formatShort(startOfYear)} - Now` },
+    { value: "Today", label: "Today", range: formatLong(now) },
+    { value: "Week", label: "Week", range: `${formatShort(startOfWeek)} - Now` },
+    { value: "Month", label: "Month", range: `${formatShort(startOfMonth)} - Now` },
+    { value: "Year", label: "Year", range: `${formatShort(startOfYear)} - Now` },
+    { value: "Custom", label: "Custom", range: "Custom range" },
   ] as const;
 };
 
@@ -98,10 +132,10 @@ const DateRangeSelector = () => {
       >
         <div className="flex flex-col leading-tight">
           <Text as="span" variant="body" weight="medium" className="text-slate-900">
-            {activeRange?.label ?? "This month"}
+            {activeRange?.label ?? "Month"}
           </Text>
           <Text as="span" variant="caption" className="text-slate-500">
-            {activeRange?.range ?? "Apr 1 - Now"}
+            {activeRange?.range ?? "Month"}
           </Text>
         </div>
         <ChevronDown

@@ -1,20 +1,16 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import { requestJson } from "../../../shared/api/http";
+import type { DateRangeValue } from "../../../shared/ui/DateRangeSelector";
 
-const GOALS_PAGE_SIZE = 2;
-
-export async function getGoalsApi(
-  pageNumber: number,
+export async function getDashboardApi(
+  period: DateRangeValue,
   options?: { signal?: AbortSignal; accessToken?: string },
 ): Promise<unknown> {
   const params = new URLSearchParams({
-    PageNumber: String(pageNumber),
-    PageSize: String(GOALS_PAGE_SIZE),
+    Period: period,
   });
 
-  console.log({ pageNumber, pageSize: GOALS_PAGE_SIZE });
-
-  return requestJson<unknown>(`/api/Goal/get-goals?${params.toString()}`, {
+  return requestJson<unknown>(`/api/Dashboard?${params.toString()}`, {
     method: "GET",
     signal: options?.signal,
     baseUrl: getAuthApiBaseUrl(),

@@ -1,6 +1,7 @@
 export type TransactionsApiTypeFilter = "Income" | "Expense";
 
 export interface TransactionsFilters {
+  period?: "Today" | "Week" | "Month" | "Year" | "Custom";
   type?: TransactionsApiTypeFilter | null;
   categoryId?: string | null;
   fromDate?: string | null;

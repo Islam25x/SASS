@@ -11,11 +11,6 @@ type TransactionRowProps = {
 };
 
 function TransactionRow({ transaction, onOpenDetails }: TransactionRowProps) {
-  const typeLabel =
-    transaction.type === "unknown"
-      ? "N/A"
-      : `${transaction.type.charAt(0).toUpperCase()}${transaction.type.slice(1)}`;
-
   return (
     <tr className="border-t cursor-pointer transition hover:bg-slate-50">
       <td className="py-3 text-sm text-gray-700">
@@ -28,12 +23,12 @@ function TransactionRow({ transaction, onOpenDetails }: TransactionRowProps) {
       </td>
       <td className="py-3 text-sm font-semibold text-gray-800">
         <Text as="span" variant="body" weight="bold" className="text-gray-800">
-          {transaction.merchant}
+          {transaction.item || transaction.rawCategory || "Transaction"}
         </Text>
       </td>
       <td className="py-3 text-sm text-gray-600">
         <Text as="span" variant="body" className="text-gray-600">
-          {typeLabel}
+          {transaction.merchant || "N/A"}
         </Text>
       </td>
       <td className="py-3 text-sm">

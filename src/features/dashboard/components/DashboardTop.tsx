@@ -11,41 +11,43 @@ import DashboardSummaryCard from "./DashboardSummaryCard";
 import { PageHeader, Text } from "../../../shared/ui";
 import { useUserProfile } from "../../../features/user/hooks/useUserProfile";
 import { getUserDisplayName } from "../../../features/user/utils/user.selectors";
+import { useDashboardSummary } from "../hooks/useDashboardSummary";
 
 const DashboardTop = () => {
   const { data: profile } = useUserProfile();
+  const { data: summary } = useDashboardSummary();
   const displayName = profile ? getUserDisplayName(profile) : "Finexa User";
 
   const dashboardItems = [
     {
       titleKey: "Available Balance",
       icon: <FontAwesomeIcon icon={faCircle} className="text-green-500" />,
-      value: 5000,
-      pev: "12.5% vs last month",
+      value: summary?.totalBalance ?? 0,
+      pev: "0% vs last period",
       isIncrease: true,
     },
     {
       titleKey: "Income",
       icon: <FontAwesomeIcon icon={faClock} className="text-primary" />,
-      value: 3500,
-      pev: "8% vs last month",
-      isIncrease: true,
+      value: summary?.totalIncome ?? 0,
+      pev: `${summary?.incomeChangePercentage ?? 0}% vs last period`,
+      isIncrease: (summary?.incomeChangePercentage ?? 0) >= 0,
       arrow: true
     },
     {
       titleKey: "Expenses",
       icon: <FontAwesomeIcon icon={faChartColumn} className="text-purple-500" />,
-      value: 2200,
-      pev: "5% vs last month",
-      isIncrease: false,
+      value: summary?.totalExpense ?? 0,
+      pev: `${summary?.expenseChangePercentage ?? 0}% vs last period`,
+      isIncrease: (summary?.expenseChangePercentage ?? 0) >= 0,
       arrow: true
     },
     {
       titleKey: "savings for this month",
       icon: <FontAwesomeIcon icon={faBell} className="text-yellow-500" />,
-      value: 1800,
-      pev: "3.2% vs last month",
-      isIncrease: true,
+      value: summary?.totalSavings ?? 0,
+      pev: `${summary?.savingsChangePercentage ?? 0}% vs last period`,
+      isIncrease: (summary?.savingsChangePercentage ?? 0) >= 0,
       arrow: true
     },
   ];

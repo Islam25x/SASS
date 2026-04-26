@@ -10,9 +10,20 @@ import type { ReceiptOcrResponse } from "../../ai/types/ai.types";
 import type { TransactionResponseDto } from "../types/transaction.dto";
 
 type TransactionsResponseEnvelope = {
+  items?: unknown;
   data?: unknown;
   result?: unknown;
   payload?: unknown;
+  pageNumber?: unknown;
+  pageSize?: unknown;
+  totalCount?: unknown;
+};
+
+export type TransactionsPage = {
+  items: Transaction[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
 };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -51,10 +62,19 @@ function isTransactionDto(value: unknown): value is TransactionResponseDto {
     isTransactionType(value.type) &&
     typeof value.occurredAt === "string" &&
     value.occurredAt.trim().length > 0 &&
-    typeof value.categoryName === "string" &&
-    value.categoryName.trim().length > 0 &&
-    typeof value.notes === "string" &&
-    (typeof value.source === "undefined" || typeof value.source === "string")
+    (typeof value.categoryName === "undefined" ||
+      value.categoryName === null ||
+      typeof value.categoryName === "string") &&
+    (typeof value.notes === "undefined" ||
+      value.notes === null ||
+      typeof value.notes === "string") &&
+    (typeof value.item === "undefined" || value.item === null || typeof value.item === "string") &&
+    (typeof value.merchant === "undefined" ||
+      value.merchant === null ||
+      typeof value.merchant === "string") &&
+    (typeof value.source === "undefined" ||
+      value.source === null ||
+      typeof value.source === "string")
   );
 }
 
@@ -79,12 +99,16 @@ export function parseTransaction(payload: unknown): Transaction {
 
   return TransactionSchema.parse({
     id: id ?? "",
+    item: parsed.merchant ?? parsed.description,
     amount: parsed.amount,
     category: parsed.category,
     description: parsed.description,
+    merchant: parsed.merchant,
     date: parsed.date,
-    transaction_type: transactionType,
-    type: asString(payload.type) ?? undefined,
+    type:
+      transactionType === "Income" || transactionType === "Expense"
+        ? transactionType
+        : "Expense",
     method:
       payload.method === "voice" || payload.method === "receipt"
         ? payload.method
@@ -102,28 +126,29 @@ function parseTransactionDto(dto: unknown): Transaction {
     throw new ApiError("Transaction amount is invalid.", 500, "INVALID_RESPONSE");
   }
 
-  const notes = toTrimmedString(dto.notes);
-  if (!notes) {
-    throw new ApiError("Transaction notes are invalid.", 500, "INVALID_RESPONSE");
-  }
-
   const occurredAt = toTrimmedString(dto.occurredAt);
   if (!occurredAt) {
     throw new ApiError("Transaction date is invalid.", 500, "INVALID_RESPONSE");
   }
 
-  const categoryName = toTrimmedString(dto.categoryName);
-  if (!categoryName) {
-    throw new ApiError("Transaction category is invalid.", 500, "INVALID_RESPONSE");
-  }
-
+  const categoryName = toTrimmedString(dto.categoryName) ?? "Other";
+  const notes = toTrimmedString(dto.notes) ?? "";
   const source = toTrimmedString(dto.source);
+  const merchant = toTrimmedString(dto.merchant) ?? "";
+  const item =
+    toTrimmedString(dto.item) ??
+    merchant ??
+    categoryName ??
+    "Transaction";
+  const description = notes || item;
 
   return TransactionSchema.parse({
     id: dto.transactionId,
+    item,
     amount,
     category: categoryName,
-    description: notes,
+    description,
+    merchant,
     date: occurredAt,
     type: dto.type,
     method: source === "voice" || source === "receipt" ? source : undefined,
@@ -140,6 +165,10 @@ function extractTransactionsData(response: unknown): TransactionResponseDto[] {
   }
 
   const candidate = response as TransactionsResponseEnvelope;
+
+  if (Array.isArray(candidate.items)) {
+    return candidate.items;
+  }
 
   if (typeof candidate.data !== "undefined") {
     return extractTransactionsData(candidate.data);
@@ -158,6 +187,36 @@ function extractTransactionsData(response: unknown): TransactionResponseDto[] {
 
 export function mapTransactionsResponseToTransactions(response: unknown): Transaction[] {
   return extractTransactionsData(response).map(parseTransactionDto);
+}
+
+export function mapTransactionsResponseToPage(response: unknown): TransactionsPage {
+  if (Array.isArray(response)) {
+    const items = response.map(parseTransactionDto);
+
+    return {
+      items,
+      pageNumber: 1,
+      pageSize: items.length || 4,
+      totalCount: items.length,
+    };
+  }
+
+  if (!isObject(response)) {
+    throw new ApiError("Transactions response is invalid.", 500, "INVALID_RESPONSE");
+  }
+
+  const candidate = response as TransactionsResponseEnvelope;
+  const items = extractTransactionsData(response).map(parseTransactionDto);
+  const pageNumber = Math.max(1, toFiniteNumber(candidate.pageNumber) ?? 1);
+  const pageSize = Math.max(1, toFiniteNumber(candidate.pageSize) ?? items.length ?? 4);
+  const totalCount = Math.max(0, toFiniteNumber(candidate.totalCount) ?? items.length);
+
+  return {
+    items,
+    pageNumber,
+    pageSize,
+    totalCount,
+  };
 }
 
 export function parseTransactionList(payload: unknown): Transaction[] {
@@ -185,11 +244,13 @@ export function buildTransactionFromParsed(
   const data = parseParsedTransaction(parsed);
   return TransactionSchema.parse({
     id: input.id,
+    item: data.merchant ?? "Voice transaction",
     amount: data.amount,
     category: data.category,
     description: data.merchant ?? "Voice transaction",
+    merchant: data.merchant,
     date: data.date,
-    transaction_type: data.transaction_type ?? "expense",
+    type: data.transaction_type === "income" ? "Income" : "Expense",
   });
 }
 
@@ -200,12 +261,13 @@ export function buildTransactionsFromReceipt(
   return response.items.map((item, index) =>
     TransactionSchema.parse({
       id: input.ids[index] ?? "",
+      item: item.name ?? response.merchant ?? "Receipt item",
       description: item.name ?? response.merchant ?? "Receipt item",
       amount: item.line_total ?? item.unit_price ?? 0,
       category: "Receipt",
+      merchant: response.merchant ?? undefined,
       date: input.issuedAt,
-      type: "expense",
-      transaction_type: "expense",
+      type: "Expense",
       method: "receipt",
     }),
   );

@@ -4,8 +4,8 @@ import { useGoals } from "../hooks/useGoals";
 import GoalCard from "./GoalCard";
 
 const SavingGoals = () => {
-  const { data } = useGoals();
-  const goals = useMemo(() => (data ?? []).slice(0, 2), [data]);
+  const { data } = useGoals(1);
+  const goals = useMemo(() => data?.items ?? [], [data]);
 
   return (
     <PanelCard className="h-full !w-full">

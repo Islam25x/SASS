@@ -160,7 +160,7 @@ const Profile = () => {
     const displayName = profile ? getUserDisplayName(profile) : "Finexa User";
     const displayEmail = profile?.email || "No email available";
     const initial = profile ? getUserInitial(profile) : "F";
-    const transactions = useMemo(() => transactionsData ?? [], [transactionsData]);
+    const transactions = useMemo(() => transactionsData?.items ?? [], [transactionsData]);
     const insights = useMemo(() => selectTransactionsInsights(transactions), [transactions]);
     const completion = useMemo(() => {
         const completionFields: Array<{ label: string; value: string | undefined }> = [

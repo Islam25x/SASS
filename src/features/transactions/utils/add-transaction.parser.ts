@@ -34,12 +34,11 @@ function normalizeTransactionType(value: AddTransactionTypeInput): AddTransactio
 
 export function parseAddTransactionPayload(input: AddTransactionInput): AddTransactionPayload {
   const transactionName = input.transactionName.trim();
+  const notes = input.notes?.trim() || transactionName || input.item?.trim() || input.merchant?.trim() || "Transaction";
+  const merchant = input.merchant?.trim();
+  const item = input.item?.trim();
   const normalizedType = normalizeTransactionType(input.type);
   const normalizedCategoryType = normalizeTransactionType(input.categoryType);
-
-  if (!transactionName) {
-    throw new ApiError("Transaction name is required.", 400, "INVALID_RESPONSE");
-  }
 
   if (!Number.isFinite(input.amount) || input.amount <= 0) {
     throw new ApiError("Amount must be greater than zero.", 400, "INVALID_RESPONSE");
@@ -61,7 +60,9 @@ export function parseAddTransactionPayload(input: AddTransactionInput): AddTrans
     amount: input.amount,
     type: normalizedType,
     categoryId: input.categoryId.trim(),
-    notes: transactionName,
+    notes,
+    merchant,
+    item,
     occurredAt: normalizeOccurredAt(input.occurredAt),
   };
 }

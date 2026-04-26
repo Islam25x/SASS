@@ -6,9 +6,19 @@ type GoalsListCardProps = {
   goals: Goal[];
   totalCount?: number;
   onAddGoal: () => void;
+  onAddMoney: (goal: Goal) => void;
+  onOpenHistory: (goal: Goal) => void;
+  onCancelGoal: (goal: Goal) => void;
 };
 
-function GoalsListCard({ goals, totalCount, onAddGoal }: GoalsListCardProps) {
+function GoalsListCard({
+  goals,
+  totalCount,
+  onAddGoal,
+  onAddMoney,
+  onOpenHistory,
+  onCancelGoal,
+}: GoalsListCardProps) {
   const countLabel = totalCount ?? goals.length;
 
   return (
@@ -34,7 +44,12 @@ function GoalsListCard({ goals, totalCount, onAddGoal }: GoalsListCardProps) {
         }
       />
 
-      <GoalsList goals={goals} />
+      <GoalsList
+        goals={goals}
+        onAddMoney={onAddMoney}
+        onOpenHistory={onOpenHistory}
+        onCancelGoal={onCancelGoal}
+      />
     </PanelCard>
   );
 }

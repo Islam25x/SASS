@@ -15,18 +15,22 @@ import { Button, Input, PageHeader } from "../../../shared/ui";
 import type { TransactionsTypeUiFilter } from "../types/transactions-filter.types";
 import type { Transaction } from "../types/transaction.types";
 
-const PAGE_SIZE = 6;
-
 function TransactionsPage() {
   const [filterType, setFilterType] = useState<TransactionsTypeUiFilter>("all");
-  const { data, isLoading, isError, error } = useTransactions({ typeFilter: filterType });
+  const [pageNumber, setPageNumber] = useState(1);
+  const { data, isLoading, isError, error } = useTransactions({
+    typeFilter: filterType,
+    pageNumber,
+  });
   const [searchValue, setSearchValue] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  const transactions = useMemo(() => data ?? [], [data]);
+  const transactions = useMemo(() => data?.items ?? [], [data]);
+  const currentPage = data?.pageNumber ?? pageNumber;
+  const pageSize = data?.pageSize ?? 4;
+  const totalCount = data?.totalCount ?? transactions.length;
   const summary = useMemo(() => selectTransactionsSummary(transactions), [transactions]);
   const insights = useMemo(() => selectTransactionsInsights(transactions), [transactions]);
   const tableRows = useMemo(
@@ -40,32 +44,30 @@ function TransactionsPage() {
     return tableRows.filter((row) => {
       const matchesQuery =
         !query ||
-        row.merchant.toLowerCase().includes(query) ||
+        (row.merchant ?? "").toLowerCase().includes(query) ||
+        (row.item ?? "").toLowerCase().includes(query) ||
         (row.rawCategory ?? "").toLowerCase().includes(query);
 
       return matchesQuery;
     });
   }, [tableRows, searchValue]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-  const pagedRows: TransactionRowData[] = filteredRows.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE
-  );
+  const pagedRows: TransactionRowData[] = filteredRows;
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setPageNumber(page);
   };
 
   const handleFilterChange = (value: TransactionsTypeUiFilter) => {
     setFilterType(value);
-    setCurrentPage(1);
+    setPageNumber(1);
   };
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
-    setCurrentPage(1);
+    setPageNumber(1);
   };
 
   const handleOpenDetails = (transaction: Transaction) => {
@@ -126,12 +128,22 @@ function TransactionsPage() {
             isLoading={isLoading}
             isError={isError}
             errorMessage={error?.message}
-            count={transactions.length}
+            count={totalCount}
             onAddTransaction={() => setIsAddTransactionOpen(true)}
             onOpenDetails={handleOpenDetails}
           />
 
           <div className="flex items-center justify-center gap-2">
+            <Button
+              type="button"
+              onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+              variant="secondary"
+              size="sm"
+              disabled={safePage === 1}
+              className="rounded-lg border border-gray-200 px-3 py-1 text-sm text-gray-600"
+            >
+              Prev
+            </Button>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
               <Button
                 key={page}
@@ -147,6 +159,22 @@ function TransactionsPage() {
                 {page}
               </Button>
             ))}
+            <Button
+              type="button"
+              onClick={() => setPageNumber((prev) => Math.min(prev + 1, totalPages))}
+              variant="secondary"
+              size="sm"
+              disabled={safePage === totalPages}
+              className="rounded-lg border border-gray-200 px-3 py-1 text-sm text-gray-600"
+            >
+              Next
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-center">
+            <span className="text-sm text-gray-500">
+              Page {safePage} of {totalPages}
+            </span>
           </div>
         </div>
 

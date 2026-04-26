@@ -1,6 +1,6 @@
-import { Plus } from "lucide-react";
-import { useState, type FormEvent } from "react";
-import { Button, Input } from "../../../shared/ui";
+import { Plus, Search, X } from "lucide-react";
+import { useMemo, useState, type FormEvent } from "react";
+import { Button, Input, Text } from "../../../shared/ui";
 import type { TransactionCategory } from "../types/category.types";
 
 type TransactionCategoryPickerProps = {
@@ -22,30 +22,33 @@ function TransactionCategoryPicker({
   isCreating = false,
   errorMessage,
 }: TransactionCategoryPickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const handleStartCreate = () => {
-    setIsAddingCategory(true);
-    setLocalError(null);
-  };
+  const selectedCategory = useMemo(
+    () => options.find((option) => option.id === selectedCategoryId) ?? null,
+    [options, selectedCategoryId],
+  );
 
-  const handleCancelCreate = () => {
-    if (isCreating) {
-      return;
+  const filteredOptions = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return options;
     }
 
-    setIsAddingCategory(false);
-    setNewCategoryName("");
-    setLocalError(null);
-  };
+    return options.filter((option) =>
+      option.name.trim().toLowerCase().includes(normalizedQuery),
+    );
+  }, [options, query]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedName = newCategoryName.trim();
-
     if (!trimmedName) {
       setLocalError("Category name is required.");
       return;
@@ -54,107 +57,161 @@ function TransactionCategoryPicker({
     setLocalError(null);
     try {
       await onCreateCategory(trimmedName);
-      setIsAddingCategory(false);
       setNewCategoryName("");
+      setIsAddingCategory(false);
+      setQuery("");
     } catch {
-      // Parent component handles the request error state.
+      // Parent handles request messaging.
     }
   };
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {options.map((option) => {
-          const isSelected = option.id === selectedCategoryId;
-
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => onSelect(option.id)}
-              className={`rounded-xl border px-3 py-3 text-left transition ${isSelected
-                  ? "border-primary bg-primary/10 shadow-sm"
-                  : "border-border bg-surface hover:border-primary/30 hover:bg-primary/5"
-                }`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-text-secondary">{option.name}</p>
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${isSelected ? "bg-primary" : "bg-gray-300"
-                    }`}
-                />
-              </div>
-            </button>
-          );
-        })}
-
-        {!isAddingCategory && (
-          <button
-            type="button"
-            onClick={handleStartCreate}
-            className="flex min-h-[52px] items-center justify-center gap-2 rounded-xl border border-dashed border-primary/40 bg-primary/5 px-3 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10"
-          >
-            <Plus size={16} />
-            Add Category
-          </button>
-        )}
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+        <div className="min-w-0">
+          <Text variant="caption" className="text-slate-500">
+            Selected category
+          </Text>
+          <Text as="p" variant="body" weight="bold" className="truncate text-text-primary">
+            {selectedCategory?.name ?? "Select category"}
+          </Text>
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="rounded-full px-3 text-[12px]"
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          {selectedCategory ? "Change" : "Choose"}
+        </Button>
       </div>
 
-      {isLoading && (
-        <div className="rounded-xl border border-border bg-surface px-3 py-3 text-sm text-gray-500">
-          Loading categories...
-        </div>
-      )}
+      {isOpen && (
+        <div className="space-y-2 rounded-lg border border-border bg-surface p-2.5 shadow-sm">
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-white px-2.5">
+            <Search size={14} className="text-slate-400" />
+            <input
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search categories..."
+              className="h-9 w-full bg-transparent text-sm text-text-secondary outline-none"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="text-slate-400 transition hover:text-slate-600"
+                aria-label="Clear category search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
 
-      {!isLoading && options.length === 0 && !isAddingCategory && (
-        <div className="rounded-xl border border-dashed border-border bg-surface px-3 py-4 text-sm text-gray-500">
-          No categories found for this type yet. Add one to continue.
-        </div>
-      )}
+          <div className="max-h-44 space-y-1.5 overflow-y-auto pr-1">
+            {isLoading && (
+              <div className="rounded-lg border border-border bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                Loading categories...
+              </div>
+            )}
 
-      {isAddingCategory && (
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-3 rounded-xl border border-border bg-surface px-3 py-3"
-        >
-          <Input
-            id="newCategoryName"
-            value={newCategoryName}
-            onChange={(event) => {
-              setNewCategoryName(event.target.value);
-              setLocalError(null);
-            }}
-            placeholder="Category name"
-            autoFocus
-            error={localError ?? undefined}
-          />
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+            {!isLoading && filteredOptions.length === 0 && (
+              <div className="rounded-lg border border-dashed border-border bg-slate-50 px-3 py-3 text-xs text-slate-500">
+                No matching categories.
+              </div>
+            )}
+
+            {!isLoading &&
+              filteredOptions.map((option) => {
+                const isSelected = option.id === selectedCategoryId;
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => {
+                      onSelect(option.id);
+                      setIsOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left transition ${
+                      isSelected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-white hover:border-primary/30 hover:bg-primary/5"
+                    }`}
+                  >
+                    <span className="text-xs font-medium text-text-primary">{option.name}</span>
+                    <span
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        isSelected ? "bg-primary" : "bg-slate-300"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+          </div>
+
+          {!isAddingCategory ? (
             <Button
               type="button"
-              variant="secondary"
+              variant="ghost"
               size="sm"
-              onClick={handleCancelCreate}
-              disabled={isCreating}
-              className="rounded-lg"
+              className="w-full rounded-lg border border-dashed border-primary/30 bg-primary/5 px-3 text-[12px] text-primary hover:bg-primary/10"
+              onClick={() => {
+                setIsAddingCategory(true);
+                setLocalError(null);
+              }}
             >
-              Cancel
+              <Plus size={14} />
+              Add Category
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="sm"
-              loading={isCreating}
-              className="rounded-lg"
-            >
-              Create Category
-            </Button>
-          </div>
-        </form>
-      )}
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-2 rounded-lg border border-border bg-slate-50 p-2.5">
+              <Input
+                id="newCategoryName"
+                value={newCategoryName}
+                onChange={(event) => {
+                  setNewCategoryName(event.target.value);
+                  setLocalError(null);
+                }}
+                placeholder="New category name"
+                autoFocus
+                error={localError ?? undefined}
+              />
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-md text-[12px]"
+                  disabled={isCreating}
+                  onClick={() => {
+                    setIsAddingCategory(false);
+                    setNewCategoryName("");
+                    setLocalError(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  loading={isCreating}
+                  className="rounded-md text-[12px]"
+                >
+                  Create
+                </Button>
+              </div>
+            </form>
+          )}
 
-      {errorMessage && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-3 text-sm text-rose-700">
-          {errorMessage}
+          {errorMessage && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+              {errorMessage}
+            </div>
+          )}
         </div>
       )}
     </div>
