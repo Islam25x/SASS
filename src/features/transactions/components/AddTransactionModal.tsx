@@ -11,6 +11,7 @@ type AddTransactionModalProps = {
   onClose: () => void;
   mode: "create" | "edit";
   initialData?: Transaction;
+  forcedType?: "income" | "expense";
 };
 
 function AddTransactionModal({
@@ -18,6 +19,7 @@ function AddTransactionModal({
   onClose,
   mode,
   initialData,
+  forcedType,
 }: AddTransactionModalProps) {
   const addTransactionMutation = useAddTransaction();
   const updateTransactionMutation = useUpdateTransaction();
@@ -53,6 +55,7 @@ function AddTransactionModal({
       isOpen={isOpen}
       mode={isEditMode ? "edit" : "add"}
       initialData={initialData}
+      forcedType={forcedType}
       onSubmit={handleSubmit}
       onClose={onClose}
       onDelete={isEditMode ? handleDelete : undefined}

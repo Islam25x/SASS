@@ -22,7 +22,7 @@ const MoneyFlowChart = () => {
     () => [
       {
         dataKey: "income",
-        stroke: "#8B5CF6",
+        stroke: "#0ea5e9",
         fill: "rgba(139,92,246,0.15)",
       },
       {
@@ -41,7 +41,7 @@ const MoneyFlowChart = () => {
 
   const legendItems = useMemo(
     () => [
-      { label: "Income", color: "#8B5CF6" },
+      { label: "Income", color: "#0ea5e9" },
       { label: "Expenses", color: "#F43F5E" },
       { label: "Savings", color: "#6366F1" },
     ],
@@ -77,15 +77,7 @@ const MoneyFlowChart = () => {
             size="sm"
             className="px-3 py-1 rounded-full text-sm text-gray-600 border-gray-200"
           >
-            All accounts
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            className="px-3 py-1 rounded-full text-sm text-gray-600 border-gray-200"
-          >
-            See all
+            monthly
           </Button>
         </div>
       </div>

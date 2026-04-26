@@ -14,6 +14,8 @@ type DashboardSummary = {
   savingsChangePercentage: number;
 };
 
+export const DASHBOARD_SUMMARY_QUERY_KEY = ["dashboard"] as const;
+
 type DashboardApiResponse = {
   totalBalance?: unknown;
   totalIncome?: unknown;
@@ -65,7 +67,7 @@ export function useDashboardSummary(): UseQueryResult<DashboardSummary, ApiError
   const token = session?.token ?? "";
 
   return useQuery<DashboardSummary, ApiError>({
-    queryKey: ["dashboard", selectedRange],
+    queryKey: [...DASHBOARD_SUMMARY_QUERY_KEY, selectedRange],
     queryFn: async ({ signal }) => {
       if (!token) {
         throw new ApiError("Auth token is required to fetch dashboard data.", 401, "INVALID_RESPONSE");

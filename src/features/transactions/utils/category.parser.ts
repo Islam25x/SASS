@@ -18,7 +18,10 @@ function readTrimmedString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function parseCategoryType(value: unknown): TransactionCategory["categoryType"] {
+function parseCategoryType(
+  value: unknown,
+  fallbackType?: TransactionCategory["categoryType"],
+): TransactionCategory["categoryType"] {
   const normalized = readTrimmedString(value).toLowerCase();
 
   if (normalized === "expense") {
@@ -29,10 +32,25 @@ function parseCategoryType(value: unknown): TransactionCategory["categoryType"] 
     return "Income";
   }
 
+  if (value === 0 || value === "0") {
+    return "Expense";
+  }
+
+  if (value === 1 || value === "1") {
+    return "Income";
+  }
+
+  if (fallbackType) {
+    return fallbackType;
+  }
+
   throw new ApiError("Category type is invalid.", 500, "INVALID_RESPONSE");
 }
 
-export function parseCategory(dto: unknown): TransactionCategory {
+export function parseCategory(
+  dto: unknown,
+  fallbackType?: TransactionCategory["categoryType"],
+): TransactionCategory {
   if (!isObject(dto)) {
     throw new ApiError("Category item is invalid.", 500, "INVALID_RESPONSE");
   }
@@ -52,13 +70,13 @@ export function parseCategory(dto: unknown): TransactionCategory {
   return {
     id,
     name,
-    categoryType: parseCategoryType(categoryDto.categoryType ?? categoryDto.type),
+    categoryType: parseCategoryType(categoryDto.categoryType ?? categoryDto.type, fallbackType),
   };
 }
 
 export function parseCategories(response: unknown): TransactionCategory[] {
   if (Array.isArray(response)) {
-    return response.map(parseCategory);
+    return response.map((item) => parseCategory(item));
   }
 
   if (!isObject(response)) {
@@ -73,21 +91,24 @@ export function parseCategories(response: unknown): TransactionCategory[] {
     throw new ApiError("Categories response is invalid.", 500, "INVALID_RESPONSE");
   }
 
-  return candidate.map(parseCategory);
+  return candidate.map((item) => parseCategory(item));
 }
 
-export function parseCreatedCategory(response: unknown): TransactionCategory | null {
+export function parseCreatedCategory(
+  response: unknown,
+  fallbackType?: TransactionCategory["categoryType"],
+): TransactionCategory | null {
   if (typeof response === "undefined" || response === null || response === "") {
     return null;
   }
 
   if (!isObject(response)) {
-    return parseCategory(response);
+    return parseCategory(response, fallbackType);
   }
 
   const envelope = response as CategoryEnvelope;
   const candidate =
     envelope.data ?? envelope.result ?? envelope.payload ?? envelope.category ?? response;
 
-  return parseCategory(candidate);
+  return parseCategory(candidate, fallbackType);
 }

@@ -1,5 +1,5 @@
 import { Plus, Search, X } from "lucide-react";
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
 import { Button, Input, Text } from "../../../shared/ui";
 import type { TransactionCategory } from "../types/category.types";
 
@@ -45,9 +45,7 @@ function TransactionCategoryPicker({
     );
   }, [options, query]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleCreateClick = async () => {
     const trimmedName = newCategoryName.trim();
     if (!trimmedName) {
       setLocalError("Category name is required.");
@@ -110,7 +108,7 @@ function TransactionCategoryPicker({
             )}
           </div>
 
-          <div className="max-h-44 space-y-1.5 overflow-y-auto pr-1">
+          <div className="max-h-24 space-y-1.5 overflow-y-auto pr-1">
             {isLoading && (
               <div className="rounded-lg border border-border bg-slate-50 px-3 py-2 text-xs text-slate-500">
                 Loading categories...
@@ -167,7 +165,7 @@ function TransactionCategoryPicker({
               Add Category
             </Button>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-2 rounded-lg border border-border bg-slate-50 p-2.5">
+            <div className="space-y-2 rounded-lg border border-border bg-slate-50 p-2.5">
               <Input
                 id="newCategoryName"
                 value={newCategoryName}
@@ -178,6 +176,12 @@ function TransactionCategoryPicker({
                 placeholder="New category name"
                 autoFocus
                 error={localError ?? undefined}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void handleCreateClick();
+                  }
+                }}
               />
               <div className="flex justify-end gap-2">
                 <Button
@@ -195,16 +199,19 @@ function TransactionCategoryPicker({
                   Cancel
                 </Button>
                 <Button
-                  type="submit"
+                  type="button"
                   variant="primary"
                   size="sm"
                   loading={isCreating}
                   className="rounded-md text-[12px]"
+                  onClick={() => {
+                    void handleCreateClick();
+                  }}
                 >
                   Create
                 </Button>
               </div>
-            </form>
+            </div>
           )}
 
           {errorMessage && (

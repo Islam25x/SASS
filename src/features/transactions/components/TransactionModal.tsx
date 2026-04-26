@@ -27,6 +27,7 @@ type TransactionModalProps = {
   isOpen: boolean;
   mode: "add" | "edit";
   initialData?: Transaction;
+  forcedType?: "income" | "expense";
   onSubmit: (data: AddTransactionInput) => Promise<void> | void;
   onClose: () => void;
   onDelete?: () => Promise<void> | void;
@@ -93,6 +94,20 @@ function createInitialState(): FormState {
   };
 }
 
+function normalizeForcedType(
+  forcedType?: "income" | "expense",
+): AddTransactionType | undefined {
+  if (forcedType === "income") {
+    return "Income";
+  }
+
+  if (forcedType === "expense") {
+    return "Expense";
+  }
+
+  return undefined;
+}
+
 function createEditState(initialData: Transaction): FormState {
   return {
     amount: `${initialData.amount}`,
@@ -109,6 +124,7 @@ function TransactionModal({
   isOpen,
   mode,
   initialData,
+  forcedType,
   onSubmit,
   onClose,
   onDelete,
@@ -124,6 +140,8 @@ function TransactionModal({
   const [isMoreDetailsOpen, setIsMoreDetailsOpen] = useState(false);
   const isEditMode = mode === "edit";
   const refetchCategories = categoriesQuery.refetch;
+  const resolvedForcedType = normalizeForcedType(forcedType);
+  const isTypeSelectionLocked = Boolean(resolvedForcedType);
 
   const allCategories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
   const categoryOptions = useMemo(
@@ -173,12 +191,30 @@ function TransactionModal({
     setIsMoreDetailsOpen(false);
 
     if (isEditMode && initialData) {
-      setFormState(createEditState(initialData));
+      const nextState = createEditState(initialData);
+      setFormState(
+        resolvedForcedType
+          ? {
+              ...nextState,
+              type: resolvedForcedType,
+              categoryId:
+                initialData.type === resolvedForcedType ? nextState.categoryId : "",
+            }
+          : nextState,
+      );
       return;
     }
 
-    setFormState(createInitialState());
-  }, [initialData, isEditMode, isOpen]);
+    const nextState = createInitialState();
+    setFormState(
+      resolvedForcedType
+        ? {
+            ...nextState,
+            type: resolvedForcedType,
+          }
+        : nextState,
+    );
+  }, [initialData, isEditMode, isOpen, resolvedForcedType]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -228,6 +264,17 @@ function TransactionModal({
       setNotice(null);
 
       try {
+        const existingCategory = findCategoryByName(allCategories, name, formState.type);
+
+        if (existingCategory) {
+          setErrors((currentErrors) => ({ ...currentErrors, categoryId: undefined }));
+          setFormState((currentState) => ({
+            ...currentState,
+            categoryId: existingCategory.id,
+          }));
+          return;
+        }
+
         const createdCategory = await createCategoryMutation.mutateAsync({
           name,
           type: formState.type,
@@ -262,7 +309,7 @@ function TransactionModal({
         throw error;
       }
     },
-    [createCategoryMutation, formState.type, refetchCategories],
+    [allCategories, createCategoryMutation, formState.type, refetchCategories],
   );
 
   if (!isOpen) {
@@ -280,6 +327,10 @@ function TransactionModal({
   };
 
   const handleTypeChange = (type: AddTransactionType) => {
+    if (isTypeSelectionLocked) {
+      return;
+    }
+
     setNotice(null);
     setErrors((currentErrors) => ({ ...currentErrors, categoryId: undefined }));
     setFormState((currentState) => ({
@@ -414,31 +465,33 @@ function TransactionModal({
           </div>
 
           <div className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_190px]">
-            <div className="space-y-1.5">
-              <Text variant="caption" weight="medium" className="text-slate-800">
-                Type
-              </Text>
-              <div className="grid grid-cols-2 rounded-lg border border-slate-200 bg-slate-100 p-1">
-                {(["Expense", "Income"] as const).map((type) => {
-                  const isActive = formState.type === type;
+            {!isTypeSelectionLocked && (
+              <div className="space-y-1.5">
+                <Text variant="caption" weight="medium" className="text-slate-800">
+                  Type
+                </Text>
+                <div className="grid grid-cols-2 rounded-lg border border-slate-200 bg-slate-100 p-1">
+                  {(["Expense", "Income"] as const).map((type) => {
+                    const isActive = formState.type === type;
 
-                  return (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => handleTypeChange(type)}
-                      className={`rounded-md px-3 py-2 text-[13px] font-semibold transition ${
-                        isActive
-                          ? "bg-primary text-white shadow-sm"
-                          : "text-slate-600 hover:bg-white"
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => handleTypeChange(type)}
+                        className={`rounded-md px-3 py-2 text-[13px] font-semibold transition ${
+                          isActive
+                            ? "bg-primary text-white shadow-sm"
+                            : "text-slate-600 hover:bg-white"
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             <Input
               id="occurredAt"

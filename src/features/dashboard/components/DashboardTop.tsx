@@ -12,11 +12,19 @@ import { PageHeader, Text } from "../../../shared/ui";
 import { useUserProfile } from "../../../features/user/hooks/useUserProfile";
 import { getUserDisplayName } from "../../../features/user/utils/user.selectors";
 import { useDashboardSummary } from "../hooks/useDashboardSummary";
+import { useState } from "react";
+import AddTransactionModal from "../../transactions/components/AddTransactionModal";
+import AdjustBalanceModal from "./AdjustBalanceModal";
+
+type ForcedTransactionType = "income" | "expense" | null;
 
 const DashboardTop = () => {
   const { data: profile } = useUserProfile();
   const { data: summary } = useDashboardSummary();
   const displayName = profile ? getUserDisplayName(profile) : "Finexa User";
+  const [forcedTransactionType, setForcedTransactionType] =
+    useState<ForcedTransactionType>(null);
+  const [isAdjustBalanceOpen, setIsAdjustBalanceOpen] = useState(false);
 
   const dashboardItems = [
     {
@@ -25,6 +33,8 @@ const DashboardTop = () => {
       value: summary?.totalBalance ?? 0,
       pev: "0% vs last period",
       isIncrease: true,
+      arrow: true,
+      onArrowClick: () => setIsAdjustBalanceOpen(true),
     },
     {
       titleKey: "Income",
@@ -32,7 +42,8 @@ const DashboardTop = () => {
       value: summary?.totalIncome ?? 0,
       pev: `${summary?.incomeChangePercentage ?? 0}% vs last period`,
       isIncrease: (summary?.incomeChangePercentage ?? 0) >= 0,
-      arrow: true
+      arrow: true,
+      onArrowClick: () => setForcedTransactionType("income"),
     },
     {
       titleKey: "Expenses",
@@ -40,7 +51,7 @@ const DashboardTop = () => {
       value: summary?.totalExpense ?? 0,
       pev: `${summary?.expenseChangePercentage ?? 0}% vs last period`,
       isIncrease: (summary?.expenseChangePercentage ?? 0) >= 0,
-      arrow: true
+      arrow: false
     },
     {
       titleKey: "savings for this month",
@@ -48,7 +59,7 @@ const DashboardTop = () => {
       value: summary?.totalSavings ?? 0,
       pev: `${summary?.savingsChangePercentage ?? 0}% vs last period`,
       isIncrease: (summary?.savingsChangePercentage ?? 0) >= 0,
-      arrow: true
+      arrow: false
     },
   ];
 
@@ -77,12 +88,24 @@ const DashboardTop = () => {
             }
             isIncrease={item.isIncrease}
             showArrow={item.arrow}
+            onArrowClick={item.onArrowClick}
           />
         ))}
       </div>
+
+      <AddTransactionModal
+        isOpen={forcedTransactionType !== null}
+        onClose={() => setForcedTransactionType(null)}
+        mode="create"
+        forcedType={forcedTransactionType ?? undefined}
+      />
+      <AdjustBalanceModal
+        isOpen={isAdjustBalanceOpen}
+        currentBalance={summary?.totalBalance ?? 0}
+        onClose={() => setIsAdjustBalanceOpen(false)}
+      />
     </section>
   );
 };
 
 export default DashboardTop;
-

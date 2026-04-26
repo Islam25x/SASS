@@ -9,6 +9,7 @@ type DashboardSummaryCardProps = {
   changeLabel: ReactNode;
   isIncrease: boolean;
   showArrow?: boolean;
+  onArrowClick?: () => void;
 };
 
 function DashboardSummaryCard({
@@ -18,6 +19,7 @@ function DashboardSummaryCard({
   changeLabel,
   isIncrease,
   showArrow = false,
+  onArrowClick,
 }: DashboardSummaryCardProps) {
   return (
     <Card variant="default" padding="md" className="pt-4 rounded-4xl text-black">
@@ -26,9 +28,14 @@ function DashboardSummaryCard({
           {title}
         </Text>
         {showArrow && (
-          <div className="rounded-full border-gray-300 justify-items-center content-center me-[-1rem] mt-[-.8rem] solid border-1 h-10 w-10 cursor-pointer hover:bg-primary hover:text-white duration-150">
+          <button
+            type="button"
+            onClick={onArrowClick}
+            className="rounded-full border-gray-300 justify-items-center content-center me-[-1rem] mt-[-.8rem] solid border-1 h-10 w-10 cursor-pointer hover:bg-primary hover:text-white duration-150"
+            aria-label={`Open ${title} transaction modal`}
+          >
             <MoveUpRight />
-          </div>
+          </button>
         )}
       </div>
 

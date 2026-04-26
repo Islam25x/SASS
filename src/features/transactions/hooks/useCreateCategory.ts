@@ -54,17 +54,30 @@ export function useCreateCategory(): UseCreateCategoryResult {
           { signal: controller.signal },
         );
 
-        return parseCreatedCategory(response);
+        return parseCreatedCategory(response, payload.type);
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;
         }
       }
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: TRANSACTION_CATEGORIES_QUERY_KEY,
-      });
+    onSuccess: (createdCategory) => {
+      if (createdCategory) {
+        queryClient.setQueryData<TransactionCategory[]>(
+          TRANSACTION_CATEGORIES_QUERY_KEY,
+          (currentCategories = []) => {
+            const alreadyExists = currentCategories.some(
+              (category) => category.id === createdCategory.id,
+            );
+
+            if (alreadyExists) {
+              return currentCategories;
+            }
+
+            return [...currentCategories, createdCategory];
+          },
+        );
+      }
     },
     retry: 0,
   });
