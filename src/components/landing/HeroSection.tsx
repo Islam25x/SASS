@@ -25,7 +25,7 @@ export default function HeroSection({ robotImageSrc, benefits, onTryFree }: Hero
       variants={pageEnter({ reducedMotion: shouldReduceMotion })}
       initial="hidden"
       animate="visible"
-      className="flex h-[88vh] items-center bg-white overflow-hidden"
+      className="flex h-[89vh] items-center bg-white overflow-hidden"
       aria-labelledby="landing-hero-title"
     >
       <div className={CONTAINER_CLASS}>
