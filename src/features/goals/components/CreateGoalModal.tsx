@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { Target, Wallet, X } from "lucide-react";
 import { Button, Input } from "../../../shared/ui";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useCreateGoal } from "../hooks/useCreateGoal";
 import type { CreateGoalFormInput } from "../types/goal.types";
 
@@ -337,11 +337,10 @@ function CreateGoalModal({ isOpen, onClose }: CreateGoalModalProps) {
                       key={option.value}
                       type="button"
                       onClick={() => handleModeChange(option.value)}
-                      className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-                        isActive
+                      className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${isActive
                           ? "bg-primary text-white shadow-sm"
                           : "bg-transparent text-gray-600 hover:bg-surface"
-                      }`}
+                        }`}
                     >
                       {option.icon}
                       {option.label}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     BrainCircuit,
     CheckCircle2,
@@ -13,6 +13,7 @@ import {
 import ProfileInfo from "./ProfileInfo";
 import Security from "./Security";
 import Preferences from "./Preferences";
+import ProfileImageUploadModal from "../../features/user/components/ProfileImageUploadModal";
 import { useTransactions } from "../../features/transactions/hooks/useTransactions";
 import { useUserProfile } from "../../features/user/hooks/useUserProfile";
 import {
@@ -154,12 +155,15 @@ function ProfileInsightsPanel({
 
 const Profile = () => {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [hasProfileImageError, setHasProfileImageError] = useState(false);
     const { data: profile } = useUserProfile();
     const { data: transactionsData, isLoading: isTransactionsLoading } = useTransactions();
     const toggleOpen = (index: number) => setActiveIndex(index);
     const displayName = profile ? getUserDisplayName(profile) : "Finexa User";
     const displayEmail = profile?.email || "No email available";
     const initial = profile ? getUserInitial(profile) : "F";
+    const profileImageUrl = !hasProfileImageError ? profile?.profileImageUrl : null;
     const transactions = useMemo(() => transactionsData?.items ?? [], [transactionsData]);
     const insights = useMemo(() => selectTransactionsInsights(transactions), [transactions]);
     const completion = useMemo(() => {
@@ -193,6 +197,10 @@ const Profile = () => {
         { icon: <Settings size={20} strokeWidth={1.75} />, label: "Preferences" },
     ];
 
+    useEffect(() => {
+        setHasProfileImageError(false);
+    }, [profile?.profileImageUrl]);
+
     return (
         <section id="Support" className={PAGE_SHELL_CLASS}>
             <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -218,11 +226,25 @@ const Profile = () => {
                                 <div className="flex flex-col items-center gap-3 text-center md:flex-row md:text-left">
                                     <div className="relative">
                                         <span className="relative flex h-12 w-12 shrink-0 overflow-hidden rounded-[18px] border border-sky-100 bg-gradient-to-br from-white via-sky-50 to-[#eef6ff] shadow-[0_16px_36px_rgba(14,165,233,0.14)]">
-                                            <span className="flex h-full w-full items-center justify-center text-lg font-semibold text-slate-700">
-                                                {initial}
-                                            </span>
+                                            {profileImageUrl ? (
+                                                <img
+                                                    src={profileImageUrl}
+                                                    alt={`${displayName} profile`}
+                                                    className="h-full w-full object-cover"
+                                                    onError={() => setHasProfileImageError(true)}
+                                                />
+                                            ) : (
+                                                <span className="flex h-full w-full items-center justify-center text-lg font-semibold text-slate-700">
+                                                    {initial}
+                                                </span>
+                                            )}
                                         </span>
-                                        <button className="absolute -bottom-1 -right-1 inline-flex h-7 w-7 items-center justify-center rounded-xl border border-slate-200 bg-white text-primary shadow-md transition hover:bg-sky-50">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsUploadModalOpen(true)}
+                                            className="absolute -bottom-1 -right-1 inline-flex h-7 w-7 items-center justify-center rounded-xl border border-slate-200 bg-white text-primary shadow-md transition hover:bg-sky-50"
+                                            aria-label="Upload profile picture"
+                                        >
                                             <Upload strokeWidth={1.5} size={14} />
                                         </button>
                                     </div>
@@ -292,6 +314,11 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
+
+            <ProfileImageUploadModal
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+            />
         </section>
     );
 };

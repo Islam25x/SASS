@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useAuth } from "../../../shared/auth/AuthContext";
 import { getGoalHistoryApi } from "../api/get-goal-history.api";
 import type { GoalHistoryPage } from "../types/goal.types";

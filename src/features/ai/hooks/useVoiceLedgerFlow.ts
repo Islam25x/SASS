@@ -5,7 +5,7 @@ import { useParseTransaction } from "./useParseTransaction";
 import { useVoiceToText } from "./useVoiceToText";
 import type { Transaction } from "../../transactions/types/transaction.types";
 import { buildTransactionFromParsed } from "../../transactions/utils/transaction.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 export type VoiceLedgerState =
   | "idle"

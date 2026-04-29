@@ -1,4 +1,4 @@
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import {
   GoalSchema,
   type Goal,
@@ -85,18 +85,17 @@ export function parseGoals(response: unknown): Goal[] {
     throw new ApiError("Goals response is invalid.", 500, "INVALID_RESPONSE");
   }
 
-  return data.map((item: any) =>
-    {
-      const targetAmount = toSafeNumber(item.targetAmount);
-      const currentAmount = toSafeNumber(item.currentAmount);
-      const monthlyAmount = toSafeNumber(item.monthlyAmount);
-      const progressPercentage = toSafeNumber(item.progressPercentage);
-      const progress =
-        Number.isFinite(progressPercentage) && progressPercentage > 0
-          ? progressPercentage
-          : calculateProgress(currentAmount, targetAmount);
+  return data.map((item: any) => {
+    const targetAmount = toSafeNumber(item.targetAmount);
+    const currentAmount = toSafeNumber(item.currentAmount);
+    const monthlyAmount = toSafeNumber(item.monthlyAmount);
+    const progressPercentage = toSafeNumber(item.progressPercentage);
+    const progress =
+      Number.isFinite(progressPercentage) && progressPercentage > 0
+        ? progressPercentage
+        : calculateProgress(currentAmount, targetAmount);
 
-      return GoalSchema.parse({
+    return GoalSchema.parse({
       id: item.goalId,
       title: typeof item.title === "string" ? item.title : "",
       description: typeof item.description === "string" ? item.description : "",
@@ -112,7 +111,7 @@ export function parseGoals(response: unknown): Goal[] {
 
       durationUnit: "Months",
     })
-    }
+  }
   );
 }
 

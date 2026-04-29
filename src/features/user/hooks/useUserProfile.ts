@@ -3,7 +3,7 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { fetchUserProfileApi } from "../api/user.api";
 import type { User } from "../types/user.types";
 import { extractUserData, parseUser } from "../utils/user.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useAuth } from "../../../shared/auth/AuthContext";
 
 export const USER_PROFILE_QUERY_KEY = ["user", "profile"] as const;
@@ -19,11 +19,13 @@ export function useUserProfile(): UseQueryResult<User, ApiError> {
         accessToken: token,
       });
 
-      return parseUser(extractUserData(response));
+      return parseUser(extractUserData(response), {
+        profileImageCacheKey: Date.now(),
+      });
     },
     staleTime: 1000 * 60 * 5,
     enabled: !!token,
-    initialData: session?.user,
+    placeholderData: session?.user,
   });
 
   useEffect(() => {

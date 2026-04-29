@@ -10,7 +10,7 @@ import { extractLoginData, parseAuthSession, readLoginToken } from "../utils/aut
 import { fetchUserProfileApi } from "../../user/api/user.api";
 import { USER_PROFILE_QUERY_KEY } from "../../user/hooks/useUserProfile";
 import { extractUserData, parseUser } from "../../user/utils/user.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { TRANSACTION_CATEGORIES_QUERY_KEY } from "../../transactions/hooks/useCategories";
 
 type LoginMutation = UseMutationResult<AuthSession, ApiError, LoginPayload>;

@@ -3,7 +3,7 @@ import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { registerApi, REGISTER_SUCCESS_MESSAGE } from "../api/auth.api";
 import type { RegisterPayload, RegisterResult } from "../types/auth.types";
 import { extractRegisterData, parseRegisterResult } from "../utils/auth.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 type RegisterMutation = UseMutationResult<
   RegisterResult,

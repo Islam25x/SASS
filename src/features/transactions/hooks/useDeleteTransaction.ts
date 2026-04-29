@@ -5,7 +5,7 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import { deleteTransactionApi } from "../api/delete-transaction.api";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 type DeleteTransactionMutation = UseMutationResult<void, ApiError, string>;
 

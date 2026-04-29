@@ -6,6 +6,7 @@ import {
   safeTrim,
   toTrimmedString,
 } from "../../../shared/utils/mapper.utils";
+import { normalizeProfileImageUrl } from "../../../shared/utils/profile-image-url";
 
 interface EnvelopeCandidate {
   data?: unknown;
@@ -41,6 +42,10 @@ interface RawUserCandidate {
   avatarUrl?: unknown;
   photoUrl?: unknown;
 }
+
+type ParseUserOptions = {
+  profileImageCacheKey?: string | number | null;
+};
 
 function unwrapEnvelope(response: unknown): unknown {
   if (!isObject(response)) {
@@ -132,7 +137,7 @@ function requireUserField(field: "id" | "email" | "username", value: string): st
   return value;
 }
 
-export function parseUser(data: unknown): User {
+export function parseUser(data: unknown, options?: ParseUserOptions): User {
   const dto = parseUserProfileDto(data);
 
   const id = requireUserField("id", safeTrim(dto.id));
@@ -147,6 +152,10 @@ export function parseUser(data: unknown): User {
     lastName: safeTrim(dto.lastName),
     phoneNumber: safeTrim(dto.phoneNumber),
     dateOfBirth: parseDate(dto.dateOfBirth),
-    profileImageUrl: safeTrim(dto.profileImageUrl) || null,
+    profileImageUrl: dto.profileImageUrl
+      ? normalizeProfileImageUrl(dto.profileImageUrl, {
+          cacheKey: options?.profileImageCacheKey,
+        })
+      : null,
   };
 }

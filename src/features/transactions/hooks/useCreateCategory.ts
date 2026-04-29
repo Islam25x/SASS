@@ -10,7 +10,7 @@ import type {
   TransactionCategory,
 } from "../types/category.types";
 import { parseCreatedCategory } from "../utils/category.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { TRANSACTION_CATEGORIES_QUERY_KEY } from "./useCategories";
 
 type CreateCategoryMutation = UseMutationResult<
@@ -49,12 +49,12 @@ export function useCreateCategory(): UseCreateCategoryResult {
         const response = await createCategoryApi(
           {
             name,
-            type: payload.type,
+            categoryType: payload.categoryType,
           },
           { signal: controller.signal },
         );
 
-        return parseCreatedCategory(response, payload.type);
+        return parseCreatedCategory(response, payload.categoryType);
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;

@@ -1,6 +1,6 @@
 import { BanknoteArrowUp, Info, TrendingDown, TrendingUp, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { Button, Input, Text, useToast } from "../../../shared/ui";
 import { useAdjustBalance } from "../hooks/useAdjustBalance";
 
@@ -225,13 +225,12 @@ function AdjustBalanceModal({
               Difference
             </Text>
             <div
-              className={`flex items-center gap-2 text-2xl font-bold ${
-                isPositive
+              className={`flex items-center gap-2 text-2xl font-bold ${isPositive
                   ? "text-emerald-600"
                   : isNegative
                     ? "text-rose-600"
                     : "text-slate-500"
-              }`}
+                }`}
             >
               {isPositive && <TrendingUp size={22} />}
               {isNegative && <TrendingDown size={22} />}

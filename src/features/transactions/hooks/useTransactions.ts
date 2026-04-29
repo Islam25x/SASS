@@ -4,7 +4,7 @@ import {
   mapTransactionsResponseToPage,
   type TransactionsPage,
 } from "../utils/transaction.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useAuth } from "../../../shared/auth/AuthContext";
 import { useDateRange } from "../../../shared/ui";
 import type {
@@ -64,8 +64,8 @@ export function useTransactions(options?: UseTransactionsOptions) {
         pageNumber,
         pageSize,
         {
-        signal,
-        accessToken: token,
+          signal,
+          accessToken: token,
         },
       );
 

@@ -1,5 +1,5 @@
-import { ApiError, mapApiError, readErrorMessage } from "../../../shared/api/api-error";
-import { getAiApiBaseUrl, requestJson } from "../../../shared/api/http";
+import { ApiError, mapApiError, readErrorMessage } from "../../../infrastructure/api/api-error";
+import { getApiBaseUrl, requestJson } from "../../../infrastructure/api/http";
 
 export async function voiceToTextApi(
   blob: Blob,
@@ -13,7 +13,7 @@ export async function voiceToTextApi(
     const formData = new FormData();
     formData.append("file", blob, "voice.webm");
 
-    const response = await fetch(`${getAiApiBaseUrl()}/voice-to-text`, {
+    const response = await fetch(`${getApiBaseUrl()}/voice-to-text`, {
       method: "POST",
       body: formData,
       signal: options?.signal,
@@ -60,7 +60,7 @@ export async function sendChatbotMessageApi(
   options?: { signal?: AbortSignal },
 ): Promise<Response> {
   try {
-    const response = await fetch(`${getAiApiBaseUrl()}/chat`, {
+    const response = await fetch(`${getApiBaseUrl()}/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

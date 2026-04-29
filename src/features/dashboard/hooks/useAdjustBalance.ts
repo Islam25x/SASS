@@ -4,7 +4,7 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { adjustBalanceApi } from "../api/adjust-balance.api";
 import { DASHBOARD_SUMMARY_QUERY_KEY } from "./useDashboardSummary";
 

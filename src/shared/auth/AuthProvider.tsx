@@ -6,7 +6,7 @@ import {
   writeStoredAuthSession,
 } from "../../infrastructure/auth/auth-storage";
 import type { User } from "../../features/user/types/user.types";
-import { API_UNAUTHORIZED_EVENT } from "../api/http";
+import { API_UNAUTHORIZED_EVENT } from "../../infrastructure/api/http";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
 
 function areUsersEqual(currentUser: User, nextUser: User): boolean {

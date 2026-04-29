@@ -3,7 +3,7 @@ import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { receiptOcrApi } from "../api/ai.api";
 import type { ReceiptOcrResponse } from "../types/ai.types";
 import { parseReceiptOcrResponse } from "../utils/ai.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 type ReceiptOcrMutation = UseMutationResult<ReceiptOcrResponse, ApiError, File>;
 

@@ -108,9 +108,7 @@ export default function ConfirmEmailPage() {
       tone: "success",
     });
 
-    redirectTimeoutRef.current = window.setTimeout(() => {
-      navigate("/login", { replace: true });
-    }, 1500);
+
 
     return () => {
       if (redirectTimeoutRef.current) {

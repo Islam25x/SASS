@@ -1,4 +1,4 @@
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import type { TransactionCategoryDto } from "../types/category.dto";
 import type { TransactionCategory } from "../types/category.types";
 
@@ -103,12 +103,16 @@ export function parseCreatedCategory(
   }
 
   if (!isObject(response)) {
-    return parseCategory(response, fallbackType);
+    return null;
   }
 
   const envelope = response as CategoryEnvelope;
   const candidate =
     envelope.data ?? envelope.result ?? envelope.payload ?? envelope.category ?? response;
+
+  if (!isObject(candidate)) {
+    return null;
+  }
 
   return parseCategory(candidate, fallbackType);
 }

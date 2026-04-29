@@ -1,7 +1,7 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getGoalsApi } from "../api/get-goals.api";
 import { parseGoalsPage, type GoalsPage } from "../utils/goal.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useAuth } from "../../../shared/auth/AuthContext";
 
 export const GOALS_QUERY_KEY = ["goals"] as const;

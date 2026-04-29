@@ -9,5 +9,5 @@ export interface TransactionCategoryDto {
 
 export interface CreateCategoryRequestDto {
   name: string;
-  type: AddTransactionType;
+  categoryType: AddTransactionType;
 }

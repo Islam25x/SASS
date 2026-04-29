@@ -1,5 +1,5 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 import type { DateRangeValue } from "../../../shared/ui/DateRangeSelector";
 
 export async function getDashboardApi(

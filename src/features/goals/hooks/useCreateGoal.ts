@@ -10,7 +10,7 @@ import {
   type CreateGoalFormInput,
   type CreateGoalInput,
 } from "../types/goal.types";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { GOALS_QUERY_KEY } from "./useGoals";
 
 function roundToTwoDecimals(value: number): number {
@@ -32,7 +32,7 @@ function mapInputToPayload(input: CreateGoalFormInput): CreateGoalInput {
     return CreateGoalInputSchema.parse({
       ...base,
       durationValue: roundToTwoDecimals(input.durationValue),
-      monthlyAmount: undefined, 
+      monthlyAmount: undefined,
     });
   }
 

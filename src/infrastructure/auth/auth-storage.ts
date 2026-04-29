@@ -1,5 +1,6 @@
 import type { AuthSession } from "../../features/auth/types/auth.types";
 import type { User } from "../../features/user/types/user.types";
+import { normalizeProfileImageUrl } from "../../shared/utils/profile-image-url";
 
 const AUTH_STORAGE_KEY = "finexa.auth.session";
 const PENDING_CONFIRMATION_EMAIL_STORAGE_KEY = "finexa.auth.pending-confirmation-email";
@@ -53,7 +54,7 @@ function parseStoredUser(value: unknown): User | null {
     lastName: candidate.lastName,
     phoneNumber: candidate.phoneNumber,
     dateOfBirth,
-    profileImageUrl: candidate.profileImageUrl,
+    profileImageUrl: normalizeProfileImageUrl(candidate.profileImageUrl),
   };
 }
 
@@ -121,6 +122,20 @@ export function writeStoredAuthSession(session: AuthSession): void {
   }
 
   window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+}
+
+export function updateStoredAuthToken(token: string, expiresAt?: Date): void {
+  const currentSession = readStoredAuthSession();
+
+  if (!currentSession) {
+    return;
+  }
+
+  writeStoredAuthSession({
+    ...currentSession,
+    token,
+    expiresAt: expiresAt ?? currentSession.expiresAt,
+  });
 }
 
 export function clearStoredAuthSession(): void {

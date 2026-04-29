@@ -1,4 +1,4 @@
-import { ApiError } from "../api/api-error";
+import { ApiError } from "../../infrastructure/api/api-error";
 
 const BASE64_PADDING_MULTIPLE = 4;
 

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { confirmEmailApi } from "../api/confirm-email.api";
 import type { ConfirmEmailPayload } from "../types/auth.types";
 

@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { updateUserProfileApi } from "../api/user.api";
 import type { UpdateUserProfileRequestDto } from "../api/user.dto";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { USER_PROFILE_QUERY_KEY } from "./useUserProfile";
 
 export interface UpdateUserProfileInput {

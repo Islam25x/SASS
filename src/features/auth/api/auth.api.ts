@@ -1,8 +1,7 @@
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
+export { refreshAccessToken } from "../../../infrastructure/api/auth-refresh";
 import type { LoginRequestDto, RegisterRequestDto } from "./auth.dto";
-
-const AUTH_API_BASE_URL =
-  import.meta.env.VITE_FINEXA_API_BASE_URL?.trim() || "https://finexa.runasp.net";
+import { getAuthApiBaseUrl } from "./auth-config";
 
 export const REGISTER_SUCCESS_MESSAGE =
   "Registration successful. Please check your email to confirm your account.";
@@ -15,7 +14,7 @@ export async function registerApi(
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: AUTH_API_BASE_URL,
+    baseUrl: getAuthApiBaseUrl(),
   });
 }
 
@@ -27,10 +26,19 @@ export async function loginApi(
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: AUTH_API_BASE_URL,
+    baseUrl: getAuthApiBaseUrl(),
   });
 }
 
-export function getAuthApiBaseUrl(): string {
-  return AUTH_API_BASE_URL;
+export async function logoutApi(
+  options?: { signal?: AbortSignal },
+): Promise<void> {
+  await requestJson<unknown>("/api/Auth/logout", {
+    method: "POST",
+    signal: options?.signal,
+    baseUrl: getAuthApiBaseUrl(),
+    withAuth: true,
+  });
 }
+
+export { getAuthApiBaseUrl } from "./auth-config";

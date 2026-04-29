@@ -1,5 +1,5 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 import type {
   TransactionsApiTypeFilter,
   TransactionsFilters,
@@ -59,11 +59,11 @@ export async function fetchTransactionsApi(
   return requestJson<unknown>(
     buildTransactionsQuery(period, type, categoryId, fromDate, toDate, pageNumber, pageSize),
     {
-    method: "GET",
-    signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
-    withAuth: true,
-    accessToken: options?.accessToken,
+      method: "GET",
+      signal: options?.signal,
+      baseUrl: getAuthApiBaseUrl(),
+      withAuth: true,
+      accessToken: options?.accessToken,
     },
   );
 }

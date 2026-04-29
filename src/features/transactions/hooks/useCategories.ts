@@ -2,7 +2,7 @@ import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { getCategoriesApi } from "../api/get-categories.api";
 import type { TransactionCategory } from "../types/category.types";
 import { parseCategories } from "../utils/category.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useAuth } from "../../../shared/auth/AuthContext";
 
 export const TRANSACTION_CATEGORIES_QUERY_KEY = ["transactions", "categories"] as const;

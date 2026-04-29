@@ -15,7 +15,7 @@ import {
   type FormEvent,
 } from "react";
 import { Button, Input, Text } from "../../../shared/ui";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useCategories } from "../hooks/useCategories";
 import { useCreateCategory } from "../hooks/useCreateCategory";
 import { findCategoryByName, selectCategoriesByType } from "../utils/category.selectors";
@@ -195,11 +195,11 @@ function TransactionModal({
       setFormState(
         resolvedForcedType
           ? {
-              ...nextState,
-              type: resolvedForcedType,
-              categoryId:
-                initialData.type === resolvedForcedType ? nextState.categoryId : "",
-            }
+            ...nextState,
+            type: resolvedForcedType,
+            categoryId:
+              initialData.type === resolvedForcedType ? nextState.categoryId : "",
+          }
           : nextState,
       );
       return;
@@ -209,9 +209,9 @@ function TransactionModal({
     setFormState(
       resolvedForcedType
         ? {
-            ...nextState,
-            type: resolvedForcedType,
-          }
+          ...nextState,
+          type: resolvedForcedType,
+        }
         : nextState,
     );
   }, [initialData, isEditMode, isOpen, resolvedForcedType]);
@@ -277,12 +277,14 @@ function TransactionModal({
 
         const createdCategory = await createCategoryMutation.mutateAsync({
           name,
-          type: formState.type,
+          categoryType: formState.type,
         });
 
         const refreshedCategories = (await refetchCategories()).data ?? [];
         const nextCategory =
-          createdCategory ?? findCategoryByName(refreshedCategories, name, formState.type);
+          createdCategory ??
+          findCategoryByName(refreshedCategories, name, formState.type) ??
+          findCategoryByName(allCategories, name, formState.type);
 
         if (!nextCategory) {
           throw new ApiError(
@@ -479,11 +481,10 @@ function TransactionModal({
                         key={type}
                         type="button"
                         onClick={() => handleTypeChange(type)}
-                        className={`rounded-md px-3 py-2 text-[13px] font-semibold transition ${
-                          isActive
+                        className={`rounded-md px-3 py-2 text-[13px] font-semibold transition ${isActive
                             ? "bg-primary text-white shadow-sm"
                             : "text-slate-600 hover:bg-white"
-                        }`}
+                          }`}
                       >
                         {type}
                       </button>

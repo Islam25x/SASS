@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { parseParsedTransaction } from "../../ai/utils/ai.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import {
   TransactionListSchema,
   TransactionSchema,

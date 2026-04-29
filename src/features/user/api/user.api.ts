@@ -1,4 +1,4 @@
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 import type {
   UpdateUserProfileRequestDto,
@@ -24,6 +24,20 @@ export async function updateUserProfileApi(
   return requestJson<UpdateUserProfileResponseDto>("/api/User/profile", {
     method: "PUT",
     body: JSON.stringify(payload),
+    signal: options?.signal,
+    baseUrl: getAuthApiBaseUrl(),
+    withAuth: true,
+  });
+}
+export async function uploadImage(
+  file: File,
+  options?: { signal?: AbortSignal },
+): Promise<UpdateUserProfileResponseDto> {
+  const formData = new FormData();
+  formData.append("file", file);
+  return requestJson<UpdateUserProfileResponseDto>("/api/User/upload-image", {
+    method: "POST",
+    body: formData,
     signal: options?.signal,
     baseUrl: getAuthApiBaseUrl(),
     withAuth: true,

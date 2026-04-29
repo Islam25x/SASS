@@ -9,7 +9,7 @@ import { z } from "zod";
 import { parseTransactionApi } from "../api/ai.api";
 import type { ParsedTransaction } from "../types/ai.types";
 import { parseParsedTransaction } from "../utils/ai.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 const ParseTransactionInputSchema = z.string().min(1);
 const DEFAULT_TRANSACTIONS_QUERY_KEY: QueryKey = ["transactions"];

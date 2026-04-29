@@ -1,5 +1,5 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 
 export async function getCategoriesApi(
   options?: { signal?: AbortSignal; accessToken?: string },

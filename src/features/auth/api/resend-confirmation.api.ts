@@ -1,4 +1,4 @@
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 import type { ResendConfirmationPayload } from "../types/auth.types";
 import { getAuthApiBaseUrl } from "./auth.api";
 

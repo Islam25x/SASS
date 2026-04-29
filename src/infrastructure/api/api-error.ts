@@ -52,8 +52,13 @@ export function mapApiError(error: unknown): ApiError {
 
 export async function readErrorMessage(response: Response): Promise<string> {
   const jsonResponse = response.clone();
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
 
   try {
+    if (!contentType.includes("application/json")) {
+      throw new Error("Response is not JSON.");
+    }
+
     const payload = (await jsonResponse.json()) as ApiErrorPayload;
     const validationMessages = payload.errors
       ? Object.values(payload.errors)

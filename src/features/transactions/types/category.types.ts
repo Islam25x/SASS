@@ -8,5 +8,5 @@ export interface TransactionCategory {
 
 export interface CreateTransactionCategoryInput {
   name: string;
-  type: AddTransactionType;
+  categoryType: AddTransactionType;
 }

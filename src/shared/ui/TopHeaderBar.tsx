@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import Button from "./Button";
 import DateRangeSelector from "./DateRangeSelector";
@@ -16,6 +16,10 @@ function TopHeaderBar() {
   const email = profile?.email || "No email available";
   const imageUrl = !hasImageError ? profile?.profileImageUrl : "";
   const initial = profile ? getUserInitial(profile) : "F";
+
+  useEffect(() => {
+    setHasImageError(false);
+  }, [profile?.profileImageUrl]);
 
   return (
     <div className="flex flex-wrap items-center gap-2">

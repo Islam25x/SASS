@@ -1,4 +1,4 @@
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import type {
   AddTransactionInput,
   AddTransactionPayload,

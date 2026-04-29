@@ -3,7 +3,7 @@ import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { voiceToTextApi } from "../api/ai.api";
 import type { VoiceToTextResponse } from "../types/ai.types";
 import { parseVoiceToTextResponse } from "../utils/ai.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 type VoiceToTextMutation = UseMutationResult<
   VoiceToTextResponse,

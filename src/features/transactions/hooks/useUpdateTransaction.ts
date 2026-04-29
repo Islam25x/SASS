@@ -7,7 +7,7 @@ import {
 import { updateTransactionApi } from "../api/update-transaction.api";
 import type { AddTransactionInput } from "../types/add-transaction.types";
 import { parseAddTransactionPayload } from "../utils/add-transaction.parser";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 
 type UpdateTransactionPayload = {
   transactionId: string;

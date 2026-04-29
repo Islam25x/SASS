@@ -4,7 +4,7 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { cancelGoalApi } from "../api/cancel-goal.api";
 import { GOALS_QUERY_KEY } from "./useGoals";
 

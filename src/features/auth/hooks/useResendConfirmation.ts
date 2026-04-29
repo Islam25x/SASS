@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
-import { ApiError } from "../../../shared/api/api-error";
+import { ApiError } from "../../../infrastructure/api/api-error";
 import { useToast } from "../../../shared/ui";
 import { extractRegisterData, parseRegisterResult } from "../utils/auth.parser";
 import { resendConfirmationApi } from "../api/resend-confirmation.api";

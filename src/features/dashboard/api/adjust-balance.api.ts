@@ -1,4 +1,4 @@
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
 
 export type AdjustBalancePayload = {

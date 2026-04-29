@@ -1,5 +1,5 @@
 import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
-import { requestJson } from "../../../shared/api/http";
+import { requestJson } from "../../../infrastructure/api/http";
 import type { CreateCategoryRequestDto } from "../types/category.dto";
 
 export async function createCategoryApi(
