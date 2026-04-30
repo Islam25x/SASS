@@ -146,7 +146,7 @@ export default function ResetPasswordPage() {
             src={robotImageSrc}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute right-[-6%] top-1/2 hidden w-[420px] max-w-[40vw] -translate-y-1/2 opacity-95 xl:block"
+            className="pointer-events-none absolute right-[-6%] top-[64%] hidden w-[420px] max-w-[40vw] -translate-y-1/2 opacity-95 xl:block"
           />
 
           {resetPasswordMutation.isSuccess ? (
