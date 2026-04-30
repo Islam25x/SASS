@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useParseTransaction } from "../hooks/useParseTransaction";
 import { useReceiptOcr } from "../hooks/useReceiptOcr";
 import { useVoiceToText } from "../hooks/useVoiceToText";
+import type { ReceiptOcrItem } from "../types/ai.types";
 import type { ParsedTransaction } from "../../transactions/utils/parsed-transaction.schema";
 import { Button, Card, Input, Text } from "../../../shared/ui";
 
@@ -74,7 +75,7 @@ function AiApiFlowsExample({
 
   const receiptTransactions = useMemo(
     () =>
-      (receiptOcrMutation.data?.items ?? []).map((item) => ({
+      (receiptOcrMutation.data?.items ?? []).map((item: ReceiptOcrItem) => ({
         amount: item.line_total ?? item.unit_price ?? 0,
         category: "Receipt",
         description:
@@ -261,7 +262,7 @@ function AiApiFlowsExample({
               Extracted Transactions
             </Text>
             <ul className="mt-2 space-y-2 text-sm text-slate-700">
-              {receiptTransactions.map((transaction, index) => (
+              {receiptTransactions.map((transaction: ParsedTransaction, index: number) => (
                 <li key={`${transaction.description}-${index}`} className="rounded bg-slate-50 p-2">
                   {transaction.description} - {transaction.amount} ({transaction.category})
                 </li>
