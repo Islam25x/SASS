@@ -18,17 +18,6 @@ export type TransactionRowData = {
   transaction: Transaction;
 };
 
-export type TransactionsSummary = {
-  totalIncome: number;
-  totalExpenses: number;
-  totalBalance: number;
-  totalSavings: number;
-  transactionCount: number;
-  incomeChange: number;
-  expensesChange: number;
-  balanceChange: number;
-};
-
 export type TransactionsInsights = {
   spendingChange: number;
   isSpendingUp: boolean;
@@ -154,49 +143,6 @@ const summarize = (transactions: Transaction[]) => {
     totalExpenses,
   };
 };
-
-export function selectTransactionsSummary(transactions: Transaction[]): TransactionsSummary {
-  const { totalIncome, totalExpenses } = summarize(transactions);
-  const totalBalance = totalIncome - totalExpenses;
-  const totalSavings = totalBalance;
-  const transactionCount = transactions.length;
-
-  const latestMonthKey = getLatestMonthKey(transactions);
-  const previousMonthKey = getPreviousMonthKey(latestMonthKey);
-  const currentMonthTransactions = latestMonthKey
-    ? transactions.filter((transaction) => getMonthKey(transaction.date) === latestMonthKey)
-    : [];
-  const previousMonthTransactions = previousMonthKey
-    ? transactions.filter((transaction) => getMonthKey(transaction.date) === previousMonthKey)
-    : [];
-
-  const currentSummary = summarize(currentMonthTransactions);
-  const previousSummary = summarize(previousMonthTransactions);
-
-  const incomeChange = calcPercentChange(
-    currentSummary.totalIncome,
-    previousSummary.totalIncome,
-  );
-  const expensesChange = calcPercentChange(
-    currentSummary.totalExpenses,
-    previousSummary.totalExpenses,
-  );
-  const balanceChange = calcPercentChange(
-    currentSummary.totalIncome - currentSummary.totalExpenses,
-    previousSummary.totalIncome - previousSummary.totalExpenses,
-  );
-
-  return {
-    totalIncome,
-    totalExpenses,
-    totalBalance,
-    totalSavings,
-    transactionCount,
-    incomeChange,
-    expensesChange,
-    balanceChange,
-  };
-}
 
 export function selectTransactionsInsights(transactions: Transaction[]): TransactionsInsights {
   const latestMonthKey = getLatestMonthKey(transactions);

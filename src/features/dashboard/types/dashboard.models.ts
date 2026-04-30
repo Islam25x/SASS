@@ -1,9 +1,7 @@
-import type { DashboardTrendDto } from "./dashboard.dto";
-
 export type DashboardTrend = {
   value: number;
   label: string;
-  trend: DashboardTrendDto["trend"];
+  trend: "up" | "down" | "neutral";
 };
 
 export type DashboardExpenseBreakdownItem = {

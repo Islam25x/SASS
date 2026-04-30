@@ -9,6 +9,14 @@ import { parseDashboardSummary } from "../utils/dashboard.parser";
 export const DASHBOARD_QUERY_KEY = ["dashboard"] as const;
 export const DASHBOARD_SUMMARY_QUERY_KEY = DASHBOARD_QUERY_KEY;
 
+function logDashboardDebug(message: string, payload?: unknown): void {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+
+  console.debug(`[dashboard] ${message}`, payload);
+}
+
 function useDashboardQuery<TData>(
   select: (dashboard: DashboardData) => TData,
 ): UseQueryResult<TData, ApiError> {
@@ -22,7 +30,12 @@ function useDashboardQuery<TData>(
         signal,
       });
 
-      return parseDashboardSummary(response);
+      logDashboardDebug("Raw dashboard API response", response);
+
+      const parsedDashboard = parseDashboardSummary(response);
+      logDashboardDebug("Dashboard query parsed successfully", parsedDashboard);
+
+      return parsedDashboard;
     },
     select,
     staleTime: 30_000,

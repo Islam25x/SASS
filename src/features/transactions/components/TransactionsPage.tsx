@@ -1,17 +1,18 @@
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import AdjustBalanceModal from "../../dashboard/components/AdjustBalanceModal";
+import { useDashboardSummary } from "../../dashboard/hooks/useDashboard";
+import { mapDashboardCardSummaryToFinancialSummary } from "../../dashboard/utils/dashboard-summary-metrics";
 import { useTransactions } from "../hooks/useTransactions";
 import {
   mapTransactionsForTable,
   selectTransactionsInsights,
-  selectTransactionsSummary,
   type TransactionRowData,
 } from "../utils/transaction.selectors";
 import TransactionTable from "./TransactionTable";
-import TransactionsSummaryCards from "./TransactionsSummaryCards";
 import AIInsightsCard from "./AIInsightsCard";
 import AddTransactionModal from "./AddTransactionModal";
-import { Button, Input, PageHeader } from "../../../shared/ui";
+import { Button, FinancialSummaryCards, Input, PageHeader } from "../../../shared/ui";
 import type { TransactionsTypeUiFilter } from "../types/transactions-filter.types";
 import type { Transaction } from "../types/transaction.types";
 
@@ -22,8 +23,15 @@ function TransactionsPage() {
     typeFilter: filterType,
     pageNumber,
   });
+  const {
+    data: dashboardSummary,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+  } = useDashboardSummary();
   const [searchValue, setSearchValue] = useState("");
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [isAdjustBalanceOpen, setIsAdjustBalanceOpen] = useState(false);
+  const [forcedTransactionType, setForcedTransactionType] = useState<"income" | "expense" | undefined>(undefined);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -31,7 +39,6 @@ function TransactionsPage() {
   const currentPage = data?.pageNumber ?? pageNumber;
   const pageSize = data?.pageSize ?? 4;
   const totalCount = data?.totalCount ?? transactions.length;
-  const summary = useMemo(() => selectTransactionsSummary(transactions), [transactions]);
   const insights = useMemo(() => selectTransactionsInsights(transactions), [transactions]);
   const tableRows = useMemo(
     () => mapTransactionsForTable(transactions),
@@ -80,6 +87,16 @@ function TransactionsPage() {
     setIsEditOpen(false);
   };
 
+  const openCreateModal = (forcedType?: "income" | "expense") => {
+    setForcedTransactionType(forcedType);
+    setIsAddTransactionOpen(true);
+  };
+
+  const handleCloseCreate = () => {
+    setIsAddTransactionOpen(false);
+    setForcedTransactionType(undefined);
+  };
+
   return (
     <div className="space-y-5">
       <PageHeader
@@ -119,7 +136,16 @@ function TransactionsPage() {
         </div>
       </div>
 
-      <TransactionsSummaryCards summary={summary} isLoading={isLoading} />
+      <FinancialSummaryCards
+        summary={mapDashboardCardSummaryToFinancialSummary(dashboardSummary)}
+        isLoading={isSummaryLoading}
+        isError={isSummaryError}
+        actions={{
+          balance: () => setIsAdjustBalanceOpen(true),
+          income: () => openCreateModal("income"),
+          expenses: () => openCreateModal("expense"),
+        }}
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <div className="space-y-4">
@@ -185,8 +211,18 @@ function TransactionsPage() {
 
       <AddTransactionModal
         isOpen={isAddTransactionOpen}
-        onClose={() => setIsAddTransactionOpen(false)}
+        onClose={handleCloseCreate}
         mode="create"
+        forcedType={forcedTransactionType}
+      />
+      <AdjustBalanceModal
+        isOpen={isAdjustBalanceOpen}
+        currentBalance={
+          typeof dashboardSummary?.totalBalance === "number"
+            ? dashboardSummary.totalBalance
+            : 0
+        }
+        onClose={() => setIsAdjustBalanceOpen(false)}
       />
       <AddTransactionModal
         isOpen={isEditOpen}

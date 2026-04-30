@@ -2,6 +2,7 @@ import { memo } from "react";
 import LineChartBase from "../../../shared/chart/LineChartBase";
 import { Button, Card, Text } from "../../../shared/ui";
 import { useDashboard } from "../hooks/useDashboard";
+import { EmptyMoneyFlowState } from "./EmptyMoneyFlowState";
 
 const chartSeries = [
   {
@@ -30,24 +31,21 @@ const legendItems = [
 const MoneyFlowChart = () => {
   const { data: dashboard } = useDashboard();
   const chartData = dashboard?.moneyFlow ?? [];
-  const hasChartData = chartData.length > 0;
-
+  const hasEnoughChartData =
+    chartData.length >= 3 &&
+    chartData.some(
+      item =>
+        item.income > 0 ||
+        item.expense > 0 ||
+        item.savings > 0
+    );
   return (
     <Card variant="default" padding="sm" className="relative w-full h-80 flex flex-col p-0">
       <div className="flex items-center justify-between my-4 mx-6">
         <Text as="h2" variant="subtitle" weight="medium" className="text-gray-900 my-1">
           Money Flow
         </Text>
-        {
-          !hasChartData && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/60 backdrop-blur-xs z-40 text-center p-6">
-              <p className="text-gray-800 font-medium mb-2">No money flow data yet</p>
-              <p className="text-white text-sm mb-4">Your money flow insights will appear here once you add transactions.</p>
-            </div>
-          )
-        }
-
-
+        {!hasEnoughChartData && <EmptyMoneyFlowState />}
         <div className="flex items-center gap-4">
           {legendItems.map((item) => (
             <div key={item.label} className="flex items-center gap-2">

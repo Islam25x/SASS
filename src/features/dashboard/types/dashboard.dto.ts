@@ -1,7 +1,7 @@
 export interface DashboardTrendDto {
     value: number;
     label: string;
-    trend: "up" | "down" | "stable";
+    trend: "up" | "down" | "stable" | "neutral";
 }
 
 export interface ExpenseBreakdownDto {
