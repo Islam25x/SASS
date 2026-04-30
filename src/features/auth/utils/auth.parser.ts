@@ -1,6 +1,5 @@
 import type { LoginResponseDto, RegisterResponseDto } from "../api/auth.dto";
 import type { AuthSession, RegisterResult } from "../types/auth.types";
-import type { User } from "../../user/types/user.types";
 import {
   createInvalidResponseError,
   decodeJwtSegment,
@@ -147,13 +146,12 @@ export function readLoginToken(data: unknown): string {
   return parseLoginResponseDto(data).token;
 }
 
-export function parseAuthSession(data: unknown, user: User): AuthSession {
+export function parseAuthSession(data: unknown): AuthSession {
   const dto = parseLoginResponseDto(data);
 
   return {
     token: dto.token,
     expiresAt: readExpiresAt(dto),
-    user,
   };
 }
 

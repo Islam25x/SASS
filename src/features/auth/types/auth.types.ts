@@ -1,5 +1,3 @@
-import type { User } from "../../user/types/user.types";
-
 export interface LoginPayload {
   email: string;
   password: string;
@@ -32,5 +30,4 @@ export interface ResendConfirmationResult {
 export interface AuthSession {
   token: string;
   expiresAt: Date;
-  user: User;
 }

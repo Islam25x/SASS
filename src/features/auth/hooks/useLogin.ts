@@ -6,11 +6,10 @@ import {
 } from "@tanstack/react-query";
 import { loginApi } from "../api/auth.api";
 import type { AuthSession, LoginPayload } from "../types/auth.types";
-import { extractLoginData, parseAuthSession, readLoginToken } from "../utils/auth.parser";
-import { fetchUserProfileApi } from "../../user/api/user.api";
-import { extractUserData, parseUser } from "../../user/utils/user.parser";
+import { extractLoginData, parseAuthSession } from "../utils/auth.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { TRANSACTION_CATEGORIES_QUERY_KEY } from "../../transactions/hooks/useCategories";
+import { USER_PROFILE_QUERY_KEY } from "../../user/hooks/useUserProfile";
 
 type LoginMutation = UseMutationResult<AuthSession, ApiError, LoginPayload>;
 
@@ -39,14 +38,7 @@ export function useLogin(): UseLoginResult {
           { signal: controller.signal },
         );
 
-        const loginData = extractLoginData(loginResponse);
-        const profileResponse = await fetchUserProfileApi({
-          signal: controller.signal,
-          authTokenOverride: readLoginToken(loginData),
-        });
-
-        const user = parseUser(extractUserData(profileResponse));
-        return parseAuthSession(loginData, user);
+        return parseAuthSession(extractLoginData(loginResponse));
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;
@@ -55,6 +47,7 @@ export function useLogin(): UseLoginResult {
     },
     onSuccess: async () => {
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: ["transactions"] }),
         queryClient.invalidateQueries({ queryKey: TRANSACTION_CATEGORIES_QUERY_KEY }),
       ]);

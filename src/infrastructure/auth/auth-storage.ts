@@ -1,61 +1,10 @@
 import type { AuthSession } from "../../features/auth/types/auth.types";
-import type { User } from "../../features/user/types/user.types";
-import { normalizeProfileImageUrl } from "../../shared/utils/profile-image-url";
 
 export const AUTH_STORAGE_KEY = "finexa.auth.session";
 const PENDING_CONFIRMATION_EMAIL_STORAGE_KEY = "finexa.auth.pending-confirmation-email";
 
 function isValidDate(value: Date): boolean {
   return !Number.isNaN(value.getTime());
-}
-
-function parseStoredUser(value: unknown): User | null {
-  if (typeof value !== "object" || value === null) {
-    return null;
-  }
-
-  const candidate = value as {
-    id?: unknown;
-    email?: unknown;
-    username?: unknown;
-    firstName?: unknown;
-    lastName?: unknown;
-    phoneNumber?: unknown;
-    dateOfBirth?: unknown;
-    profileImageUrl?: unknown;
-  };
-
-  if (
-    typeof candidate.id !== "string" ||
-    typeof candidate.email !== "string" ||
-    typeof candidate.username !== "string" ||
-    typeof candidate.firstName !== "string" ||
-    typeof candidate.lastName !== "string" ||
-    typeof candidate.phoneNumber !== "string" ||
-    (candidate.profileImageUrl !== null && typeof candidate.profileImageUrl !== "string")
-  ) {
-    return null;
-  }
-
-  const dateOfBirth =
-    typeof candidate.dateOfBirth === "string" && candidate.dateOfBirth
-      ? new Date(candidate.dateOfBirth)
-      : null;
-
-  if (dateOfBirth && !isValidDate(dateOfBirth)) {
-    return null;
-  }
-
-  return {
-    id: candidate.id,
-    email: candidate.email,
-    username: candidate.username,
-    firstName: candidate.firstName,
-    lastName: candidate.lastName,
-    phoneNumber: candidate.phoneNumber,
-    dateOfBirth,
-    profileImageUrl: normalizeProfileImageUrl(candidate.profileImageUrl),
-  };
 }
 
 export function readStoredAuthSession(): AuthSession | null {
@@ -72,16 +21,13 @@ export function readStoredAuthSession(): AuthSession | null {
     const parsed = JSON.parse(rawValue) as {
       token?: unknown;
       expiresAt?: unknown;
-      user?: unknown;
     };
-    const user = parseStoredUser(parsed.user);
     const expiresAt =
       typeof parsed.expiresAt === "string" ? new Date(parsed.expiresAt) : null;
 
     if (
       typeof parsed.token !== "string" ||
-      !parsed.token ||
-      !user
+      !parsed.token
     ) {
       clearStoredAuthSession();
       return null;
@@ -90,7 +36,6 @@ export function readStoredAuthSession(): AuthSession | null {
     return {
       token: parsed.token,
       expiresAt: expiresAt && isValidDate(expiresAt) ? expiresAt : new Date(0),
-      user,
     };
   } catch {
     clearStoredAuthSession();
