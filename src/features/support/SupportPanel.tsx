@@ -4,7 +4,7 @@ import { Mail, CircleHelp, FileText } from "lucide-react";
 import Questions from "./Questions";
 import Documentation from "./Documentation";
 import ContactSupport from "./ContactSupport";
-import { Button, Text } from "../../../shared/ui";
+import { Button, Text } from "../../shared/ui";
 
 import "./Support.css";
 
@@ -34,9 +34,8 @@ const Support = () => {
                             onClick={() => toggleOpen(index)}
                             variant={activeIndex === index ? "primary" : "ghost"}
                             size="sm"
-                            className={`justify-center no-underline px-3 py-1.5 text-sm font-medium flex items-center gap-2 rounded-md ${
-                                activeIndex === index ? "text-white" : "text-gray-600 hover:text-gray-900"
-                            }`}
+                            className={`justify-center no-underline px-3 py-1.5 text-sm font-medium flex items-center gap-2 rounded-md ${activeIndex === index ? "text-white" : "text-gray-600 hover:text-gray-900"
+                                }`}
                         >
                             {btn.icon}
                             {btn.labelKey}

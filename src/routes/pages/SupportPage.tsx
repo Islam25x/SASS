@@ -1,4 +1,4 @@
-import SupportPanel from "../../features/ai/support/SupportPanel";
+import SupportPanel from "../../features/support/SupportPanel";
 
 const SupportPage = () => {
   return <SupportPanel />;

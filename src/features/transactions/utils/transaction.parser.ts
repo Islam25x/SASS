@@ -1,14 +1,24 @@
 import { z } from "zod";
-import { parseParsedTransaction } from "../../ai/utils/ai.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import {
   TransactionListSchema,
   TransactionSchema,
   type Transaction,
 } from "./transaction.schema";
-import type { ReceiptOcrResponse } from "../../ai/types/ai.types";
 import type { TransactionResponseDto } from "../types/transaction.dto";
 import { normalizeOptionalTransactionItem } from "./transaction-item";
+import { parseParsedTransaction } from "./parsed-transaction.schema";
+
+type ReceiptTransactionLikeItem = {
+  name?: string;
+  line_total?: number;
+  unit_price?: number;
+};
+
+type ReceiptTransactionLikeResponse = {
+  items: ReceiptTransactionLikeItem[];
+  merchant?: string;
+};
 
 type TransactionsResponseEnvelope = {
   items?: unknown;
@@ -252,7 +262,7 @@ export function buildTransactionFromParsed(
 }
 
 export function buildTransactionsFromReceipt(
-  response: ReceiptOcrResponse,
+  response: ReceiptTransactionLikeResponse,
   input: { issuedAt: string; ids: string[] },
 ): Transaction[] {
   return response.items.map((item, index) =>

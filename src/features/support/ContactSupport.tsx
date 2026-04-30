@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import type { FormEvent } from "react";
-import { Button, Card, Input, Text } from "../../../shared/ui";
+import { Button, Card, Input, Text } from "../../shared/ui";
 
 const ContactSupport = () => {
     const form = useRef<HTMLFormElement>(null);

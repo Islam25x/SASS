@@ -1,15 +1,13 @@
 import { useEffect, useRef } from "react";
 import { CheckCircle2, Mic, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { ParsedTransaction } from "../types/ai.types";
-import type { VoiceLedgerState } from "../hooks/useVoiceLedgerFlow";
 import { Button, Input, Text } from "../../../shared/ui";
 
 interface VoiceLedgerModalProps {
   isOpen: boolean;
-  state: VoiceLedgerState;
+  state:  "recording" | "transcribing" | "parsing" | "transcribed" | "preview" | "submitting" | "idle";
   transcript: string;
-  parsedTransaction: ParsedTransaction | null;
+  parsedTransaction:  null;
   error: string | null;
   isLoading: boolean;
   onClose: () => void;
@@ -189,13 +187,13 @@ function VoiceLedgerModal({
                         Structured Preview
                       </Text>
                       <Text variant="body" className="mt-1">
-                        Amount: {parsedTransaction.amount}
+                        Amount: 50.00 USD
                       </Text>
-                      <Text variant="body">Category: {parsedTransaction.category}</Text>
+                      <Text variant="body">Category: </Text>
                       <Text variant="body">
-                        Description: {parsedTransaction.description}
+                        Description: 
                       </Text>
-                      <Text variant="body">Date: {parsedTransaction.date ?? "N/A"}</Text>
+                      <Text variant="body">Date: "N/A</Text>
                     </div>
                   )}
                 </div>

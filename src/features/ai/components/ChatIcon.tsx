@@ -3,10 +3,6 @@ import type { LucideIcon } from "lucide-react";
 import { Brain, Mic, ReceiptText } from "lucide-react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import ChatBot from "./ChatBot";
-import VoiceLedgerModal from "./VoiceLedgerModal";
-import { useVoiceLedgerFlow } from "../hooks/useVoiceLedgerFlow";
-import { useReceiptOcrFlow } from "../hooks/useReceiptOcrFlow";
-import ReceiptOcrModal from "./ReceiptOcrModal";
 import { Button, Text } from "../../../shared/ui";
 
 const NOOP = () => { };
@@ -106,16 +102,7 @@ function ChatIcon() {
     const [isPinnedOpen, setIsPinnedOpen] = useState(false);
 
     const launcherRef = useRef<HTMLDivElement | null>(null);
-    const voiceLedgerFlow = useVoiceLedgerFlow({
-        onTransactionCreated: () => {
-            setVoiceModalOpen(false);
-        },
-    });
-    const receiptOcrFlow = useReceiptOcrFlow({
-        onComplete: () => {
-            setOcrModalOpen(false);
-        },
-    });
+
 
     const isAnyModalOpen = active || voiceModalOpen || ocrModalOpen;
 
@@ -217,48 +204,6 @@ function ChatIcon() {
 
             <AnimatePresence>
                 {active && <ChatBot setActive={setActive} setHideIcon={NOOP} />}
-                {voiceModalOpen && (
-                    <VoiceLedgerModal
-                        isOpen={voiceModalOpen}
-                        state={voiceLedgerFlow.state}
-                        transcript={voiceLedgerFlow.transcript}
-                        parsedTransaction={voiceLedgerFlow.parsedTransaction}
-                        error={voiceLedgerFlow.error}
-                        isLoading={voiceLedgerFlow.isLoading}
-                        onClose={() => {
-                            voiceLedgerFlow.cancel();
-                            setVoiceModalOpen(false);
-                        }}
-                        onStartRecording={voiceLedgerFlow.startRecording}
-                        onStopRecording={() => {
-                            void voiceLedgerFlow.stopRecording();
-                        }}
-                        onConfirm={() => {
-                            void voiceLedgerFlow.confirmTransaction();
-                        }}
-                        onTranscriptChange={voiceLedgerFlow.updateTranscript}
-                    />
-                )}
-                {ocrModalOpen && (
-                    <ReceiptOcrModal
-                        isOpen={ocrModalOpen}
-                        state={receiptOcrFlow.state}
-                        selectedFile={receiptOcrFlow.selectedFile}
-                        previewUrl={receiptOcrFlow.previewUrl}
-                        extractedTransactions={receiptOcrFlow.extractedTransactions}
-                        error={receiptOcrFlow.error}
-                        isLoading={receiptOcrFlow.isLoading}
-                        onClose={() => {
-                            receiptOcrFlow.cancel();
-                            setOcrModalOpen(false);
-                        }}
-                        onFileChange={receiptOcrFlow.handleFile}
-                        onProcess={() => {
-                            void receiptOcrFlow.processReceipt();
-                        }}
-                        onConfirm={receiptOcrFlow.confirmTransactions}
-                    />
-                )}
             </AnimatePresence>
         </>
     );

@@ -1,4 +1,4 @@
-import { Card, Text } from "../../../shared/ui";
+import { Card, Text } from "../../shared/ui";
 
 const Questions = () => {
     const questions = [

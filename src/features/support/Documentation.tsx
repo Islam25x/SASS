@@ -1,4 +1,4 @@
-import { Button, Card, Text } from "../../../shared/ui";
+import { Button, Card, Text } from "../../shared/ui";
 
 const Documentation = () => {
     const documents = [

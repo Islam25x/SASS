@@ -1,17 +1,42 @@
 import { z } from "zod";
+import type { TransactionResponseDto } from "../../transactions/types/transaction.dto";
+
+export type ChatMessageRole = "user" | "assistant";
+
+export interface ChatMessageDto {
+  role: ChatMessageRole;
+  content: string;
+  createdAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: ChatMessageRole;
+  content: string;
+  createdAt: string;
+}
+
+export interface ChatDto {
+  title: string;
+  messages: ChatMessageDto[];
+}
+
+export interface ChatConversation {
+  title: string;
+  messages: ChatMessage[];
+}
+
+export interface SendChatMessageDto {
+  message: string;
+}
+export interface SendChatMessageResponseDto {
+  sessionId: string;
+  reply: string;
+  transactions: TransactionResponseDto[];
+}
 
 export const VoiceToTextResponseSchema = z.object({
   text: z.string(),
-});
-
-export const ParsedTransactionSchema = z.object({
-  amount: z.number().finite(),
-  currency: z.string().optional(),
-  merchant: z.string().optional(),
-  category: z.string().min(1),
-  transaction_type: z.string().optional(),
-  date: z.string().optional(),
-  description: z.string().min(1),
 });
 
 export const ReceiptOcrItemSchema = z.object({
@@ -28,6 +53,5 @@ export const ReceiptOcrResponseSchema = z.object({
 });
 
 export type VoiceToTextResponse = z.infer<typeof VoiceToTextResponseSchema>;
-export type ParsedTransaction = z.infer<typeof ParsedTransactionSchema>;
 export type ReceiptOcrItem = z.infer<typeof ReceiptOcrItemSchema>;
 export type ReceiptOcrResponse = z.infer<typeof ReceiptOcrResponseSchema>;

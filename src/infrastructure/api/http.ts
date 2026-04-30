@@ -1,4 +1,4 @@
-import { getApiBaseUrl as getDefaultApiBaseUrl } from "./api-config";
+import { getAppApiBaseUrl as getDefaultApiBaseUrl } from "./api-config";
 import { getAuthSessionSnapshot } from "../auth/auth-session-store";
 import { refreshAccessToken } from "./auth-refresh";
 import { ApiError, mapApiError, readErrorMessage } from "./api-error";

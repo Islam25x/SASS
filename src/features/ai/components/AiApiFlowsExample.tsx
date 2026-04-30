@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useParseTransaction } from "../hooks/useParseTransaction";
 import { useReceiptOcr } from "../hooks/useReceiptOcr";
 import { useVoiceToText } from "../hooks/useVoiceToText";
-import type { ParsedTransaction } from "../types/ai.types";
+import type { ParsedTransaction } from "../../transactions/utils/parsed-transaction.schema";
 import { Button, Card, Input, Text } from "../../../shared/ui";
 
 // Example UI layer: consumes hooks only, keeps API details outside the component.
