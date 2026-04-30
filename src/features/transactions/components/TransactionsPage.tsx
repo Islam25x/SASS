@@ -52,6 +52,7 @@ function TransactionsPage() {
       const matchesQuery =
         !query ||
         (row.merchant ?? "").toLowerCase().includes(query) ||
+        row.displayTitle.toLowerCase().includes(query) ||
         (row.item ?? "").toLowerCase().includes(query) ||
         (row.rawCategory ?? "").toLowerCase().includes(query);
 

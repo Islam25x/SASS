@@ -3,15 +3,20 @@ import {
   TransactionCategory,
   TransactionType,
 } from "../types/transaction.enums";
+import {
+  getTransactionDisplayTitle,
+  normalizeOptionalTransactionItem,
+} from "./transaction-item";
 
 export type NormalizedTransactionType = TransactionType | "unknown";
 
 export type TransactionRowData = {
   id: string;
-  item: string;
+  item?: string | null;
+  displayTitle: string;
   date?: string;
   amount: number;
-  merchant: string;
+  merchant?: string | null;
   type: NormalizedTransactionType;
   category: TransactionCategory;
   rawCategory?: string;
@@ -69,14 +74,11 @@ export function normalizeTransactionCategory(value?: string): TransactionCategor
 export function mapTransactionsForTable(transactions: Transaction[]): TransactionRowData[] {
   return transactions.map((transaction) => ({
     id: transaction.id,
-    item:
-      transaction.item ||
-      transaction.merchant ||
-      transaction.category ||
-      "Transaction",
+    item: transaction.item,
+    displayTitle: getTransactionDisplayTitle(transaction),
     date: transaction.date,
     amount: transaction.amount,
-    merchant: transaction.merchant || "",
+    merchant: normalizeOptionalTransactionItem(transaction.merchant),
     type: normalizeTransactionType(transaction),
     category: normalizeTransactionCategory(transaction.category),
     rawCategory: transaction.category || "Other",

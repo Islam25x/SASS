@@ -3,11 +3,11 @@ import { ParsedTransactionSchema } from "../../ai/types/ai.types";
 
 export const TransactionSchema = z.object({
   id: z.string().min(1),
-  item: z.string().min(1),
+  item: z.string().min(1).nullable().optional(),
   amount: z.number().finite(),
   category: z.string().min(1),
-  description: z.string().min(1),
-  merchant: z.string().optional(),
+  description: z.string(),
+  merchant: z.string().nullable().optional(),
   date: z.string().optional(),
   type: z.enum(["Income", "Expense"]),
   method: z.enum(["voice", "receipt"]).optional(),

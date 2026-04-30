@@ -23,7 +23,7 @@ function TransactionRow({ transaction, onOpenDetails }: TransactionRowProps) {
       </td>
       <td className="py-3 text-sm font-semibold text-gray-800">
         <Text as="span" variant="body" weight="bold" className="text-gray-800">
-          {transaction.item || transaction.rawCategory || "Transaction"}
+          {transaction.displayTitle}
         </Text>
       </td>
       <td className="py-3 text-sm text-gray-600">

@@ -5,6 +5,7 @@ import type {
   AddTransactionType,
   AddTransactionTypeInput,
 } from "../types/add-transaction.types";
+import { normalizeOptionalTransactionItem } from "./transaction-item";
 
 function normalizeOccurredAt(value: string): string {
   const parsedDate = new Date(value);
@@ -34,9 +35,11 @@ function normalizeTransactionType(value: AddTransactionTypeInput): AddTransactio
 
 export function parseAddTransactionPayload(input: AddTransactionInput): AddTransactionPayload {
   const transactionName = input.transactionName.trim();
-  const notes = input.notes?.trim() || transactionName || input.item?.trim() || input.merchant?.trim() || "Transaction";
-  const merchant = input.merchant?.trim();
-  const item = input.item?.trim();
+  const normalizedNotes = normalizeOptionalTransactionItem(input.notes);
+  const merchant = normalizeOptionalTransactionItem(input.merchant);
+  const item = normalizeOptionalTransactionItem(input.item);
+  const fallbackNotes = transactionName || item || merchant || "Transaction";
+  const notes = normalizedNotes ?? fallbackNotes;
   const normalizedType = normalizeTransactionType(input.type);
   const normalizedCategoryType = normalizeTransactionType(input.categoryType);
 

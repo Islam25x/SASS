@@ -8,6 +8,7 @@ import {
 } from "./transaction.schema";
 import type { ReceiptOcrResponse } from "../../ai/types/ai.types";
 import type { TransactionResponseDto } from "../types/transaction.dto";
+import { normalizeOptionalTransactionItem } from "./transaction-item";
 
 type TransactionsResponseEnvelope = {
   items?: unknown;
@@ -99,11 +100,11 @@ export function parseTransaction(payload: unknown): Transaction {
 
   return TransactionSchema.parse({
     id: id ?? "",
-    item: parsed.merchant ?? parsed.description,
+    item: normalizeOptionalTransactionItem(parsed.merchant ?? parsed.description),
     amount: parsed.amount,
     category: parsed.category,
-    description: parsed.description,
-    merchant: parsed.merchant,
+    description: parsed.description ?? "",
+    merchant: normalizeOptionalTransactionItem(parsed.merchant),
     date: parsed.date,
     type:
       transactionType === "Income" || transactionType === "Expense"
@@ -118,7 +119,7 @@ export function parseTransaction(payload: unknown): Transaction {
 
 function parseTransactionDto(dto: unknown): Transaction {
   if (!isTransactionDto(dto)) {
-    throw new ApiError("Transaction item is invalid.", 500, "INVALID_RESPONSE");
+    throw new ApiError("Transaction payload is invalid.", 500, "INVALID_RESPONSE");
   }
 
   const amount = toFiniteNumber(dto.amount);
@@ -134,13 +135,9 @@ function parseTransactionDto(dto: unknown): Transaction {
   const categoryName = toTrimmedString(dto.categoryName) ?? "Other";
   const notes = toTrimmedString(dto.notes) ?? "";
   const source = toTrimmedString(dto.source);
-  const merchant = toTrimmedString(dto.merchant) ?? "";
-  const item =
-    toTrimmedString(dto.item) ??
-    merchant ??
-    categoryName ??
-    "Transaction";
-  const description = notes || item;
+  const merchant = normalizeOptionalTransactionItem(dto.merchant);
+  const item = normalizeOptionalTransactionItem(dto.item);
+  const description = notes || item || "";
 
   return TransactionSchema.parse({
     id: dto.transactionId,
@@ -244,11 +241,11 @@ export function buildTransactionFromParsed(
   const data = parseParsedTransaction(parsed);
   return TransactionSchema.parse({
     id: input.id,
-    item: data.merchant ?? "Voice transaction",
+    item: normalizeOptionalTransactionItem(data.merchant ?? data.description),
     amount: data.amount,
     category: data.category,
-    description: data.merchant ?? "Voice transaction",
-    merchant: data.merchant,
+    description: data.description ?? "",
+    merchant: normalizeOptionalTransactionItem(data.merchant),
     date: data.date,
     type: data.transaction_type === "income" ? "Income" : "Expense",
   });
@@ -261,11 +258,11 @@ export function buildTransactionsFromReceipt(
   return response.items.map((item, index) =>
     TransactionSchema.parse({
       id: input.ids[index] ?? "",
-      item: item.name ?? response.merchant ?? "Receipt item",
-      description: item.name ?? response.merchant ?? "Receipt item",
+      item: normalizeOptionalTransactionItem(item.name),
+      description: normalizeOptionalTransactionItem(item.name) ?? "",
       amount: item.line_total ?? item.unit_price ?? 0,
       category: "Receipt",
-      merchant: response.merchant ?? undefined,
+      merchant: normalizeOptionalTransactionItem(response.merchant),
       date: input.issuedAt,
       type: "Expense",
       method: "receipt",
