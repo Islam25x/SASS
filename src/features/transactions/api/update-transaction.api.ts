@@ -1,4 +1,4 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 import type { AddTransactionPayload } from "../types/add-transaction.types";
 
@@ -11,7 +11,7 @@ export async function updateTransactionApi(
     method: "PUT",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }

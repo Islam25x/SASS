@@ -1,4 +1,4 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 
 export async function refundGoalApi(
@@ -8,7 +8,7 @@ export async function refundGoalApi(
   await requestJson<unknown>(`/api/Goal/${encodeURIComponent(goalId)}/refund`, {
     method: "POST",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }

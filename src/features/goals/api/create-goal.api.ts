@@ -1,4 +1,4 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 import type { CreateGoalInput } from "../types/goal.types";
 
@@ -10,7 +10,7 @@ export async function createGoalApi(
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }

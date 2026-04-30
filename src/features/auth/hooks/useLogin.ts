@@ -43,7 +43,7 @@ export function useLogin(): UseLoginResult {
         const loginData = extractLoginData(loginResponse);
         const profileResponse = await fetchUserProfileApi({
           signal: controller.signal,
-          accessToken: readLoginToken(loginData),
+          authTokenOverride: readLoginToken(loginData),
         });
 
         const user = parseUser(extractUserData(profileResponse));

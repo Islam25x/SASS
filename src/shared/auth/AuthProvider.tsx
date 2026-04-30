@@ -1,12 +1,20 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
-import { useEffect } from "react";
 import {
-  clearStoredAuthSession,
-  readStoredAuthSession,
-  writeStoredAuthSession,
-} from "../../infrastructure/auth/auth-storage";
+  useCallback,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+  type PropsWithChildren,
+} from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { User } from "../../features/user/types/user.types";
 import { API_UNAUTHORIZED_EVENT } from "../../infrastructure/api/http";
+import {
+  clearAuthSessionState,
+  getAuthSessionSnapshot,
+  patchAuthSession,
+  setAuthSession,
+  subscribeToAuthSession,
+} from "../../infrastructure/auth/auth-session-store";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
 
 function areUsersEqual(currentUser: User, nextUser: User): boolean {
@@ -23,33 +31,34 @@ function areUsersEqual(currentUser: User, nextUser: User): boolean {
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState(() => readStoredAuthSession());
+  const queryClient = useQueryClient();
+  const session = useSyncExternalStore(
+    subscribeToAuthSession,
+    getAuthSessionSnapshot,
+    () => null,
+  );
 
   const login = useCallback((nextSession: NonNullable<AuthContextValue["session"]>) => {
-    writeStoredAuthSession(nextSession);
-    setSession(nextSession);
+    setAuthSession(nextSession);
   }, []);
 
   const setUser = useCallback((user: User) => {
-    setSession((currentSession) => {
+    patchAuthSession((currentSession) => {
       if (!currentSession || areUsersEqual(currentSession.user, user)) {
         return currentSession;
       }
 
-      const nextSession = {
+      return {
         ...currentSession,
         user,
       };
-
-      writeStoredAuthSession(nextSession);
-      return nextSession;
     });
   }, []);
 
   const logout = useCallback(() => {
-    clearStoredAuthSession();
-    setSession(null);
-  }, []);
+    clearAuthSessionState();
+    queryClient.clear();
+  }, [queryClient]);
 
   useEffect(() => {
     if (typeof window === "undefined") {

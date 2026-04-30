@@ -1,10 +1,11 @@
-import {
-  clearStoredAuthSession,
-  updateStoredAuthToken,
-} from "../auth/auth-storage";
-import { AUTH_API_BASE_URL } from "../../features/auth/api/auth-config";
+import { APP_API_BASE_URL } from "./api-config";
 import { decodeJwtSegment } from "../../shared/utils/mapper.utils";
+import {
+  clearAuthSessionState,
+  patchAuthSession,
+} from "../auth/auth-session-store";
 import { ApiError } from "./api-error";
+import { unwrapEnvelope } from "../../shared/utils/api-response.utils";
 
 interface RefreshTokenResponse {
   token: string;
@@ -87,15 +88,13 @@ async function parseRefreshResponse(response: Response): Promise<RefreshTokenRes
     );
   }
 
-  if (!isRecord(payload)) {
+  const responseData = unwrapEnvelope(payload);
+
+  if (!isRecord(responseData)) {
     return null;
   }
 
-  const token =
-    toTrimmedString(payload.token) ??
-    toTrimmedString(payload.accessToken) ??
-    toTrimmedString(payload.jwt) ??
-    toTrimmedString(payload.jwtToken);
+  const token = toTrimmedString(responseData.token);
 
   if (!token) {
     return null;
@@ -103,33 +102,43 @@ async function parseRefreshResponse(response: Response): Promise<RefreshTokenRes
 
   return {
     token,
-    expiresAt: readExpiresAt(token, payload.expiresAt, payload.expiresIn),
+    expiresAt: readExpiresAt(token, responseData.expiresAt, responseData.expiresIn),
   };
 }
 
 async function performRefresh(): Promise<string | null> {
   try {
-    const response = await fetch(`${AUTH_API_BASE_URL}/api/Auth/refresh-token`, {
+    const response = await fetch(`${APP_API_BASE_URL}/api/Auth/refresh-token`, {
       method: "POST",
       credentials: "include",
     });
 
     if (!response.ok) {
-      clearStoredAuthSession();
+      clearAuthSessionState();
       return null;
     }
 
     const refreshResponse = await parseRefreshResponse(response);
 
     if (!refreshResponse) {
-      clearStoredAuthSession();
+      clearAuthSessionState();
       return null;
     }
 
-    updateStoredAuthToken(refreshResponse.token, refreshResponse.expiresAt);
+    patchAuthSession((currentSession) => {
+      if (!currentSession) {
+        return null;
+      }
+
+      return {
+        ...currentSession,
+        token: refreshResponse.token,
+        expiresAt: refreshResponse.expiresAt ?? currentSession.expiresAt,
+      };
+    });
     return refreshResponse.token;
   } catch {
-    clearStoredAuthSession();
+    clearAuthSessionState();
     return null;
   }
 }

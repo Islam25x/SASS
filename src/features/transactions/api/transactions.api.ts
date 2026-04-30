@@ -1,4 +1,4 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 import type {
   TransactionsApiTypeFilter,
@@ -54,16 +54,15 @@ export async function fetchTransactionsApi(
   toDate: string | null | undefined,
   pageNumber: number | undefined,
   pageSize: number,
-  options?: { signal?: AbortSignal; accessToken?: string },
+  options?: { signal?: AbortSignal },
 ): Promise<unknown> {
   return requestJson<unknown>(
     buildTransactionsQuery(period, type, categoryId, fromDate, toDate, pageNumber, pageSize),
     {
       method: "GET",
       signal: options?.signal,
-      baseUrl: getAuthApiBaseUrl(),
+      baseUrl: getAppApiBaseUrl(),
       withAuth: true,
-      accessToken: options?.accessToken,
     },
   );
 }

@@ -1,5 +1,5 @@
 import { requestJson } from "../../../infrastructure/api/http";
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 
 export type AdjustBalancePayload = {
   targetBalance: number;
@@ -17,7 +17,7 @@ export async function adjustBalanceApi(
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }

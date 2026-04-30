@@ -7,61 +7,22 @@ import {
   toTrimmedString,
 } from "../../../shared/utils/mapper.utils";
 import { normalizeProfileImageUrl } from "../../../shared/utils/profile-image-url";
-
-interface EnvelopeCandidate {
-  data?: unknown;
-  result?: unknown;
-  payload?: unknown;
-  user?: unknown;
-  profile?: unknown;
-}
+import { unwrapEnvelope } from "../../../shared/utils/api-response.utils";
 
 interface RawUserCandidate {
   id?: unknown;
-  userId?: unknown;
   email?: unknown;
-  mail?: unknown;
-  username?: unknown;
   userName?: unknown;
-  displayName?: unknown;
   firstName?: unknown;
-  firstname?: unknown;
-  givenName?: unknown;
   lastName?: unknown;
-  lastname?: unknown;
-  surname?: unknown;
-  familyName?: unknown;
   phoneNumber?: unknown;
-  phone?: unknown;
-  mobile?: unknown;
   dateOfBirth?: unknown;
-  birthDate?: unknown;
-  dob?: unknown;
-  imageUrl?: unknown;
   profileImageUrl?: unknown;
-  avatarUrl?: unknown;
-  photoUrl?: unknown;
 }
 
 type ParseUserOptions = {
   profileImageCacheKey?: string | number | null;
 };
-
-function unwrapEnvelope(response: unknown): unknown {
-  if (!isObject(response)) {
-    return response;
-  }
-
-  const candidate = response as EnvelopeCandidate;
-  return (
-    candidate.data ??
-    candidate.result ??
-    candidate.payload ??
-    candidate.user ??
-    candidate.profile ??
-    response
-  );
-}
 
 export function extractUserData(response: unknown): unknown {
   return unwrapEnvelope(response);
@@ -91,21 +52,14 @@ function parseUserProfileDto(data: unknown): UserProfileDto {
 
   const candidate = data as RawUserCandidate;
   return {
-    id: readFirstPresentString(candidate, ["id", "userId"]),
-    email: readFirstPresentString(candidate, ["email", "mail"]),
-    userName: readFirstPresentString(candidate, ["userName", "username"]),
-    firstName: readFirstPresentString(candidate, ["firstName", "firstname", "givenName"]),
-    lastName: readFirstPresentString(candidate, ["lastName", "lastname", "familyName", "surname"]),
-    phoneNumber: readFirstPresentString(candidate, ["phoneNumber", "phone", "mobile"]),
-    dateOfBirth:
-      toTrimmedString(candidate.dateOfBirth) ??
-      toTrimmedString(candidate.birthDate) ??
-      toTrimmedString(candidate.dob),
-    profileImageUrl:
-      toTrimmedString(candidate.profileImageUrl) ??
-      toTrimmedString(candidate.imageUrl) ??
-      toTrimmedString(candidate.avatarUrl) ??
-      toTrimmedString(candidate.photoUrl),
+    id: readFirstPresentString(candidate, ["id"]),
+    email: readFirstPresentString(candidate, ["email"]),
+    userName: readFirstPresentString(candidate, ["userName"]),
+    firstName: readFirstPresentString(candidate, ["firstName"]),
+    lastName: readFirstPresentString(candidate, ["lastName"]),
+    phoneNumber: readFirstPresentString(candidate, ["phoneNumber"]),
+    dateOfBirth: toTrimmedString(candidate.dateOfBirth),
+    profileImageUrl: toTrimmedString(candidate.profileImageUrl),
   };
 }
 

@@ -9,19 +9,10 @@ import {
   toFiniteNumber,
   toTrimmedString,
 } from "../../../shared/utils/mapper.utils";
-
-interface EnvelopeCandidate {
-  data?: unknown;
-  result?: unknown;
-  payload?: unknown;
-  user?: unknown;
-}
+import { unwrapEnvelope } from "../../../shared/utils/api-response.utils";
 
 interface RawLoginCandidate {
   token?: unknown;
-  accessToken?: unknown;
-  jwt?: unknown;
-  jwtToken?: unknown;
   expiresAt?: unknown;
   expiresIn?: unknown;
 }
@@ -30,14 +21,7 @@ interface RawRegisterCandidate {
   message?: unknown;
 }
 
-function unwrapEnvelope(response: unknown): unknown {
-  if (!isObject(response)) {
-    return response;
-  }
 
-  const candidate = response as EnvelopeCandidate;
-  return candidate.data ?? candidate.result ?? candidate.payload ?? candidate.user ?? response;
-}
 
 export function extractLoginData(response: unknown): unknown {
   return unwrapEnvelope(response);
@@ -72,11 +56,7 @@ function parseLoginResponseDto(data: unknown): LoginResponseDto {
   }
 
   const candidate = data as RawLoginCandidate;
-  const token =
-    toTrimmedString(candidate.token) ??
-    toTrimmedString(candidate.accessToken) ??
-    toTrimmedString(candidate.jwt) ??
-    toTrimmedString(candidate.jwtToken);
+  const token = toTrimmedString(candidate.token);
 
   if (!token) {
     throw createInvalidResponseError(

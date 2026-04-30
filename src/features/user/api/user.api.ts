@@ -1,19 +1,19 @@
 import { requestJson } from "../../../infrastructure/api/http";
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import type {
   UpdateUserProfileRequestDto,
   UpdateUserProfileResponseDto,
 } from "./user.dto";
 
 export async function fetchUserProfileApi(
-  options?: { signal?: AbortSignal; accessToken?: string },
+  options?: { signal?: AbortSignal; authTokenOverride?: string },
 ): Promise<unknown> {
   return requestJson<unknown>("/api/User/profile", {
     method: "GET",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
-    accessToken: options?.accessToken,
+    authTokenOverride: options?.authTokenOverride,
   });
 }
 
@@ -25,7 +25,7 @@ export async function updateUserProfileApi(
     method: "PUT",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }
@@ -39,7 +39,7 @@ export async function uploadImage(
     method: "POST",
     body: formData,
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }

@@ -1,7 +1,7 @@
 import { requestJson } from "../../../infrastructure/api/http";
 export { refreshAccessToken } from "../../../infrastructure/api/auth-refresh";
-import type { LoginRequestDto, RegisterRequestDto } from "./auth.dto";
-import { getAuthApiBaseUrl } from "./auth-config";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
+import type { LoginRequestDto, RegisterRequestDto, LogoutResponseDto } from "./auth.dto";
 
 export const REGISTER_SUCCESS_MESSAGE =
   "Registration successful. Please check your email to confirm your account.";
@@ -14,7 +14,7 @@ export async function registerApi(
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
   });
 }
 
@@ -26,19 +26,21 @@ export async function loginApi(
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
   });
 }
 
 export async function logoutApi(
   options?: { signal?: AbortSignal },
-): Promise<void> {
-  await requestJson<unknown>("/api/Auth/logout", {
-    method: "POST",
-    signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
-    withAuth: true,
-  });
+): Promise<LogoutResponseDto> {
+  return requestJson<LogoutResponseDto>(
+    "/api/Auth/logout",
+    {
+      method: "POST",
+      signal: options?.signal,
+      baseUrl: getAppApiBaseUrl(),
+      withAuth: true,
+      skipAuthRefresh: true,
+    }
+  );
 }
-
-export { getAuthApiBaseUrl } from "./auth-config";

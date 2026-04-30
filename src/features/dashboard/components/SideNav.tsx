@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import logoSrc from "../../../assets/logo.png";
 import mobileLogoSrc from "../../../assets/mobile view logo.png";
+import { useLogout } from "../../auth/hooks/useLogout";
 import { Button, Text, cn } from "../../../shared/ui";
-import { useAuth } from "../../../shared/auth/AuthContext";
 
 interface AdminNavProps {
   setActiveComponent: (component: string) => void;
@@ -19,7 +19,7 @@ interface AdminNavProps {
 }
 
 function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
-  const { logout } = useAuth();
+  const logoutMutation = useLogout();
   const navigate = useNavigate();
 
   const navItems: { name: string; icon: LucideIcon; link?: string }[] = [
@@ -39,8 +39,8 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
       {
         name: "Log out",
         icon: LogOut,
-        onClick: () => {
-          logout();
+        onClick: async () => {
+          await logoutMutation.mutateAsync();
           navigate("/welcome", { replace: true });
         },
       },
@@ -94,7 +94,7 @@ function SideNav({ setActiveComponent, activeComponent }: AdminNavProps) {
         key={name}
         onClick={() => {
           setActiveComponent(name);
-          onClick?.();
+          void onClick?.();
         }}
         className={classes}
         variant="ghost"

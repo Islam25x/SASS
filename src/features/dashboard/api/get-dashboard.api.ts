@@ -1,10 +1,10 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 import type { DateRangeValue } from "../../../shared/ui/DateRangeSelector";
 
 export async function getDashboardApi(
   period: DateRangeValue,
-  options?: { signal?: AbortSignal; accessToken?: string },
+  options?: { signal?: AbortSignal },
 ): Promise<unknown> {
   const params = new URLSearchParams({
     Period: period,
@@ -13,8 +13,7 @@ export async function getDashboardApi(
   return requestJson<unknown>(`/api/Dashboard?${params.toString()}`, {
     method: "GET",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
-    accessToken: options?.accessToken,
   });
 }

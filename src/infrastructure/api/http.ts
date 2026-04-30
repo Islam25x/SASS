@@ -1,14 +1,14 @@
-import { readStoredAuthToken } from "../auth/auth-storage";
+import { getApiBaseUrl as getDefaultApiBaseUrl } from "./api-config";
+import { getAuthSessionSnapshot } from "../auth/auth-session-store";
 import { refreshAccessToken } from "./auth-refresh";
 import { ApiError, mapApiError, readErrorMessage } from "./api-error";
 
-const API_BASE_URL = "https://stt-flax.vercel.app/api";
 export const API_UNAUTHORIZED_EVENT = "app:api-unauthorized";
 
 interface RequestJsonOptions extends RequestInit {
   baseUrl?: string;
   withAuth?: boolean;
-  accessToken?: string;
+  authTokenOverride?: string;
   skipAuthRefresh?: boolean;
 }
 
@@ -25,7 +25,7 @@ export async function requestJson<T>(
   init: RequestJsonOptions,
 ): Promise<T> {
   try {
-    const baseUrl = init.baseUrl ?? API_BASE_URL;
+    const baseUrl = init.baseUrl ?? getDefaultApiBaseUrl();
     const response = await executeRequest(path, init, baseUrl);
 
     if (response.status === 401 && init.withAuth && !init.skipAuthRefresh) {
@@ -34,7 +34,7 @@ export async function requestJson<T>(
       if (newToken) {
         const retryResponse = await executeRequest(path, {
           ...init,
-          accessToken: newToken,
+          authTokenOverride: newToken,
           skipAuthRefresh: true,
         }, baseUrl);
 
@@ -73,7 +73,9 @@ async function executeRequest(
   const headers = new Headers(init.headers ?? {});
   const isFormData = init.body instanceof FormData;
   const hasBody = init.body != null;
-  const token = init.withAuth ? init.accessToken ?? readStoredAuthToken() : null;
+  const token = init.withAuth
+    ? init.authTokenOverride ?? getAuthSessionSnapshot()?.token ?? null
+    : null;
 
   if (isFormData) {
     headers.delete("Content-Type");
@@ -93,7 +95,7 @@ async function executeRequest(
 
   delete requestInit.baseUrl;
   delete requestInit.withAuth;
-  delete requestInit.accessToken;
+  delete requestInit.authTokenOverride;
   delete requestInit.skipAuthRefresh;
 
   return fetch(`${baseUrl}${path}`, requestInit);
@@ -124,5 +126,5 @@ async function parseResponseBody<T>(response: Response): Promise<T> {
 }
 
 export function getApiBaseUrl(): string {
-  return API_BASE_URL;
+  return getDefaultApiBaseUrl();
 }

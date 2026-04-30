@@ -58,22 +58,6 @@ function parseStoredUser(value: unknown): User | null {
   };
 }
 
-function parseLegacyStoredUser(value: {
-  email?: unknown;
-  username?: unknown;
-}): User {
-  return {
-    id: "",
-    email: typeof value.email === "string" ? value.email : "",
-    username: typeof value.username === "string" ? value.username : "",
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    dateOfBirth: null,
-    profileImageUrl: null,
-  };
-}
-
 export function readStoredAuthSession(): AuthSession | null {
   if (typeof window === "undefined") {
     return null;
@@ -89,10 +73,8 @@ export function readStoredAuthSession(): AuthSession | null {
       token?: unknown;
       expiresAt?: unknown;
       user?: unknown;
-      email?: unknown;
-      username?: unknown;
     };
-    const user = parseStoredUser(parsed.user) ?? parseLegacyStoredUser(parsed);
+    const user = parseStoredUser(parsed.user);
     const expiresAt =
       typeof parsed.expiresAt === "string" ? new Date(parsed.expiresAt) : null;
 
@@ -124,30 +106,12 @@ export function writeStoredAuthSession(session: AuthSession): void {
   window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
 }
 
-export function updateStoredAuthToken(token: string, expiresAt?: Date): void {
-  const currentSession = readStoredAuthSession();
-
-  if (!currentSession) {
-    return;
-  }
-
-  writeStoredAuthSession({
-    ...currentSession,
-    token,
-    expiresAt: expiresAt ?? currentSession.expiresAt,
-  });
-}
-
 export function clearStoredAuthSession(): void {
   if (typeof window === "undefined") {
     return;
   }
 
   window.localStorage.removeItem(AUTH_STORAGE_KEY);
-}
-
-export function readStoredAuthToken(): string | null {
-  return readStoredAuthSession()?.token ?? null;
 }
 
 export function readStoredPendingConfirmationEmail(): string | null {

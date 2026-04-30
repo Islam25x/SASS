@@ -62,25 +62,19 @@ function mapDashboardSummary(response: unknown): DashboardSummary {
 }
 
 export function useDashboardSummary(): UseQueryResult<DashboardSummary, ApiError> {
-  const { session } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { selectedRange } = useDateRange();
-  const token = session?.token ?? "";
 
   return useQuery<DashboardSummary, ApiError>({
     queryKey: [...DASHBOARD_SUMMARY_QUERY_KEY, selectedRange],
     queryFn: async ({ signal }) => {
-      if (!token) {
-        throw new ApiError("Auth token is required to fetch dashboard data.", 401, "INVALID_RESPONSE");
-      }
-
       const response = await getDashboardApi(selectedRange, {
         signal,
-        accessToken: token,
       });
 
       return mapDashboardSummary(response);
     },
     staleTime: 30_000,
-    enabled: !!token,
+    enabled: isAuthenticated,
   });
 }

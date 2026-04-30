@@ -1,4 +1,4 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 
 export async function deleteTransactionApi(
@@ -8,7 +8,7 @@ export async function deleteTransactionApi(
   await requestJson<unknown>(`/api/Transaction/${encodeURIComponent(transactionId)}`, {
     method: "DELETE",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
   });
 }

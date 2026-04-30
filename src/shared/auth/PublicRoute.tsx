@@ -7,9 +7,9 @@ type PublicRouteProps = {
 };
 
 function PublicRoute({ children }: PublicRouteProps) {
-  const { session } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  if (session?.token) {
+  if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 

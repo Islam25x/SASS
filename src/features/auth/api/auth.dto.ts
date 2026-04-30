@@ -12,10 +12,13 @@ export interface RegisterRequestDto {
 
 export interface LoginResponseDto {
   token: string;
-  expiresAt: string | null;
-  expiresIn: number | null;
+  expiresAt?: string | null;
+  expiresIn?: number | null;
 }
 
 export interface RegisterResponseDto {
+  message: string;
+}
+export interface LogoutResponseDto {
   message: string;
 }

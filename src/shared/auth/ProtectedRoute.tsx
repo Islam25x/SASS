@@ -7,9 +7,9 @@ type ProtectedRouteProps = {
 };
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { session } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  if (!session?.token) {
+  if (!isAuthenticated) {
     return <Navigate to="/welcome" replace />;
   }
 

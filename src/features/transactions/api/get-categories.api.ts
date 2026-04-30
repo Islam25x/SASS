@@ -1,14 +1,13 @@
-import { getAuthApiBaseUrl } from "../../auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 
 export async function getCategoriesApi(
-  options?: { signal?: AbortSignal; accessToken?: string },
+  options?: { signal?: AbortSignal },
 ): Promise<unknown> {
   return requestJson<unknown>("/api/Category/get-categories", {
     method: "GET",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
     withAuth: true,
-    accessToken: options?.accessToken,
   });
 }

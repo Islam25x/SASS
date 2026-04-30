@@ -11,8 +11,7 @@ export function useGoalHistory(
   goalId: string | null,
   pageNumber: number,
 ): UseQueryResult<GoalHistoryPage, ApiError> {
-  const { session } = useAuth();
-  const token = session?.token ?? "";
+  const { isAuthenticated } = useAuth();
   const normalizedGoalId = goalId?.trim() ?? "";
 
   return useQuery<GoalHistoryPage, ApiError>({
@@ -20,12 +19,11 @@ export function useGoalHistory(
     queryFn: async ({ signal }) => {
       const response = await getGoalHistoryApi(normalizedGoalId, pageNumber, {
         signal,
-        accessToken: token,
       });
 
       return parseGoalHistory(response);
     },
-    enabled: !!token && normalizedGoalId.length > 0,
+    enabled: isAuthenticated && normalizedGoalId.length > 0,
     staleTime: 30_000,
     refetchOnWindowFocus: false,
   });

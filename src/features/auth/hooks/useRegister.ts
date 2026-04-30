@@ -4,6 +4,7 @@ import { registerApi, REGISTER_SUCCESS_MESSAGE } from "../api/auth.api";
 import type { RegisterPayload, RegisterResult } from "../types/auth.types";
 import { extractRegisterData, parseRegisterResult } from "../utils/auth.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { isRegisterSuccessMessage } from "../utils/auth-response-signals";
 
 type RegisterMutation = UseMutationResult<
   RegisterResult,
@@ -14,15 +15,6 @@ type RegisterMutation = UseMutationResult<
 type UseRegisterResult = RegisterMutation & {
   cancel: () => void;
 };
-
-function isRegisterSuccessMessage(message: string): boolean {
-  const normalizedMessage = message.trim().toLowerCase();
-
-  return (
-    normalizedMessage.includes("registration successful") ||
-    normalizedMessage.includes("confirm your account")
-  );
-}
 
 export function useRegister(): UseRegisterResult {
   const abortControllerRef = useRef<AbortController | null>(null);

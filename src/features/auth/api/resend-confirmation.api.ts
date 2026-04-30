@@ -1,6 +1,6 @@
 import { requestJson } from "../../../infrastructure/api/http";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import type { ResendConfirmationPayload } from "../types/auth.types";
-import { getAuthApiBaseUrl } from "./auth.api";
 
 export async function resendConfirmationApi(
   payload: ResendConfirmationPayload,
@@ -13,6 +13,6 @@ export async function resendConfirmationApi(
   return requestJson<unknown>(`/api/Auth/resend-confirmation-link?${query.toString()}`, {
     method: "POST",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
   });
 }

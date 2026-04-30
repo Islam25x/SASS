@@ -1,6 +1,6 @@
 import { requestJson } from "../../../infrastructure/api/http";
+import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import type { ConfirmEmailPayload } from "../types/auth.types";
-import { getAuthApiBaseUrl } from "./auth.api";
 
 export async function confirmEmailApi(
   payload: ConfirmEmailPayload,
@@ -14,6 +14,6 @@ export async function confirmEmailApi(
   return requestJson<unknown>(`/api/Auth/confirm-email?${query.toString()}`, {
     method: "GET",
     signal: options?.signal,
-    baseUrl: getAuthApiBaseUrl(),
+    baseUrl: getAppApiBaseUrl(),
   });
 }

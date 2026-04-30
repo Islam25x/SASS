@@ -14,20 +14,18 @@ type UseCategoriesOptions = {
 export function useCategories(
   options?: UseCategoriesOptions,
 ): UseQueryResult<TransactionCategory[], ApiError> {
-  const { session } = useAuth();
-  const token = session?.token ?? "";
+  const { isAuthenticated } = useAuth();
 
   return useQuery<TransactionCategory[], ApiError>({
     queryKey: TRANSACTION_CATEGORIES_QUERY_KEY,
     queryFn: async ({ signal }) => {
       const response = await getCategoriesApi({
         signal,
-        accessToken: token,
       });
 
       return parseCategories(response);
     },
     staleTime: 1000 * 60,
-    enabled: (options?.enabled ?? true) && !!token,
+    enabled: (options?.enabled ?? true) && isAuthenticated,
   });
 }

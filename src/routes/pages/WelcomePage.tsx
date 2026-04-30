@@ -1,6 +1,4 @@
 import { Camera, Lightbulb, Mic, Target, TrendingUp, Wallet, X } from "lucide-react";
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import CTASection from "../../components/landing/CTASection";
 import FeatureSection from "../../components/landing/FeatureSection";
 import GoalsSection from "../../components/landing/GoalsSection";
@@ -11,19 +9,10 @@ import mobileLogoSrc from "../../assets/mobile view logo.png";
 import robotImageSrc from "../../assets/Finixa robot.png";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { pageMotion } from "../../shared/animations/pageMotion";
-import { REGISTER_SUCCESS_MESSAGE } from "../../features/auth/api/auth.api";
-import { useLogin } from "../../features/auth/hooks/useLogin";
-import { useRegister } from "../../features/auth/hooks/useRegister";
-import {
-  clearStoredPendingConfirmationEmail,
-  writeStoredPendingConfirmationEmail,
-} from "../../infrastructure/auth/auth-storage";
-import { useAuth } from "../../shared/auth/AuthContext";
-import { useToast } from "../../shared/ui";
+import { useWelcomeAuthFlow } from "../../features/auth/hooks/useWelcomeAuthFlow";
 import { CheckEmailPanel } from "./CheckEmailPage";
 
 const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const heroBenefits: BenefitItem[] = [
   { id: "voice-photo", label: "Track expenses by voice or photo" },
@@ -77,11 +66,6 @@ const MODAL_TRANSITION = {
   ease: "easeOut",
 } as const;
 
-type AuthBanner = {
-  tone: "success" | "error";
-  text: string;
-} | null;
-
 function StickyNavbar() {
   const shouldReduceMotion = Boolean(useReducedMotion());
 
@@ -114,252 +98,26 @@ function StickyNavbar() {
 
 export default function WelcomePage() {
   const shouldReduceMotion = Boolean(useReducedMotion());
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const { showToast } = useToast();
-  const loginMutation = useLogin();
-  const registerMutation = useRegister();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup" | "check-email">("login");
-  const [confirmationEmail, setConfirmationEmail] = useState("");
-  const [authBanner, setAuthBanner] = useState<AuthBanner>(null);
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>(
-    {}
-  );
-  const [registerData, setRegisterData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agree: false,
-  });
-  const [registerErrors, setRegisterErrors] = useState<{
-    username?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    agree?: string;
-    form?: string;
-  }>({});
-
-  useEffect(() => {
-    if (!isAuthOpen) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeAuthModal();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isAuthOpen]);
-
-  useEffect(() => {
-    if (location.pathname !== "/login") {
-      return;
-    }
-
-    setAuthMode("login");
-    setIsAuthOpen(true);
-    setAuthBanner(null);
-    setLoginErrors({});
-    setRegisterErrors({});
-    loginMutation.reset();
-    registerMutation.reset();
-  }, [location.pathname]);
-
-  const openLoginModal = () => {
-    setConfirmationEmail("");
-    setAuthMode("login");
-    setIsAuthOpen(true);
-    setAuthBanner(null);
-    setLoginErrors({});
-    setRegisterErrors({});
-    loginMutation.reset();
-    registerMutation.reset();
-  };
-
-  const closeAuthModal = () => {
-    if (location.pathname === "/login") {
-      navigate("/welcome", { replace: true });
-    }
-
-    setIsAuthOpen(false);
-    setAuthBanner(null);
-    setLoginErrors({});
-    setRegisterErrors({});
-    loginMutation.reset();
-    registerMutation.reset();
-  };
-
-  const switchToSignup = () => {
-    setConfirmationEmail("");
-    setAuthMode("signup");
-    setAuthBanner(null);
-    setLoginErrors({});
-    loginMutation.reset();
-  };
-
-  const switchToLogin = () => {
-    setConfirmationEmail("");
-    setAuthMode("login");
-    setRegisterErrors({});
-    setAuthBanner(null);
-  };
-
-  const openCheckEmailModal = (email: string) => {
-    const normalizedEmail = email.trim();
-
-    if (normalizedEmail) {
-      writeStoredPendingConfirmationEmail(normalizedEmail);
-    }
-
-    setConfirmationEmail(normalizedEmail);
-    setAuthMode("check-email");
-    setIsAuthOpen(true);
-    setAuthBanner(null);
-    setLoginErrors({});
-    setRegisterErrors({});
-  };
-
-  const handleLoginChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setAuthBanner(null);
-    setLoginErrors((prev) => ({ ...prev, [name]: undefined }));
-    setLoginData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleRegisterChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const newValue =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-    setAuthBanner((current) => (current?.tone === "error" ? null : current));
-    setRegisterErrors((prev) => ({ ...prev, [name]: undefined, form: undefined }));
-    setRegisterData((prev) => ({ ...prev, [name]: newValue }));
-  };
-
-  const validateLogin = () => {
-    const newErrors: { email?: string; password?: string } = {};
-    if (!loginData.email.trim()) newErrors.email = "Email is required";
-    if (!loginData.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (loginData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-    return newErrors;
-  };
-
-  const validateRegister = () => {
-    const newErrors: typeof registerErrors = {};
-    if (!registerData.username.trim()) newErrors.username = "Username is required";
-    if (!registerData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!EMAIL_REGEX.test(registerData.email.trim())) {
-      newErrors.email = "Enter a valid email address";
-    }
-    if (!registerData.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (registerData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-    if (!registerData.confirmPassword.trim()) {
-      newErrors.confirmPassword = "Please confirm your password";
-    }
-    if (registerData.password !== registerData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-    if (!registerData.agree) newErrors.agree = "You must agree to the policy";
-    return newErrors;
-  };
-
-  const handleLoginSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setAuthBanner(null);
-    const validationErrors = validateLogin();
-    if (Object.keys(validationErrors).length > 0) {
-      setLoginErrors(validationErrors);
-      return;
-    }
-
-    try {
-      const session = await loginMutation.mutateAsync({
-        email: loginData.email.trim(),
-        password: loginData.password,
-      });
-
-      clearStoredPendingConfirmationEmail();
-      login(session);
-      setIsAuthOpen(false);
-      setLoginErrors({});
-      navigate("/dashboard", { replace: true });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Login failed. Please try again.";
-      if (message.toLowerCase().includes("confirm")) {
-        const submittedEmail = loginData.email.trim();
-        openCheckEmailModal(submittedEmail);
-        showToast({
-          id: `auth-login-confirm:${submittedEmail.toLowerCase()}`,
-          message: "Please confirm your email. We've sent you a new confirmation link.",
-          tone: "warning",
-        });
-        return;
-      }
-
-      setLoginErrors((prev) => ({ ...prev, password: message }));
-      setAuthBanner({ tone: "error", text: message });
-    }
-  };
-
-  const handleRegisterSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setAuthBanner(null);
-    const validationErrors = validateRegister();
-    if (Object.keys(validationErrors).length > 0) {
-      setRegisterErrors(validationErrors);
-      return;
-    }
-
-    try {
-      const submittedEmail = registerData.email.trim();
-      await registerMutation.mutateAsync({
-        email: submittedEmail,
-        username: registerData.username.trim(),
-        password: registerData.password,
-        confirmPassword: registerData.confirmPassword,
-      });
-
-      setRegisterErrors({});
-      setRegisterData({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        agree: false,
-      });
-      setLoginData({ email: "", password: "" });
-      showToast({
-        id: "auth-register-success",
-        message: REGISTER_SUCCESS_MESSAGE,
-        tone: "success",
-      });
-      openCheckEmailModal(submittedEmail);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Registration failed. Please try again.";
-      setRegisterErrors((prev) => ({ ...prev, form: message }));
-      setAuthBanner({ tone: "error", text: message });
-      showToast({
-        id: "auth-register-error",
-        message,
-        tone: "error",
-      });
-    }
-  };
+  const {
+    authBanner,
+    authMode,
+    closeAuthModal,
+    confirmationEmail,
+    handleLoginChange,
+    handleLoginSubmit,
+    handleRegisterChange,
+    handleRegisterSubmit,
+    isAuthOpen,
+    loginData,
+    loginErrors,
+    loginMutation,
+    openLoginModal,
+    registerData,
+    registerErrors,
+    registerMutation,
+    switchToLogin,
+    switchToSignup,
+  } = useWelcomeAuthFlow();
 
   return (
     <motion.main

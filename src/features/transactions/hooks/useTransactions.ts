@@ -21,9 +21,8 @@ type UseTransactionsOptions = {
 };
 
 export function useTransactions(options?: UseTransactionsOptions) {
-  const { session } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { selectedRange } = useDateRange();
-  const token = session?.token ?? "";
   const typeFilter = options?.typeFilter ?? "all";
   const type =
     typeFilter === "income"
@@ -49,12 +48,6 @@ export function useTransactions(options?: UseTransactionsOptions) {
       pageSize,
     ],
     queryFn: async ({ signal }) => {
-      console.log({ pageNumber: pageNumber ?? 1 });
-
-      if (!token) {
-        throw new ApiError("Auth token is required to fetch transactions.", 401, "INVALID_RESPONSE");
-      }
-
       const response = await fetchTransactionsApi(
         selectedRange,
         type,
@@ -65,7 +58,6 @@ export function useTransactions(options?: UseTransactionsOptions) {
         pageSize,
         {
           signal,
-          accessToken: token,
         },
       );
 
@@ -76,6 +68,6 @@ export function useTransactions(options?: UseTransactionsOptions) {
       }
     },
     staleTime: 30_000,
-    enabled: !!token,
+    enabled: isAuthenticated,
   });
 }

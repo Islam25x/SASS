@@ -9,14 +9,12 @@ import { useAuth } from "../../../shared/auth/AuthContext";
 export const USER_PROFILE_QUERY_KEY = ["user", "profile"] as const;
 
 export function useUserProfile(): UseQueryResult<User, ApiError> {
-  const { session, setUser } = useAuth();
-  const token = session?.token ?? "";
+  const { isAuthenticated, session, setUser } = useAuth();
   const query = useQuery<User, ApiError>({
     queryKey: USER_PROFILE_QUERY_KEY,
     queryFn: async ({ signal }) => {
       const response = await fetchUserProfileApi({
         signal,
-        accessToken: token,
       });
 
       return parseUser(extractUserData(response), {
@@ -24,7 +22,7 @@ export function useUserProfile(): UseQueryResult<User, ApiError> {
       });
     },
     staleTime: 1000 * 60 * 5,
-    enabled: !!token,
+    enabled: isAuthenticated,
     placeholderData: session?.user,
   });
 

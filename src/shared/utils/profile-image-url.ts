@@ -1,4 +1,4 @@
-import { getAuthApiBaseUrl } from "../../features/auth/api/auth.api";
+import { getAppApiBaseUrl } from "../../infrastructure/api/api-config";
 import { safeTrim } from "./mapper.utils";
 
 type NormalizeProfileImageUrlOptions = {
@@ -45,7 +45,7 @@ export function normalizeProfileImageUrl(
     return appendCacheKey(`https:${normalizedValue}`, cacheKey);
   }
 
-  const baseUrl = getAuthApiBaseUrl().replace(/\/+$/, "");
+  const baseUrl = getAppApiBaseUrl().replace(/\/+$/, "");
   const path = normalizedValue.startsWith("/") ? normalizedValue : `/${normalizedValue}`;
 
   try {
