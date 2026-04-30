@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
   const goToLogin = () => navigate("/login", { replace: true });
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f6f8ff] text-slate-900">
+    <main className="relative h-screen overflow-hidden bg-[#f6f8ff] text-slate-900">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.14),_transparent_38%),radial-gradient(circle_at_bottom_left,_rgba(125,211,252,0.18),_transparent_28%)]" />
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 sm:px-8">
         <header className="flex items-center justify-between gap-6">
