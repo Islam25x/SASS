@@ -1,10 +1,10 @@
 import { ApiError } from "../../../infrastructure/api/api-error";
 import type {
-    DashboardResponseDto,
-    DashboardTrendDto,
-    ExpenseBreakdownDto,
-    MoneyFlowDto,
-} from "../types/dashboard.dto";
+  DashboardResponseDto,
+  DashboardTrendDto,
+  ExpenseBreakdownDto,
+  MoneyFlowDto,
+} from "../api/dashboard.dto";
 import type {
     DashboardData,
     DashboardExpenseBreakdownItem,

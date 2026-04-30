@@ -1,9 +1,9 @@
 import { requestJson } from "../../../infrastructure/api/http";
 import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
-import type { ConfirmEmailPayload } from "../types/auth.types";
+import type { ConfirmEmailRequestDto } from "./auth.dto";
 
 export async function confirmEmailApi(
-  payload: ConfirmEmailPayload,
+  payload: ConfirmEmailRequestDto,
   options?: { signal?: AbortSignal },
 ): Promise<unknown> {
   const query = new URLSearchParams({

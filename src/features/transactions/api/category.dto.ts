@@ -1,4 +1,4 @@
-import type { AddTransactionType } from "./add-transaction.types";
+import type { AddTransactionType } from "../types/add-transaction.types";
 
 export interface TransactionCategoryDto {
   id?: unknown;

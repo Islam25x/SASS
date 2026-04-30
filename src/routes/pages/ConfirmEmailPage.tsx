@@ -16,6 +16,7 @@ import {
   readStoredPendingConfirmationEmail,
   writeStoredPendingConfirmationEmail,
 } from "../../infrastructure/auth/auth-storage";
+import { readAuthLinkParam } from "../../shared/auth/auth-link-params";
 import { Button, Card, useToast } from "../../shared/ui";
 
 const successHighlights = [
@@ -53,20 +54,20 @@ export default function ConfirmEmailPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
-  const redirectTimeoutRef = useRef<number | null>(null);
   const successHandledRef = useRef(false);
+  const searchString = searchParams.toString();
   const confirmationEmail =
-    searchParams.get("email")?.trim() ?? readStoredPendingConfirmationEmail() ?? "";
+    readAuthLinkParam(searchString, "email") || readStoredPendingConfirmationEmail() || "";
   const confirmationPayload = useMemo(() => {
-    const userId = searchParams.get("userId")?.trim() ?? "";
-    const token = searchParams.get("token")?.trim() ?? "";
+    const userId = readAuthLinkParam(searchString, "userId");
+    const token = readAuthLinkParam(searchString, "token");
 
     if (!userId || !token) {
       return null;
     }
 
     return { userId, token };
-  }, [searchParams]);
+  }, [searchString]);
 
   useEffect(() => {
     if (!confirmationEmail) {
@@ -107,24 +108,7 @@ export default function ConfirmEmailPage() {
       message: "Email confirmed successfully",
       tone: "success",
     });
-
-
-
-    return () => {
-      if (redirectTimeoutRef.current) {
-        window.clearTimeout(redirectTimeoutRef.current);
-        redirectTimeoutRef.current = null;
-      }
-    };
-  }, [confirmationPayload, isSuccess, navigate, showToast]);
-
-  useEffect(() => {
-    return () => {
-      if (redirectTimeoutRef.current) {
-        window.clearTimeout(redirectTimeoutRef.current);
-      }
-    };
-  }, []);
+  }, [confirmationPayload, isSuccess, showToast]);
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#F8FAFF] px-4 py-10 text-slate-900 sm:px-6">

@@ -1,5 +1,9 @@
-import type { LoginResponseDto, RegisterResponseDto } from "../api/auth.dto";
-import type { AuthSession, RegisterResult } from "../types/auth.types";
+import type {
+  LoginResponseDto,
+  RegisterResponseDto,
+  ResendConfirmationResponseDto,
+} from "../api/auth.dto";
+import type { AuthSession } from "../types/auth.types";
 import {
   createInvalidResponseError,
   decodeJwtSegment,
@@ -155,7 +159,17 @@ export function parseAuthSession(data: unknown): AuthSession {
   };
 }
 
-export function parseRegisterResult(data: unknown): RegisterResult {
+export function parseRegisterResult(data: unknown): RegisterResponseDto {
+  const dto = parseRegisterResponseDto(data);
+
+  return {
+    message: dto.message,
+  };
+}
+
+export function parseResendConfirmationResult(
+  data: unknown,
+): ResendConfirmationResponseDto {
   const dto = parseRegisterResponseDto(data);
 
   return {

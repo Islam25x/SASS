@@ -3,7 +3,7 @@ import {
   VoiceToTextResponseSchema,
   type ReceiptOcrResponse,
   type VoiceToTextResponse,
-} from "../types/ai.types";
+} from "../api/ai.dto";
 import {
   parseParsedTransaction as parseTransactionPayload,
   type ParsedTransaction,

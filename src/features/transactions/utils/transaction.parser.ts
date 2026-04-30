@@ -5,7 +5,7 @@ import {
   TransactionSchema,
   type Transaction,
 } from "./transaction.schema";
-import type { TransactionResponseDto } from "../types/transaction.dto";
+import type { TransactionResponseDto } from "../api/transaction.dto";
 import { normalizeOptionalTransactionItem } from "./transaction-item";
 import { parseParsedTransaction } from "./parsed-transaction.schema";
 

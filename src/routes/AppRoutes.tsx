@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import SupportPage from "./pages/SupportPage";
 import AIPage from "./pages/AIPage";
@@ -6,8 +6,24 @@ import ProfilePage from "./pages/ProfilePage";
 import WelcomePage from "./pages/WelcomePage";
 import CheckEmailPage from "./pages/CheckEmailPage";
 import ConfirmEmailPage from "./pages/ConfirmEmailPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProtectedRoute from "../shared/auth/ProtectedRoute";
 import PublicRoute from "../shared/auth/PublicRoute";
+
+function PreserveAuthLinkRedirect({ to }: { to: string }) {
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: to,
+        search: location.search,
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
+}
 
 const AppRoutes = () => {
   return (
@@ -43,6 +59,10 @@ const AppRoutes = () => {
       <Route
         path="/confirm-email"
         element={<ConfirmEmailPage />}
+      />
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
       />
       <Route
         path="/profile"
@@ -82,6 +102,8 @@ const AppRoutes = () => {
       <Route path="/Welcome" element={<Navigate to="/welcome" replace />} />
       <Route path="/Login" element={<Navigate to="/login" replace />} />
       <Route path="/Dashboard" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/ConfirmEmail" element={<PreserveAuthLinkRedirect to="/confirm-email" />} />
+      <Route path="/ResetPassword" element={<PreserveAuthLinkRedirect to="/reset-password" />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

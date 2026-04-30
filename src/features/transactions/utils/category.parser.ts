@@ -1,5 +1,5 @@
 import { ApiError } from "../../../infrastructure/api/api-error";
-import type { TransactionCategoryDto } from "../types/category.dto";
+import type { TransactionCategoryDto } from "../api/category.dto";
 import type { TransactionCategory } from "../types/category.types";
 
 type CategoryEnvelope = {

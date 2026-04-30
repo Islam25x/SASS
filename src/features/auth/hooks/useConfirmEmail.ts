@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { confirmEmailApi } from "../api/confirm-email.api";
-import type { ConfirmEmailPayload } from "../types/auth.types";
+import type { ConfirmEmailRequestDto } from "../api/auth.dto";
 
-export function useConfirmEmail(payload: ConfirmEmailPayload | null) {
+export function useConfirmEmail(payload: ConfirmEmailRequestDto | null) {
   return useQuery<unknown, ApiError>({
     queryKey: ["auth", "confirm-email", payload?.userId ?? "", payload?.token ?? ""],
     queryFn: ({ signal }) => {

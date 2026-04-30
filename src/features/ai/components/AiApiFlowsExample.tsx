@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useParseTransaction } from "../hooks/useParseTransaction";
 import { useReceiptOcr } from "../hooks/useReceiptOcr";
 import { useVoiceToText } from "../hooks/useVoiceToText";
-import type { ReceiptOcrItem } from "../types/ai.types";
+import type { ReceiptOcrItem } from "../api/ai.dto";
 import type { ParsedTransaction } from "../../transactions/utils/parsed-transaction.schema";
 import { Button, Card, Input, Text } from "../../../shared/ui";
 

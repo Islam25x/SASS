@@ -1,9 +1,8 @@
 import type {
-  ChatConversation,
   ChatDto,
-  ChatMessage,
   ChatMessageDto,
-} from "../types/ai.types";
+} from "../api/ai.dto";
+import type { ChatConversation, ChatMessage } from "../types/ai.types";
 
 export const CHAT_MESSAGES_QUERY_KEY = ["chat", "messages"] as const;
 

@@ -1,4 +1,4 @@
-import { Camera, Lightbulb, Mic, Target, TrendingUp, Wallet, X } from "lucide-react";
+import { ArrowLeft, Camera, Lightbulb, Mail, Mic, Target, TrendingUp, Wallet, X } from "lucide-react";
 import CTASection from "../../components/landing/CTASection";
 import FeatureSection from "../../components/landing/FeatureSection";
 import GoalsSection from "../../components/landing/GoalsSection";
@@ -103,6 +103,11 @@ export default function WelcomePage() {
     authMode,
     closeAuthModal,
     confirmationEmail,
+    forgotPasswordData,
+    forgotPasswordErrors,
+    forgotPasswordMutation,
+    handleForgotPasswordChange,
+    handleForgotPasswordSubmit,
     handleLoginChange,
     handleLoginSubmit,
     handleRegisterChange,
@@ -112,9 +117,11 @@ export default function WelcomePage() {
     loginErrors,
     loginMutation,
     openLoginModal,
+    passwordResetEmail,
     registerData,
     registerErrors,
     registerMutation,
+    switchToForgotPassword,
     switchToLogin,
     switchToSignup,
   } = useWelcomeAuthFlow();
@@ -198,7 +205,7 @@ export default function WelcomePage() {
                   <CheckEmailPanel
                     email={confirmationEmail}
                     embedded
-                    onGoToLogin={switchToLogin}
+                    onGoToLogin={() => switchToLogin(confirmationEmail)}
                   />
                 </div>
               ) : (
@@ -213,224 +220,324 @@ export default function WelcomePage() {
                   </button>
 
                   {authMode === "login" ? (
-                  <>
-                    <div className="text-center mb-6">
-                      <h2
-                        id="auth-modal-title"
-                        className="text-2xl font-semibold text-slate-900"
-                      >
-                        Sign into your account
-                      </h2>
-                    </div>
-
-                    <form onSubmit={handleLoginSubmit}>
-                      <div className="mb-4">
-                        <label htmlFor="modal-login-name" className="block font-medium">
-                          email
-                        </label>
-                        <input
-                          type="email"
-                          id="modal-login-name"
-                          name="email"
-                          value={loginData.email}
-                          onChange={handleLoginChange}
-                          disabled={loginMutation.isPending}
-                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
-                        />
-                        {loginErrors.email && (
-                          <p className="text-red-500 text-sm">{loginErrors.email}</p>
-                        )}
-                      </div>
-
-                      <div className="mb-4">
-                        <label htmlFor="modal-login-password" className="block font-medium">
-                          Password
-                        </label>
-                        <input
-                          type="password"
-                          id="modal-login-password"
-                          name="password"
-                          value={loginData.password}
-                          onChange={handleLoginChange}
-                          disabled={loginMutation.isPending}
-                          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40"
-                        />
-                        {loginErrors.password && (
-                          <p className="text-red-500 text-sm">{loginErrors.password}</p>
-                        )}
-                      </div>
-
-                      <p className="text-gray-500 text-sm mb-3">
-                        By submitting your info, you agree to our policy at{" "}
-                        <span className="text-primary-600">finexa</span>
-                      </p>
-
-                      <p className="text-sm mb-4">
-                        Don&apos;t have an account?{" "}
-                        <button
-                          type="button"
-                          onClick={switchToSignup}
-                          className="text-primary-600 hover:underline"
+                    <>
+                      <div className="mb-6 text-center">
+                        <h2
+                          id="auth-modal-title"
+                          className="text-2xl font-semibold text-slate-900"
                         >
-                          Sign up
-                        </button>
-                      </p>
-
-                      <button
-                        type="submit"
-                        disabled={loginMutation.isPending}
-                        className="w-full bg-primary-700 hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400 text-white py-2 rounded-md transition-colors cursor-pointer"
-                      >
-                        {loginMutation.isPending ? "Signing in..." : "Sign In"}
-                      </button>
-                    </form>
-                  </>
-                  ) : (
-                  <>
-                    <div className="text-center mb-6">
-                      <h2
-                        id="auth-modal-title"
-                        className="text-3xl font-bold text-primary-700 drop-shadow-md"
-                      >
-                        Create an Account
-                      </h2>
-                    </div>
-
-                    {authBanner && (
-                      <div
-                        className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-                          authBanner.tone === "success"
-                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                            : "border-red-200 bg-red-50 text-red-700"
-                        }`}
-                        aria-live="polite"
-                      >
-                        {authBanner.text}
+                          Sign into your account
+                        </h2>
                       </div>
-                    )}
 
-                    <form onSubmit={handleRegisterSubmit} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label htmlFor="modal-register-username" className="block font-medium">
-                            Username
-                          </label>
-                          <input
-                            type="text"
-                            id="modal-register-username"
-                            name="username"
-                            value={registerData.username}
-                            onChange={handleRegisterChange}
-                            disabled={registerMutation.isPending}
-                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
-                          />
-                          {registerErrors.username && (
-                            <p className="text-red-500 text-sm">{registerErrors.username}</p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label htmlFor="modal-register-email" className="block font-medium">
-                            Email Address
+                      <form onSubmit={handleLoginSubmit}>
+                        <div className="mb-4">
+                          <label htmlFor="modal-login-name" className="block font-medium">
+                            email
                           </label>
                           <input
                             type="email"
-                            id="modal-register-email"
+                            id="modal-login-name"
                             name="email"
-                            value={registerData.email}
-                            onChange={handleRegisterChange}
-                            disabled={registerMutation.isPending}
-                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                            value={loginData.email}
+                            onChange={handleLoginChange}
+                            disabled={loginMutation.isPending}
+                            placeholder="Enter your email"
+                            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
                           />
-                          {registerErrors.email && (
-                            <p className="text-red-500 text-sm">{registerErrors.email}</p>
+                          {loginErrors.email && (
+                            <p className="text-sm text-red-500">{loginErrors.email}</p>
                           )}
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label htmlFor="modal-register-password" className="block font-medium">
+                        <div className="mb-2">
+                          <label htmlFor="modal-login-password" className="block font-medium">
                             Password
                           </label>
                           <input
                             type="password"
-                            id="modal-register-password"
+                            id="modal-login-password"
                             name="password"
-                            value={registerData.password}
-                            onChange={handleRegisterChange}
-                            disabled={registerMutation.isPending}
-                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                            value={loginData.password}
+                            onChange={handleLoginChange}
+                            disabled={loginMutation.isPending}
+                            placeholder="Enter your password"
+                            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
                           />
-                          {registerErrors.password && (
-                            <p className="text-red-500 text-sm">{registerErrors.password}</p>
+                          {loginErrors.password && (
+                            <p className="text-sm text-red-500">{loginErrors.password}</p>
                           )}
                         </div>
 
-                        <div>
-                          <label
-                            htmlFor="modal-register-confirm"
-                            className="block font-medium"
+                        <div className="mb-4 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={switchToForgotPassword}
+                            className="text-sm text-primary-600 transition hover:underline"
                           >
-                            Confirm Password
+                            Forgot password?
+                          </button>
+                        </div>
+
+                        <p className="mb-3 text-sm text-gray-500">
+                          By submitting your info, you agree to our policy at{" "}
+                          <span className="text-primary-600">finexa</span>
+                        </p>
+
+                        <p className="mb-4 text-sm">
+                          Don&apos;t have an account?{" "}
+                          <button
+                            type="button"
+                            onClick={switchToSignup}
+                            className="text-primary-600 hover:underline"
+                          >
+                            Sign up
+                          </button>
+                        </p>
+
+                        <button
+                          type="submit"
+                          disabled={loginMutation.isPending}
+                          className="w-full cursor-pointer rounded-md bg-primary-700 py-2 text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400"
+                        >
+                          {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                        </button>
+                      </form>
+                    </>
+                  ) : authMode === "forgot-password" ? (
+                    <>
+                      <div className="mb-6 text-center">
+                        <h2
+                          id="auth-modal-title"
+                          className="text-2xl font-semibold text-slate-900"
+                        >
+                          Reset your password
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
+                          Enter the email associated with your account and we&apos;ll send you a
+                          reset link.
+                        </p>
+                      </div>
+
+                      <form onSubmit={handleForgotPasswordSubmit}>
+                        {forgotPasswordErrors.form && (
+                          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {forgotPasswordErrors.form}
+                          </div>
+                        )}
+
+                        <div className="mb-5">
+                          <label htmlFor="modal-forgot-password-email" className="block font-medium">
+                            email
                           </label>
                           <input
-                            type="password"
-                            id="modal-register-confirm"
-                            name="confirmPassword"
-                            value={registerData.confirmPassword}
-                            onChange={handleRegisterChange}
-                            disabled={registerMutation.isPending}
-                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                            type="email"
+                            id="modal-forgot-password-email"
+                            name="email"
+                            value={forgotPasswordData.email}
+                            onChange={handleForgotPasswordChange}
+                            disabled={forgotPasswordMutation.isPending}
+                            placeholder="Enter your email"
+                            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
                           />
-                          {registerErrors.confirmPassword && (
-                            <p className="text-red-500 text-sm">
-                              {registerErrors.confirmPassword}
-                            </p>
+                          {forgotPasswordErrors.email && (
+                            <p className="text-sm text-red-500">{forgotPasswordErrors.email}</p>
                           )}
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={forgotPasswordMutation.isPending}
+                          className="w-full cursor-pointer rounded-md bg-primary-700 py-2 text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400"
+                        >
+                          {forgotPasswordMutation.isPending
+                            ? "Sending reset link..."
+                            : "Send Reset Link"}
+                        </button>
+                      </form>
+
+                      <div className="mt-6 text-center">
+                        <button
+                          type="button"
+                          onClick={() => switchToLogin(forgotPasswordData.email)}
+                          className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:underline"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                          Back to sign in
+                        </button>
+                      </div>
+                    </>
+                  ) : authMode === "forgot-password-check-email" ? (
+                    <div className="px-1 py-4 text-center">
+                      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.22),_rgba(37,99,235,0.08))]">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 shadow-[0_18px_40px_rgba(59,130,246,0.18)]">
+                          <Mail className="h-6 w-6 text-[#5B8CFF]" strokeWidth={1.8} />
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="modal-register-agree"
-                          name="agree"
-                          checked={registerData.agree}
-                          onChange={handleRegisterChange}
-                          disabled={registerMutation.isPending}
-                          className="h-4 w-4 text-primary-600 border-gray-300 rounded"
-                        />
-                        <label htmlFor="modal-register-agree" className="text-sm text-gray-700">
-                          I agree to the{" "}
-                          <span className="text-primary-600 font-semibold">finexa policy</span>
-                        </label>
-                      </div>
-                      {registerErrors.agree && (
-                        <p className="text-red-500 text-sm">{registerErrors.agree}</p>
-                      )}
-                      
-
-                      <p className="text-sm">
-                        Already have an account?{" "}
-                        <button
-                          type="button"
-                          onClick={switchToLogin}
-                          className="text-primary-600 hover:underline"
-                        >
-                          Login
-                        </button>
+                      <h2
+                        id="auth-modal-title"
+                        className="mt-5 text-2xl font-semibold text-slate-900"
+                      >
+                        Check your email
+                      </h2>
+                      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                        If an account exists for{" "}
+                        <span className="font-semibold text-slate-900">{passwordResetEmail}</span>,
+                        we&apos;ve sent a password reset link to that email address.
                       </p>
 
                       <button
-                        type="submit"
-                        disabled={registerMutation.isPending}
-                        className="w-full bg-primary-700 hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400 text-white py-2 rounded-md transition-all cursor-pointer"
+                        type="button"
+                        onClick={() => switchToLogin(passwordResetEmail)}
+                        className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:underline"
                       >
-                        {registerMutation.isPending ? "Creating account..." : "Register"}
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to sign in
                       </button>
-                    </form>
-                  </>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-6 text-center">
+                        <h2
+                          id="auth-modal-title"
+                          className="text-3xl font-bold text-primary-700 drop-shadow-md"
+                        >
+                          Create an Account
+                        </h2>
+                      </div>
+
+                      {authBanner && (
+                        <div
+                          className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
+                            authBanner.tone === "success"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : "border-red-200 bg-red-50 text-red-700"
+                          }`}
+                          aria-live="polite"
+                        >
+                          {authBanner.text}
+                        </div>
+                      )}
+
+                      <form onSubmit={handleRegisterSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                          <div>
+                            <label htmlFor="modal-register-username" className="block font-medium">
+                              Username
+                            </label>
+                            <input
+                              type="text"
+                              id="modal-register-username"
+                              name="username"
+                              value={registerData.username}
+                              onChange={handleRegisterChange}
+                              disabled={registerMutation.isPending}
+                              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            />
+                            {registerErrors.username && (
+                              <p className="text-sm text-red-500">{registerErrors.username}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label htmlFor="modal-register-email" className="block font-medium">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              id="modal-register-email"
+                              name="email"
+                              value={registerData.email}
+                              onChange={handleRegisterChange}
+                              disabled={registerMutation.isPending}
+                              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            />
+                            {registerErrors.email && (
+                              <p className="text-sm text-red-500">{registerErrors.email}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                          <div>
+                            <label htmlFor="modal-register-password" className="block font-medium">
+                              Password
+                            </label>
+                            <input
+                              type="password"
+                              id="modal-register-password"
+                              name="password"
+                              value={registerData.password}
+                              onChange={handleRegisterChange}
+                              disabled={registerMutation.isPending}
+                              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            />
+                            {registerErrors.password && (
+                              <p className="text-sm text-red-500">{registerErrors.password}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label htmlFor="modal-register-confirm" className="block font-medium">
+                              Confirm Password
+                            </label>
+                            <input
+                              type="password"
+                              id="modal-register-confirm"
+                              name="confirmPassword"
+                              value={registerData.confirmPassword}
+                              onChange={handleRegisterChange}
+                              disabled={registerMutation.isPending}
+                              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            />
+                            {registerErrors.confirmPassword && (
+                              <p className="text-sm text-red-500">
+                                {registerErrors.confirmPassword}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="modal-register-agree"
+                            name="agree"
+                            checked={registerData.agree}
+                            onChange={handleRegisterChange}
+                            disabled={registerMutation.isPending}
+                            className="h-4 w-4 rounded border-gray-300 text-primary-600"
+                          />
+                          <label htmlFor="modal-register-agree" className="text-sm text-gray-700">
+                            I agree to the{" "}
+                            <span className="font-semibold text-primary-600">finexa policy</span>
+                          </label>
+                        </div>
+                        {registerErrors.agree && (
+                          <p className="text-sm text-red-500">{registerErrors.agree}</p>
+                        )}
+
+                        <p className="text-sm">
+                          Already have an account?{" "}
+                          <button
+                            type="button"
+                            onClick={() => switchToLogin()}
+                            className="text-primary-600 hover:underline"
+                          >
+                            Login
+                          </button>
+                        </p>
+
+                        <button
+                          type="submit"
+                          disabled={registerMutation.isPending}
+                          className="w-full cursor-pointer rounded-md bg-primary-700 py-2 text-white transition-all hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-400"
+                        >
+                          {registerMutation.isPending ? "Creating account..." : "Register"}
+                        </button>
+                      </form>
+                    </>
                   )}
                 </div>
               )}

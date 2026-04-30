@@ -1,16 +1,15 @@
+import type { ResetPasswordRequestDto, ResetPasswordResponseDto } from "./auth.dto";
 import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
-import type { CreateCategoryRequestDto } from "./category.dto";
 
-export async function createCategoryApi(
-  payload: CreateCategoryRequestDto,
+export async function resetPasswordApi(
+  payload: ResetPasswordRequestDto,
   options?: { signal?: AbortSignal },
-): Promise<unknown> {
-  return requestJson<unknown>("/api/Category/create-category", {
+): Promise<ResetPasswordResponseDto> {
+  return requestJson<ResetPasswordResponseDto>("/api/Auth/reset-password", {
     method: "POST",
     body: JSON.stringify(payload),
     signal: options?.signal,
     baseUrl: getAppApiBaseUrl(),
-    withAuth: true,
   });
 }

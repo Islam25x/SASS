@@ -1,7 +1,7 @@
 import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
 import type { DateRangeValue } from "../../../shared/ui/DateRangeSelector";
-import type { DashboardResponseDto } from "../types/dashboard.dto";
+import type { DashboardResponseDto } from "./dashboard.dto";
 
 function buildDashboardQueryParams(period: DateRangeValue): string {
   const params = new URLSearchParams();

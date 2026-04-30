@@ -1,9 +1,9 @@
 import { requestJson } from "../../../infrastructure/api/http";
 import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
-import type { ResendConfirmationPayload } from "../types/auth.types";
+import type { ResendConfirmationRequestDto } from "./auth.dto";
 
 export async function resendConfirmationApi(
-  payload: ResendConfirmationPayload,
+  payload: ResendConfirmationRequestDto,
   options?: { signal?: AbortSignal },
 ): Promise<unknown> {
   const query = new URLSearchParams({

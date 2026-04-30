@@ -2,19 +2,22 @@ import { useEffect, useRef } from "react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { useToast } from "../../../shared/ui";
-import { extractRegisterData, parseRegisterResult } from "../utils/auth.parser";
-import { resendConfirmationApi } from "../api/resend-confirmation.api";
 import type {
-  ResendConfirmationPayload,
-  ResendConfirmationResult,
-} from "../types/auth.types";
+  ResendConfirmationRequestDto,
+  ResendConfirmationResponseDto,
+} from "../api/auth.dto";
+import {
+  extractRegisterData,
+  parseResendConfirmationResult,
+} from "../utils/auth.parser";
+import { resendConfirmationApi } from "../api/resend-confirmation.api";
 
 const RESEND_CONFIRMATION_SUCCESS_MESSAGE = "A new confirmation email has been sent";
 
 type ResendConfirmationMutation = UseMutationResult<
-  ResendConfirmationResult,
+  ResendConfirmationResponseDto,
   ApiError,
-  ResendConfirmationPayload
+  ResendConfirmationRequestDto
 >;
 
 type UseResendConfirmationResult = ResendConfirmationMutation & {
@@ -26,9 +29,9 @@ export function useResendConfirmation(): UseResendConfirmationResult {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const mutation = useMutation<
-    ResendConfirmationResult,
+    ResendConfirmationResponseDto,
     ApiError,
-    ResendConfirmationPayload
+    ResendConfirmationRequestDto
   >({
     mutationKey: ["auth", "resend-confirmation"],
     mutationFn: async (payload) => {
@@ -45,7 +48,7 @@ export function useResendConfirmation(): UseResendConfirmationResult {
           { signal: controller.signal },
         );
 
-        return parseRegisterResult(extractRegisterData(response));
+        return parseResendConfirmationResult(extractRegisterData(response));
       } finally {
         if (abortControllerRef.current === controller) {
           abortControllerRef.current = null;

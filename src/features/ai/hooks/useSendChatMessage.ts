@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { sendChatMessageApi } from "../api/ChatBot.api";
 import type {
-  ChatConversation,
   SendChatMessageDto,
   SendChatMessageResponseDto,
+} from "../api/ai.dto";
+import type {
+  ChatConversation,
 } from "../types/ai.types";
 import {
   appendChatMessages,

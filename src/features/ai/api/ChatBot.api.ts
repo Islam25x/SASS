@@ -1,5 +1,9 @@
 import { requestJson } from "../../../infrastructure/api/http";
-import type { ChatDto, SendChatMessageDto, SendChatMessageResponseDto } from "../types/ai.types";
+import type {
+  ChatDto,
+  SendChatMessageDto,
+  SendChatMessageResponseDto,
+} from "./ai.dto";
 
 export async function getChatMessagesApi(
     options?: { signal?: AbortSignal },
