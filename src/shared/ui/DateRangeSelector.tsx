@@ -92,7 +92,6 @@ const buildRangeOptions = () => {
     { value: "Week", label: "Week", range: `${formatShort(startOfWeek)} - Now` },
     { value: "Month", label: "Month", range: `${formatShort(startOfMonth)} - Now` },
     { value: "Year", label: "Year", range: `${formatShort(startOfYear)} - Now` },
-    { value: "Custom", label: "Custom", range: "Custom range" },
   ] as const;
 };
 

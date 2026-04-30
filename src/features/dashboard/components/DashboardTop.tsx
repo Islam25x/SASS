@@ -11,7 +11,7 @@ import DashboardSummaryCard from "./DashboardSummaryCard";
 import { PageHeader, Text } from "../../../shared/ui";
 import { useUserProfile } from "../../../features/user/hooks/useUserProfile";
 import { getUserDisplayName } from "../../../features/user/utils/user.selectors";
-import { useDashboardSummary } from "../hooks/useDashboardSummary";
+import { useDashboardSummary } from "../hooks/useDashboard";
 import { useState } from "react";
 import AddTransactionModal from "../../transactions/components/AddTransactionModal";
 import AdjustBalanceModal from "./AdjustBalanceModal";
@@ -40,8 +40,8 @@ const DashboardTop = () => {
       titleKey: "Income",
       icon: <FontAwesomeIcon icon={faClock} className="text-primary" />,
       value: summary?.totalIncome ?? 0,
-      pev: `${summary?.incomeChangePercentage ?? 0}% vs last period`,
-      isIncrease: (summary?.incomeChangePercentage ?? 0) >= 0,
+      pev: summary?.incomeChangePercentage.label ?? "0% vs last period",
+      isIncrease: summary?.incomeChangePercentage.trend !== "down",
       arrow: true,
       onArrowClick: () => setForcedTransactionType("income"),
     },
@@ -49,16 +49,17 @@ const DashboardTop = () => {
       titleKey: "Expenses",
       icon: <FontAwesomeIcon icon={faChartColumn} className="text-purple-500" />,
       value: summary?.totalExpense ?? 0,
-      pev: `${summary?.expenseChangePercentage ?? 0}% vs last period`,
-      isIncrease: (summary?.expenseChangePercentage ?? 0) >= 0,
-      arrow: false
+      pev: summary?.expenseChangePercentage.label ?? "0% vs last period",
+      isIncrease: summary?.expenseChangePercentage.trend !== "down",
+      arrow: true,
+      onArrowClick: () => setForcedTransactionType("expense"),
     },
     {
       titleKey: "savings for this month",
       icon: <FontAwesomeIcon icon={faBell} className="text-yellow-500" />,
       value: summary?.totalSavings ?? 0,
-      pev: `${summary?.savingsChangePercentage ?? 0}% vs last period`,
-      isIncrease: (summary?.savingsChangePercentage ?? 0) >= 0,
+      pev: summary?.savingsChangePercentage.label ?? "0% vs last period",
+      isIncrease: summary?.savingsChangePercentage.trend !== "down",
       arrow: false
     },
   ];

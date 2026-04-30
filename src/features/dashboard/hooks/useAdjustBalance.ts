@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { adjustBalanceApi } from "../api/adjust-balance.api";
-import { DASHBOARD_SUMMARY_QUERY_KEY } from "./useDashboardSummary";
+import { DASHBOARD_QUERY_KEY } from "./useDashboard";
 
 type AdjustBalanceResult = {
   message: string;
@@ -56,7 +56,7 @@ export function useAdjustBalance(): UseAdjustBalanceResult {
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: DASHBOARD_SUMMARY_QUERY_KEY,
+          queryKey: DASHBOARD_QUERY_KEY,
         }),
         queryClient.invalidateQueries({
           queryKey: ["transactions"],

@@ -1,52 +1,36 @@
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import LineChartBase from "../../../shared/chart/LineChartBase";
-import type { LineChartRow } from "../../../shared/chart/LineChartBase";
 import { Button, Card, Text } from "../../../shared/ui";
+import { useDashboard } from "../hooks/useDashboard";
 
+const chartSeries = [
+  {
+    dataKey: "income",
+    stroke: "#0ea5e9",
+    fill: "rgba(139,92,246,0.15)",
+  },
+  {
+    dataKey: "expense",
+    stroke: "#F43F5E",
+    fill: "rgba(244,63,94,0.15)",
+  },
+  {
+    dataKey: "savings",
+    stroke: "#6366F1",
+    fill: "rgba(99,102,241,0.15)",
+  },
+] as const;
+
+const legendItems = [
+  { label: "Income", color: "#0ea5e9" },
+  { label: "Expenses", color: "#F43F5E" },
+  { label: "Savings", color: "#6366F1" },
+] as const;
 
 const MoneyFlowChart = () => {
-  const chartData = useMemo<LineChartRow[]>(
-    () => [
-      { label: "Jan", income: 4000, expenses: 2500, savings: 1500 },
-      { label: "Feb", income: 3000, expenses: 2000, savings: 1000 },
-      { label: "Mar", income: 5000, expenses: 3000, savings: 2000 },
-      { label: "Apr", income: 4500, expenses: 2800, savings: 1700 },
-      { label: "May", income: 6000, expenses: 3500, savings: 2500 },
-      { label: "Jun", income: 7000, expenses: 4000, savings: 3000 },
-      { label: "Jul", income: 6500, expenses: 3700, savings: 2800 },
-    ],
-    []
-  );
-
-  const series = useMemo(
-    () => [
-      {
-        dataKey: "income",
-        stroke: "#0ea5e9",
-        fill: "rgba(139,92,246,0.15)",
-      },
-      {
-        dataKey: "expenses",
-        stroke: "#F43F5E",
-        fill: "rgba(244,63,94,0.15)",
-      },
-      {
-        dataKey: "savings",
-        stroke: "#6366F1",
-        fill: "rgba(99,102,241,0.15)",
-      },
-    ],
-    []
-  );
-
-  const legendItems = useMemo(
-    () => [
-      { label: "Income", color: "#0ea5e9" },
-      { label: "Expenses", color: "#F43F5E" },
-      { label: "Savings", color: "#6366F1" },
-    ],
-    []
-  );
+  const { data: dashboard } = useDashboard();
+  const chartData = dashboard?.moneyFlow ?? [];
+  const hasChartData = chartData.length > 0;
 
   return (
     <Card variant="default" padding="sm" className="relative w-full h-80 flex flex-col p-0">
@@ -54,10 +38,15 @@ const MoneyFlowChart = () => {
         <Text as="h2" variant="subtitle" weight="medium" className="text-gray-900 my-1">
           Money Flow
         </Text>
-        {/* <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/60 backdrop-blur-xs z-40 text-center p-6">
-          <p className="text-gray-800 font-medium mb-2">Please enter your income data</p>
-          <p className="text-white text-sm mb-4">We need your income to show the Money Flow chart.</p>
-        </div> */}
+        {
+          !hasChartData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/60 backdrop-blur-xs z-40 text-center p-6">
+              <p className="text-gray-800 font-medium mb-2">No money flow data yet</p>
+              <p className="text-white text-sm mb-4">Your money flow insights will appear here once you add transactions.</p>
+            </div>
+          )
+        }
+
 
         <div className="flex items-center gap-4">
           {legendItems.map((item) => (
@@ -83,7 +72,7 @@ const MoneyFlowChart = () => {
       </div>
 
       <div className="flex-1 min-h-15 px-6 pb-6">
-        <LineChartBase data={chartData} series={series} />
+        <LineChartBase data={chartData} series={[...chartSeries]} />
       </div>
     </Card>
   );
