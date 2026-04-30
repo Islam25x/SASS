@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { fetchUserProfileApi } from "../api/user.api";
 import type { User } from "../types/user.types";
@@ -17,20 +16,19 @@ export function useUserProfile(): UseQueryResult<User, ApiError> {
         signal,
       });
 
-      return parseUser(extractUserData(response), {
+      const user = parseUser(extractUserData(response), {
         profileImageCacheKey: Date.now(),
       });
+      setUser(user);
+      return user;
     },
     staleTime: 1000 * 60 * 5,
     enabled: isAuthenticated,
-    placeholderData: session?.user,
+    initialData: session?.user,
   });
 
-  useEffect(() => {
-    if (query.data && query.data !== session?.user) {
-      setUser(query.data);
-    }
-  }, [query.data, session?.user, setUser]);
-
-  return query;
+  return {
+    ...query,
+    data: session?.user ?? query.data,
+  } as UseQueryResult<User, ApiError>;
 }

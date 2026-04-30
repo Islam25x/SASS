@@ -1,5 +1,6 @@
 import type { AuthSession } from "../../features/auth/types/auth.types";
 import {
+  AUTH_STORAGE_KEY,
   clearStoredAuthSession,
   readStoredAuthSession,
   writeStoredAuthSession,
@@ -9,6 +10,7 @@ type AuthSessionListener = () => void;
 
 let sessionSnapshot: AuthSession | null | undefined;
 const listeners = new Set<AuthSessionListener>();
+let hasStorageSync = false;
 
 function notifyListeners(): void {
   for (const listener of listeners) {
@@ -26,6 +28,26 @@ function ensureSnapshot(): AuthSession | null {
 
 export function getAuthSessionSnapshot(): AuthSession | null {
   return ensureSnapshot();
+}
+
+export function initializeAuthSessionStore(): void {
+  ensureSnapshot();
+
+  if (hasStorageSync || typeof window === "undefined") {
+    return;
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key !== AUTH_STORAGE_KEY) {
+      return;
+    }
+
+    sessionSnapshot = readStoredAuthSession();
+    notifyListeners();
+  };
+
+  window.addEventListener("storage", handleStorage);
+  hasStorageSync = true;
 }
 
 export function subscribeToAuthSession(listener: AuthSessionListener): () => void {

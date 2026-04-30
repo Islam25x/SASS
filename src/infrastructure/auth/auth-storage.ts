@@ -2,7 +2,7 @@ import type { AuthSession } from "../../features/auth/types/auth.types";
 import type { User } from "../../features/user/types/user.types";
 import { normalizeProfileImageUrl } from "../../shared/utils/profile-image-url";
 
-const AUTH_STORAGE_KEY = "finexa.auth.session";
+export const AUTH_STORAGE_KEY = "finexa.auth.session";
 const PENDING_CONFIRMATION_EMAIL_STORAGE_KEY = "finexa.auth.pending-confirmation-email";
 
 function isValidDate(value: Date): boolean {

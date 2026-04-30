@@ -11,6 +11,7 @@ import { API_UNAUTHORIZED_EVENT } from "../../infrastructure/api/http";
 import {
   clearAuthSessionState,
   getAuthSessionSnapshot,
+  initializeAuthSessionStore,
   patchAuthSession,
   setAuthSession,
   subscribeToAuthSession,
@@ -32,6 +33,11 @@ function areUsersEqual(currentUser: User, nextUser: User): boolean {
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    initializeAuthSessionStore();
+  }, []);
+
   const session = useSyncExternalStore(
     subscribeToAuthSession,
     getAuthSessionSnapshot,

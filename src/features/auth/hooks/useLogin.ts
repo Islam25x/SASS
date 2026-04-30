@@ -8,7 +8,6 @@ import { loginApi } from "../api/auth.api";
 import type { AuthSession, LoginPayload } from "../types/auth.types";
 import { extractLoginData, parseAuthSession, readLoginToken } from "../utils/auth.parser";
 import { fetchUserProfileApi } from "../../user/api/user.api";
-import { USER_PROFILE_QUERY_KEY } from "../../user/hooks/useUserProfile";
 import { extractUserData, parseUser } from "../../user/utils/user.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { TRANSACTION_CATEGORIES_QUERY_KEY } from "../../transactions/hooks/useCategories";
@@ -56,7 +55,6 @@ export function useLogin(): UseLoginResult {
     },
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: USER_PROFILE_QUERY_KEY }),
         queryClient.invalidateQueries({ queryKey: ["transactions"] }),
         queryClient.invalidateQueries({ queryKey: TRANSACTION_CATEGORIES_QUERY_KEY }),
       ]);
