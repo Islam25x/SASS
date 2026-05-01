@@ -27,7 +27,6 @@ const DashboardTop = () => {
     status,
   } = useDashboardSummary();
   const displayName = profile ? getUserDisplayName(profile) : "Finexa User";
-  const welcomeName = displayName.split(".")[0] + " " + displayName.split(".")[1] || displayName;
   const [forcedTransactionType, setForcedTransactionType] =
     useState<ForcedTransactionType>(null);
   const [isAdjustBalanceOpen, setIsAdjustBalanceOpen] = useState(false);
@@ -45,7 +44,7 @@ const DashboardTop = () => {
   return (
     <section id="DashboardTop" className="container mt-5 px-3 pb-8 space-y-5">
       <PageHeader
-        title={`Welcome back, ${welcomeName}`}
+        title={`Welcome back, ${displayName}`}
         subtitle="Welcome to your dashboard"
       />
       <FinancialSummaryCards
