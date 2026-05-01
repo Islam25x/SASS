@@ -7,6 +7,10 @@ import {
   getTransactionDisplayTitle,
   normalizeOptionalTransactionItem,
 } from "./transaction-item";
+import {
+  formatTransactionMonthKeyFromDate,
+  toTransactionMonthKey,
+} from "./transaction-dates";
 
 export type NormalizedTransactionType = TransactionType | "unknown";
 
@@ -91,10 +95,7 @@ export function selectRecentTransactions(transactions: Transaction[], limit = 3)
 }
 
 const getMonthKey = (value?: string) => {
-  if (!value) return "";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "";
-  return `${parsed.getFullYear()}-${parsed.getMonth()}`;
+  return toTransactionMonthKey(value);
 };
 
 const getLatestMonthKey = (transactions: Transaction[]) => {
@@ -112,8 +113,8 @@ const getPreviousMonthKey = (monthKey: string) => {
   const month = Number(monthString);
   if (!Number.isFinite(year) || !Number.isFinite(month)) return "";
 
-  const previousDate = new Date(year, month - 1, 1);
-  return `${previousDate.getFullYear()}-${previousDate.getMonth()}`;
+  const previousDate = new Date(year, month - 2, 1);
+  return formatTransactionMonthKeyFromDate(previousDate);
 };
 
 const calcPercentChange = (current: number, previous: number) => {

@@ -8,6 +8,7 @@ import {
 import type { TransactionResponseDto } from "../api/transaction.dto";
 import { normalizeOptionalTransactionItem } from "./transaction-item";
 import { parseParsedTransaction } from "./parsed-transaction.schema";
+import { parseTransactionDate } from "./transaction-dates";
 
 type ReceiptTransactionLikeItem = {
   name?: string;
@@ -138,7 +139,7 @@ function parseTransactionDto(dto: unknown): Transaction {
   }
 
   const occurredAt = toTrimmedString(dto.occurredAt);
-  if (!occurredAt) {
+  if (!occurredAt || !parseTransactionDate(occurredAt)) {
     throw new ApiError("Transaction date is invalid.", 500, "INVALID_RESPONSE");
   }
 

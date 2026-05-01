@@ -6,11 +6,12 @@ import type {
   AddTransactionTypeInput,
 } from "../types/add-transaction.types";
 import { normalizeOptionalTransactionItem } from "./transaction-item";
+import { parseTransactionDateTimeLocalInput } from "./transaction-dates";
 
 function normalizeOccurredAt(value: string): string {
-  const parsedDate = new Date(value);
+  const parsedDate = parseTransactionDateTimeLocalInput(value);
 
-  if (Number.isNaN(parsedDate.getTime())) {
+  if (!parsedDate) {
     throw new ApiError("Transaction date is invalid.", 400, "INVALID_RESPONSE");
   }
 

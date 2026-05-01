@@ -21,6 +21,10 @@ import { useCreateCategory } from "../hooks/useCreateCategory";
 import { findCategoryByName, selectCategoriesByType } from "../utils/category.selectors";
 import type { AddTransactionInput, AddTransactionType } from "../types/add-transaction.types";
 import type { Transaction } from "../types/transaction.types";
+import {
+  formatNowForDateTimeLocal,
+  parseDateTimeLocalValue,
+} from "../utils/transaction-dates";
 import TransactionCategoryPicker from "./TransactionCategoryPicker";
 
 type TransactionModalProps = {
@@ -52,34 +56,12 @@ type NoticeState = {
   message: string;
 } | null;
 
-function formatNowForDateTimeLocal(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = `${now.getMonth() + 1}`.padStart(2, "0");
-  const day = `${now.getDate()}`.padStart(2, "0");
-  const hours = `${now.getHours()}`.padStart(2, "0");
-  const minutes = `${now.getMinutes()}`.padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
 function formatDateTimeLocal(value?: string): string {
   if (!value) {
     return formatNowForDateTimeLocal();
   }
 
-  const parsedDate = new Date(value);
-  if (Number.isNaN(parsedDate.getTime())) {
-    return formatNowForDateTimeLocal();
-  }
-
-  const year = parsedDate.getFullYear();
-  const month = `${parsedDate.getMonth() + 1}`.padStart(2, "0");
-  const day = `${parsedDate.getDate()}`.padStart(2, "0");
-  const hours = `${parsedDate.getHours()}`.padStart(2, "0");
-  const minutes = `${parsedDate.getMinutes()}`.padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+  return parseDateTimeLocalValue(value);
 }
 
 function createInitialState(): FormState {

@@ -11,6 +11,7 @@ import type {
     DashboardMoneyFlowPoint,
     DashboardTrend,
 } from "../types/dashboard.models";
+import { parseBackendTimestamp } from "../../../shared/utils/date-time";
 
 function logDashboardDebug(message: string, payload?: unknown): void {
     if (!import.meta.env.DEV) {
@@ -48,8 +49,8 @@ function parseDate(value: unknown, fieldName: string): Date {
         throw new ApiError(`Dashboard field "${fieldName}" is invalid.`, 500, "INVALID_RESPONSE");
     }
 
-    const parsedDate = new Date(value);
-    if (Number.isNaN(parsedDate.getTime())) {
+    const parsedDate = parseBackendTimestamp(value);
+    if (!parsedDate) {
         throw new ApiError(`Dashboard field "${fieldName}" is invalid.`, 500, "INVALID_RESPONSE");
     }
 
