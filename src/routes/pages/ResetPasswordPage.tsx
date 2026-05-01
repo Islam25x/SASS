@@ -311,7 +311,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <footer className="pb-4 text-center text-sm text-slate-400">
-          <span>Copyright 2024 Finexa. All rights reserved.</span>
+          <span>Copyright 2026 Finexa. All rights reserved.</span>
           <span className="mx-3 hidden sm:inline">Privacy Policy</span>
           <span className="hidden sm:inline">Terms of Service</span>
         </footer>
