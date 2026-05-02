@@ -8,7 +8,6 @@ import {
   normalizeOptionalTransactionItem,
 } from "./transaction-item";
 import {
-  formatTransactionMonthKeyFromDate,
   toTransactionMonthKey,
 } from "./transaction-dates";
 
@@ -112,9 +111,9 @@ const getPreviousMonthKey = (monthKey: string) => {
   const year = Number(yearString);
   const month = Number(monthString);
   if (!Number.isFinite(year) || !Number.isFinite(month)) return "";
-
-  const previousDate = new Date(year, month - 2, 1);
-  return formatTransactionMonthKeyFromDate(previousDate);
+  const previousMonth = month === 1 ? 12 : month - 1;
+  const previousYear = month === 1 ? year - 1 : year;
+  return `${previousYear}-${`${previousMonth}`.padStart(2, "0")}`;
 };
 
 const calcPercentChange = (current: number, previous: number) => {

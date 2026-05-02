@@ -5,7 +5,6 @@ import {
 } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { parseTransactionApi } from "../api/ai.api";
-import { parseParsedTransaction } from "../utils/ai.parser";
 import type { ParsedTransaction } from "../../transactions/utils/parsed-transaction.schema";
 
 type UseParseTransactionOptions = {
@@ -19,8 +18,7 @@ export function useParseTransaction(
   const queryClient = useQueryClient();
 
   return useMutation<ParsedTransaction, ApiError, string>({
-    mutationFn: async (message) =>
-      parseParsedTransaction(await parseTransactionApi(message)),
+    mutationFn: async (message) => parseTransactionApi(message),
     onSuccess: async () => {
       if (!options?.invalidateTransactions || !options.transactionsQueryKey) {
         return;

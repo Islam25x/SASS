@@ -1,6 +1,7 @@
 import { ArrowUpRight, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { PanelCard, Text } from "../../../shared/ui";
 import type { Goal, GoalHistoryPage } from "../types/goal.types";
+import { formatBackendTimestampForDisplay } from "../../../shared/utils/date-time";
 
 type GoalHistoryOverlayProps = {
   goal: Goal;
@@ -23,22 +24,11 @@ function formatCurrency(value: number) {
 }
 
 function formatDate(value: string) {
-  if (!value?.trim()) {
-    return "N/A";
-  }
-
-  const parsedDate = new Date(value);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "N/A";
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
+  return formatBackendTimestampForDisplay(value, {
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "Africa/Cairo",
-  }).format(parsedDate);
+  });
 }
 
 function GoalHistoryOverlay({

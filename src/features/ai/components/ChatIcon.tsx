@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { Brain, Mic, ReceiptText } from "lucide-react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import ChatBot from "./ChatBot";
+import VoiceLedgerModal from "./VoiceLedgerModal";
 import { Button, Text } from "../../../shared/ui";
 
 const NOOP = () => { };
@@ -205,6 +206,11 @@ function ChatIcon() {
             <AnimatePresence>
                 {active && <ChatBot setActive={setActive} setHideIcon={NOOP} />}
             </AnimatePresence>
+
+            <VoiceLedgerModal
+                isOpen={voiceModalOpen}
+                onClose={() => setVoiceModalOpen(false)}
+            />
         </>
     );
 }

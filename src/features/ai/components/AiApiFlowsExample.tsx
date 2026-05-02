@@ -6,6 +6,7 @@ import { useVoiceToText } from "../hooks/useVoiceToText";
 import type { ReceiptOcrItem } from "../api/ai.dto";
 import type { ParsedTransaction } from "../../transactions/utils/parsed-transaction.schema";
 import { Button, Card, Input, Text } from "../../../shared/ui";
+import { formatBackendTimestampForDisplay } from "../../../shared/utils/date-time";
 
 // Example UI layer: consumes hooks only, keeps API details outside the component.
 interface AiApiFlowsExampleProps {
@@ -215,7 +216,9 @@ function AiApiFlowsExample({
               <Text variant="body">Amount: {parsedPreview.amount}</Text>
               <Text variant="body">Category: {parsedPreview.category}</Text>
               <Text variant="body">Description: {parsedPreview.description}</Text>
-              <Text variant="body">Date: {parsedPreview.date ?? "N/A"}</Text>
+              <Text variant="body">
+                Date: {formatBackendTimestampForDisplay(parsedPreview.date)}
+              </Text>
             </div>
             <Button
               type="button"
@@ -264,7 +267,8 @@ function AiApiFlowsExample({
             <ul className="mt-2 space-y-2 text-sm text-slate-700">
               {receiptTransactions.map((transaction: ParsedTransaction, index: number) => (
                 <li key={`${transaction.description}-${index}`} className="rounded bg-slate-50 p-2">
-                  {transaction.description} - {transaction.amount} ({transaction.category})
+                  {transaction.description} - {transaction.amount} ({transaction.category}){" "}
+                  - {formatBackendTimestampForDisplay(transaction.date)}
                 </li>
               ))}
             </ul>

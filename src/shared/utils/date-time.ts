@@ -5,6 +5,17 @@ const DATE_TIME_WITHOUT_ZONE_PATTERN =
 
 const HAS_EXPLICIT_TIMEZONE_PATTERN = /(Z|[+-]\d{2}:\d{2})$/i;
 
+export const CAIRO_TIME_ZONE = "Africa/Cairo";
+
+type CairoDateTimeParts = {
+  year: string;
+  month: string;
+  day: string;
+  hour: string;
+  minute: string;
+  second: string;
+};
+
 function buildUtcDate(
   year: number,
   month: number,
@@ -88,6 +99,33 @@ function parseDateParts(
   pattern: RegExp,
 ): RegExpMatchArray | null {
   return value.match(pattern);
+}
+
+function getCairoPartsFormatter(): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat("en-US-u-nu-latn", {
+    timeZone: CAIRO_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+}
+
+function getCairoDateTimeParts(date: Date): CairoDateTimeParts {
+  const parts = getCairoPartsFormatter().formatToParts(date);
+  const lookup = new Map(parts.map((part) => [part.type, part.value]));
+
+  return {
+    year: lookup.get("year") ?? "0000",
+    month: lookup.get("month") ?? "00",
+    day: lookup.get("day") ?? "00",
+    hour: lookup.get("hour") ?? "00",
+    minute: lookup.get("minute") ?? "00",
+    second: lookup.get("second") ?? "00",
+  };
 }
 
 export function parseBackendTimestamp(
@@ -237,7 +275,7 @@ export function formatNowForDateTimeLocal(): string {
   return formatDateForDateTimeLocal(new Date());
 }
 
-export function formatBackendTimestampForDateTimeLocalInput(
+export function formatBackendTimestampForDateTimeInput(
   value?: string | null,
 ): string {
   const parsedDate = parseBackendTimestamp(value);
@@ -246,10 +284,17 @@ export function formatBackendTimestampForDateTimeLocalInput(
     return formatNowForDateTimeLocal();
   }
 
-  return formatDateForDateTimeLocal(parsedDate);
+  const parts = getCairoDateTimeParts(parsedDate);
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
 }
 
-export function toMonthKeyFromBackendTimestamp(
+export function formatBackendTimestampForDateTimeLocalInput(
+  value?: string | null,
+): string {
+  return formatBackendTimestampForDateTimeInput(value);
+}
+
+export function getCairoMonthKey(
   value?: string | null,
 ): string {
   const parsed = parseBackendTimestamp(value);
@@ -258,22 +303,19 @@ export function toMonthKeyFromBackendTimestamp(
     return "";
   }
 
-  return `${parsed.getFullYear()}-${padNumber(
-    parsed.getMonth() + 1,
-  )}`;
+  const parts = getCairoDateTimeParts(parsed);
+  return `${parts.year}-${parts.month}`;
 }
 
-export const localDateTimeFormatter =
-  new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+export function toMonthKeyFromBackendTimestamp(
+  value?: string | null,
+): string {
+  return getCairoMonthKey(value);
+}
 
 export function formatBackendTimestampForDisplay(
   value?: string | null,
+  options?: Intl.DateTimeFormatOptions,
 ): string {
   const parsed = parseBackendTimestamp(value);
 
@@ -281,9 +323,13 @@ export function formatBackendTimestampForDisplay(
     return "N/A";
   }
 
-  const adjustedDate = new Date(
-    parsed.getTime() + 2 * 60 * 60 * 1000,
-  );
-
-  return localDateTimeFormatter.format(adjustedDate);
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: CAIRO_TIME_ZONE,
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    ...options,
+  }).format(parsed);
 }

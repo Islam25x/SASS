@@ -1,63 +1,215 @@
-import { useEffect, useRef } from "react";
-import { CheckCircle2, Mic, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Button, Input, Text } from "../../../shared/ui";
+import { CheckCircle2, Loader2, Mic, PencilLine, RotateCcw, X } from "lucide-react";
+import { useCreateTransactionsFromSpeech } from "../hooks/useCreateTransactionsFromSpeech";
+import { useVoiceRecorder } from "../hooks/useVoiceRecorder";
+import { useVoiceToText } from "../hooks/useVoiceToText";
+import { Button, Input, Text, useToast } from "../../../shared/ui";
 
 interface VoiceLedgerModalProps {
   isOpen: boolean;
-  state:  "recording" | "transcribing" | "parsing" | "transcribed" | "preview" | "submitting" | "idle";
-  transcript: string;
-  parsedTransaction:  null;
-  error: string | null;
-  isLoading: boolean;
   onClose: () => void;
-  onStartRecording: () => void;
-  onStopRecording: () => void;
-  onConfirm: () => void;
-  onTranscriptChange: (value: string) => void;
 }
+
+type VoiceLedgerState =
+  | "idle"
+  | "recording"
+  | "transcribing"
+  | "review"
+  | "submitting"
+  | "success";
 
 const MODAL_TRANSITION = {
   duration: 0.22,
   ease: "easeOut",
 } as const;
 
-function VoiceLedgerModal({
-  isOpen,
-  state,
-  transcript,
-  parsedTransaction,
-  error,
-  isLoading,
-  onClose,
-  onStartRecording,
-  onStopRecording,
-  onConfirm,
-  onTranscriptChange,
-}: VoiceLedgerModalProps) {
+function createVoiceFile(blob: Blob) {
+  const extension = blob.type.includes("mpeg")
+    ? "mp3"
+    : blob.type.includes("mp4")
+      ? "m4a"
+      : "webm";
+
+  return new File([blob], `voice-ledger-${Date.now()}.${extension}`, {
+    type: "audio/webm",
+  });
+}
+
+function VoiceLedgerModal({ isOpen, onClose }: VoiceLedgerModalProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const wasOpenRef = useRef(isOpen);
+  const [transcript, setTranscript] = useState("");
+  const recorder = useVoiceRecorder();
+  const voiceToTextMutation = useVoiceToText();
+  const createTransactionsMutation = useCreateTransactionsFromSpeech();
+  const { showToast } = useToast();
+
+  const isPending =
+    recorder.isPreparing ||
+    voiceToTextMutation.isPending ||
+    createTransactionsMutation.isPending;
+  const hasSuccess = Boolean(createTransactionsMutation.data);
+
+  const state = useMemo<VoiceLedgerState>(() => {
+    if (hasSuccess) {
+      return "success";
+    }
+
+    if (createTransactionsMutation.isPending) {
+      return "submitting";
+    }
+
+    if (voiceToTextMutation.isPending) {
+      return "transcribing";
+    }
+
+    if (recorder.isRecording) {
+      return "recording";
+    }
+
+    if (transcript.trim()) {
+      return "review";
+    }
+
+    return "idle";
+  }, [
+    createTransactionsMutation.isPending,
+    hasSuccess,
+    recorder.isRecording,
+    transcript,
+    voiceToTextMutation.isPending,
+  ]);
+
+  const errorMessage =
+    recorder.error ??
+    voiceToTextMutation.error?.message ??
+    createTransactionsMutation.error?.message ??
+    null;
+
+  const statusLabel = useMemo(() => {
+    if (state === "recording") {
+      return "Listening...";
+    }
+
+    if (state === "transcribing") {
+      return "Converting your speech to text...";
+    }
+
+    if (state === "submitting") {
+      return "Creating transactions from your transcript...";
+    }
+
+    if (state === "success") {
+      return "Transactions created successfully.";
+    }
+
+    if (recorder.isPreparing) {
+      return "Preparing your microphone...";
+    }
+
+    if (state === "review") {
+      return "Review and edit the transcript before you confirm.";
+    }
+
+    return "Press record and describe your transaction.";
+  }, [recorder.isPreparing, state]);
 
   useEffect(() => {
-    if (isOpen && (state === "transcribed" || state === "preview")) {
-      textareaRef.current?.focus();
+    if (isOpen && state === "review") {
+      const frame = window.requestAnimationFrame(() => textareaRef.current?.focus());
+      return () => window.cancelAnimationFrame(frame);
     }
   }, [isOpen, state]);
 
-  const isRecordingLike =
-    state === "recording" || state === "transcribing" || state === "parsing";
-  const showPreview =
-    state === "transcribed" || state === "preview" || state === "submitting";
+  useEffect(() => {
+    if (!createTransactionsMutation.data) {
+      return;
+    }
 
-  const statusLabel =
-    state === "recording"
-      ? "Listening..."
-      : state === "transcribing"
-        ? "Transcribing..."
-        : state === "parsing"
-          ? "Parsing transaction..."
-          : "Tap the mic to start recording";
+    showToast({
+      message:
+        createTransactionsMutation.data.count === 1
+          ? "1 transaction was created from voice input."
+          : `${createTransactionsMutation.data.count} transactions were created from voice input.`,
+      tone: "success",
+    });
+  }, [createTransactionsMutation.data, showToast]);
 
-          
+  useEffect(() => {
+    if (!isOpen && wasOpenRef.current) {
+      recorder.reset();
+      setTranscript("");
+      voiceToTextMutation.reset();
+      createTransactionsMutation.reset();
+    }
+
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  const handleClose = () => {
+    if (isPending) {
+      return;
+    }
+
+    recorder.reset();
+    setTranscript("");
+    voiceToTextMutation.reset();
+    createTransactionsMutation.reset();
+    onClose();
+  };
+
+  const handleStartRecording = async () => {
+    if (isPending) {
+      return;
+    }
+
+    createTransactionsMutation.reset();
+    voiceToTextMutation.reset();
+    setTranscript("");
+
+    try {
+      await recorder.startRecording();
+    } catch {
+      return;
+    }
+  };
+
+  const handleStopRecording = async () => {
+    if (!recorder.isRecording || isPending) {
+      return;
+    }
+
+    try {
+      const audioBlob = await recorder.stopRecording();
+      const response = await voiceToTextMutation.mutateAsync(createVoiceFile(audioBlob));
+      setTranscript(response.text);
+    } catch {
+      return;
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (isPending) {
+      return;
+    }
+
+    const normalizedTranscript = transcript.trim();
+
+    if (!normalizedTranscript) {
+      return;
+    }
+
+    try {
+      await createTransactionsMutation.mutateAsync(normalizedTranscript);
+    } catch {
+      return;
+    }
+  };
+
+  const confirmDisabled = !transcript.trim() || isPending;
+  const showTranscriptEditor = state === "review" || state === "submitting";
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -67,7 +219,7 @@ function VoiceLedgerModal({
           exit={{ opacity: 0 }}
           transition={MODAL_TRANSITION}
           className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/35 p-4 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <motion.section
             role="dialog"
@@ -77,21 +229,28 @@ function VoiceLedgerModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.97 }}
             transition={MODAL_TRANSITION}
-            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            className="flex w-full max-w-md flex-col rounded-2xl border border-slate-200 bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <header className="flex items-start justify-between border-b border-slate-100 p-6">
               <div>
-                <Text as="h2" variant="title" weight="bold" id="voice-ledger-title" className="text-slate-900">
+                <Text
+                  as="h2"
+                  variant="title"
+                  weight="bold"
+                  id="voice-ledger-title"
+                  className="text-slate-900"
+                >
                   Voice Ledger
                 </Text>
                 <Text variant="body" className="mt-2 text-slate-500">
-                  Press record and speak to capture a transaction...
+                  {statusLabel}
                 </Text>
               </div>
               <Button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
+                disabled={isPending}
                 variant="ghost"
                 size="sm"
                 shape="circle"
@@ -103,7 +262,7 @@ function VoiceLedgerModal({
             </header>
 
             <div className="space-y-4 p-6">
-              {!showPreview && (
+              {state !== "success" && !showTranscriptEditor && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="relative">
                     <motion.span
@@ -111,36 +270,33 @@ function VoiceLedgerModal({
                       animate={{ scale: [1, 1.22, 1], opacity: [0.24, 0.1, 0.24] }}
                       transition={{ duration: 2.1, repeat: Infinity, ease: "easeInOut" }}
                       className={`absolute inset-0 rounded-full ${
-                        state === "recording" ? "bg-red-500" : "bg-primary"
+                        state === "recording" ? "bg-rose-500" : "bg-primary"
                       }`}
                     />
-                    {(() => {
-                      const MotionButton = motion(Button);
-                      return (
-                        <MotionButton
+                    <Button
                       type="button"
-                      onClick={state === "recording" ? onStopRecording : onStartRecording}
-                      whileTap={{ scale: 0.96 }}
-                      animate={isRecordingLike ? { scale: [1, 1.03, 1] } : { scale: 1 }}
-                      transition={
-                        isRecordingLike
-                          ? { duration: 1.2, repeat: Infinity, ease: "easeInOut" }
-                          : { duration: 0.15 }
-                      }
+                      onClick={() => {
+                        void (state === "recording"
+                          ? handleStopRecording()
+                          : handleStartRecording());
+                      }}
+                      disabled={isPending && state !== "recording"}
                       variant="primary"
                       size="lg"
                       shape="circle"
-                      className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg p-0 ${
-                        state === "recording" ? "bg-red-500" : "bg-primary"
+                      className={`relative z-10 flex h-24 w-24 items-center justify-center rounded-full p-0 text-white shadow-lg ${
+                        state === "recording" ? "bg-rose-500 hover:bg-rose-600" : "bg-primary"
                       }`}
                     >
-                      <Mic size={30} strokeWidth={2.4} />
-                    </MotionButton>
-                      );
-                    })()}
+                      {recorder.isPreparing || voiceToTextMutation.isPending ? (
+                        <Loader2 size={28} className="animate-spin" />
+                      ) : (
+                        <Mic size={30} strokeWidth={2.4} />
+                      )}
+                    </Button>
                   </div>
 
-                  {isRecordingLike && (
+                  {state === "recording" && (
                     <div className="flex items-center gap-1.5" aria-hidden="true">
                       {[0, 1, 2, 3, 4].map((bar) => (
                         <motion.span
@@ -152,68 +308,77 @@ function VoiceLedgerModal({
                             delay: bar * 0.08,
                             ease: "easeInOut",
                           }}
-                          className="h-6 w-1.5 origin-bottom rounded-full bg-red-400"
+                          className="h-6 w-1.5 origin-bottom rounded-full bg-rose-400"
                         />
                       ))}
                     </div>
                   )}
 
                   <Text variant="body" weight="medium" className="text-slate-700">
-                    {statusLabel}
+                    {state === "recording"
+                      ? "Tap again to stop recording."
+                      : "Tap the mic to start recording."}
                   </Text>
                 </div>
               )}
 
-              {showPreview && (
+              {showTranscriptEditor && (
                 <div className="space-y-3">
                   <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-                    <CheckCircle2 size={16} />
+                    <PencilLine size={16} />
                     <Text as="span" variant="body" weight="medium" className="text-emerald-700">
-                      Transcribed
+                      Editable transcript
                     </Text>
                   </div>
                   <Input
                     as="textarea"
                     ref={textareaRef}
                     value={transcript}
-                    onChange={(event) => onTranscriptChange(event.target.value)}
+                    onChange={(event) => setTranscript(event.target.value)}
                     placeholder="Review and edit your transcribed transaction..."
-                    className="min-h-28 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700"
-                    disabled={state === "submitting"}
+                    className="min-h-32 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700"
+                    disabled={isPending}
                   />
-                  {parsedTransaction && (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-                      <Text variant="body" weight="bold" className="text-slate-900">
-                        Structured Preview
-                      </Text>
-                      <Text variant="body" className="mt-1">
-                        Amount: 50.00 USD
-                      </Text>
-                      <Text variant="body">Category: </Text>
-                      <Text variant="body">
-                        Description: 
-                      </Text>
-                      <Text variant="body">Date: "N/A</Text>
-                    </div>
-                  )}
+                  <Text variant="caption" className="text-slate-500">
+                    Confirming this transcript will create transactions using the current backend speech parser.
+                  </Text>
                 </div>
               )}
 
-              {error && (
+              {state === "success" && createTransactionsMutation.data && (
+                <div className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-emerald-700">
+                    <CheckCircle2 size={16} />
+                    <Text as="span" variant="body" weight="medium" className="text-emerald-700">
+                      Success
+                    </Text>
+                  </div>
+                  <Text variant="body" weight="bold" className="text-emerald-900">
+                    {createTransactionsMutation.data.message}
+                  </Text>
+                  <Text variant="body" className="text-emerald-800">
+                    {createTransactionsMutation.data.count === 1
+                      ? "1 transaction was created."
+                      : `${createTransactionsMutation.data.count} transactions were created.`}
+                  </Text>
+                </div>
+              )}
+
+              {errorMessage && (
                 <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
                   <Text variant="body" className="text-rose-700">
-                    {error}
+                    {errorMessage}
                   </Text>
                 </div>
               )}
             </div>
 
             <footer className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/70 p-4">
-              {state !== "idle" && (
+              {state !== "success" && (
                 <Button
                   type="button"
-                  onClick={onClose}
-                  disabled={state === "submitting"}
+                  onClick={handleClose}
+                  disabled={isPending}
                   variant="secondary"
                   size="sm"
                   className="rounded-xl border-slate-300 bg-white px-4 py-2 text-sm text-slate-700"
@@ -222,29 +387,48 @@ function VoiceLedgerModal({
                 </Button>
               )}
 
-              {state === "recording" && (
+              {state === "review" && (
                 <Button
                   type="button"
-                  onClick={onStopRecording}
-                  disabled={isLoading}
-                  variant="danger"
+                  onClick={() => {
+                    voiceToTextMutation.reset();
+                    createTransactionsMutation.reset();
+                    setTranscript("");
+                  }}
+                  disabled={isPending}
+                  variant="secondary"
                   size="sm"
                   className="rounded-xl px-4 py-2 text-sm"
                 >
-                  Stop Recording
+                  <RotateCcw size={14} />
+                  Record Again
                 </Button>
               )}
 
-              {(state === "transcribed" || state === "preview" || state === "submitting") && (
+              {state === "review" || state === "submitting" ? (
                 <Button
                   type="button"
-                  onClick={onConfirm}
-                  disabled={(state !== "transcribed" && state !== "preview") || isLoading}
+                  onClick={() => {
+                    void handleConfirm();
+                  }}
+                  disabled={confirmDisabled}
                   variant="primary"
                   size="sm"
                   className="rounded-xl px-4 py-2 text-sm"
                 >
-                  {state === "submitting" ? "Confirming..." : "Confirm"}
+                  {state === "submitting" ? "Creating..." : "Confirm Transcript"}
+                </Button>
+              ) : null}
+
+              {state === "success" && (
+                <Button
+                  type="button"
+                  onClick={handleClose}
+                  variant="primary"
+                  size="sm"
+                  className="rounded-xl px-4 py-2 text-sm"
+                >
+                  Done
                 </Button>
               )}
             </footer>

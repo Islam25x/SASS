@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2, Upload, X } from "lucide-react";
 import type { ReceiptOcrState } from "../hooks/useReceiptOcrFlow";
 import type { Transaction } from "../../transactions/types/transaction.types";
 import { Button, Input, Text } from "../../../shared/ui";
+import { formatBackendTimestampForDisplay } from "../../../shared/utils/date-time";
 
 interface ReceiptOcrModalProps {
   isOpen: boolean;
@@ -204,7 +205,7 @@ function ReceiptOcrModal({
                         </Text>
                         <Text variant="body">
                           {transaction.type}{" "}
-                          | {transaction.date ?? "N/A"}
+                          | {formatBackendTimestampForDisplay(transaction.date)}
                         </Text>
                       </li>
                     ))}
