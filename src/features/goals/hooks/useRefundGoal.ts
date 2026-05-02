@@ -5,8 +5,8 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { invalidateGoalDomainQueries } from "../../../infrastructure/query/invalidation/goal-invalidation";
 import { refundGoalApi } from "../api/refund-goal.api";
-import { GOALS_QUERY_KEY } from "./useGoals";
 
 type RefundGoalMutation = UseMutationResult<void, ApiError, string>;
 
@@ -39,13 +39,10 @@ export function useRefundGoal(): UseRefundGoalResult {
       }
     },
     onSuccess: async (_, goalId) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: GOALS_QUERY_KEY }),
-        queryClient.invalidateQueries({ queryKey: ["goal-detail", goalId] }),
-        queryClient.invalidateQueries({ queryKey: ["goal-history", goalId] }),
-        queryClient.invalidateQueries({ queryKey: ["transactions"], exact: false }),
-        queryClient.refetchQueries({ queryKey: ["transactions"] }),
-      ]);
+      await invalidateGoalDomainQueries(queryClient, {
+        goalId,
+        includeTransactionEffects: true,
+      });
     },
     retry: 0,
   });

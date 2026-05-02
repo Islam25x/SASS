@@ -11,7 +11,7 @@ import {
   type CreateGoalInput,
 } from "../types/goal.types";
 import { ApiError } from "../../../infrastructure/api/api-error";
-import { GOALS_QUERY_KEY } from "./useGoals";
+import { invalidateGoalDomainQueries } from "../../../infrastructure/query/invalidation/goal-invalidation";
 
 function roundToTwoDecimals(value: number): number {
   return Math.round(value * 100) / 100;
@@ -76,9 +76,7 @@ export function useCreateGoal(): UseCreateGoalResult {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: GOALS_QUERY_KEY,
-      });
+      await invalidateGoalDomainQueries(queryClient);
     },
     retry: 0,
   });

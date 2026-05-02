@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { invalidateTransactionDomainQueries } from "../../../infrastructure/query/invalidation/transaction-invalidation";
 import { sendChatMessageApi } from "../api/ChatBot.api";
 import type {
   SendChatMessageDto,
@@ -47,7 +48,7 @@ export function useSendChatMessage() {
 
       return { previousChat };
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       queryClient.setQueryData<ChatConversation>(
         CHAT_MESSAGES_QUERY_KEY,
         (currentChat) =>
@@ -58,6 +59,10 @@ export function useSendChatMessage() {
             ),
           ]),
       );
+
+      if (response.transactions.length > 0) {
+        await invalidateTransactionDomainQueries(queryClient);
+      }
     },
     onError: (_error, _payload, context) => {
       queryClient.setQueryData<ChatConversation>(

@@ -2,9 +2,10 @@ import type {
   ChatDto,
   ChatMessageDto,
 } from "../api/ai.dto";
+import { queryKeys } from "../../../infrastructure/query/query-keys";
 import type { ChatConversation, ChatMessage } from "../types/ai.types";
 
-export const CHAT_MESSAGES_QUERY_KEY = ["chat", "messages"] as const;
+export const CHAT_MESSAGES_QUERY_KEY = queryKeys.ai.chatMessages;
 
 const DEFAULT_ASSISTANT_MESSAGE = "👋 Hello there! How can I help you today?";
 export const CHAT_REPLY_FALLBACK = "Sorry, I didn't get that.";

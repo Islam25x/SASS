@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { deleteTransactionApi } from "../api/delete-transaction.api";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { invalidateTransactionDomainQueries } from "../../../infrastructure/query/invalidation/transaction-invalidation";
 
 type DeleteTransactionMutation = UseMutationResult<void, ApiError, string>;
 
@@ -42,9 +43,7 @@ export function useDeleteTransaction(): UseDeleteTransactionResult {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
-      });
+      await invalidateTransactionDomainQueries(queryClient);
     },
     retry: 0,
   });

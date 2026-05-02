@@ -8,6 +8,7 @@ import { addTransactionApi } from "../api/add-transaction.api";
 import type { AddTransactionInput } from "../types/add-transaction.types";
 import { parseAddTransactionPayload } from "../utils/add-transaction.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { invalidateTransactionDomainQueries } from "../../../infrastructure/query/invalidation/transaction-invalidation";
 
 type AddTransactionMutation = UseMutationResult<void, ApiError, AddTransactionInput>;
 
@@ -38,9 +39,7 @@ export function useAddTransaction(): UseAddTransactionResult {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
-      });
+      await invalidateTransactionDomainQueries(queryClient);
     },
     retry: 0,
   });

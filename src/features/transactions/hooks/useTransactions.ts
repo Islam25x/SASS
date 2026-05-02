@@ -5,6 +5,7 @@ import {
   type TransactionsPage,
 } from "../utils/transaction.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { queryKeys } from "../../../infrastructure/query/query-keys";
 import { useAuth } from "../../../shared/auth/AuthContext";
 import { useDateRange } from "../../../shared/ui";
 import type {
@@ -37,8 +38,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
   const pageSize = 4;
 
   return useQuery<TransactionsPage, ApiError>({
-    queryKey: [
-      "transactions",
+    queryKey: queryKeys.transactions.list(
       selectedRange,
       type,
       categoryId,
@@ -46,7 +46,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
       toDate,
       pageNumber,
       pageSize,
-    ],
+    ),
     queryFn: async ({ signal }) => {
       const response = await fetchTransactionsApi(
         selectedRange,

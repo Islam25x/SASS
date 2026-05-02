@@ -5,6 +5,7 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { invalidateTransactionDomainQueries } from "../../../infrastructure/query/invalidation/transaction-invalidation";
 import type { CreateTransactionsFromSpeechResponseDto } from "../api/ai.dto";
 import { createTransactionsFromSpeechApi } from "../api/ai.api";
 
@@ -46,9 +47,7 @@ export function useCreateTransactionsFromSpeech(): UseCreateTransactionsFromSpee
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["transactions"],
-      });
+      await invalidateTransactionDomainQueries(queryClient);
     },
     retry: 0,
   });

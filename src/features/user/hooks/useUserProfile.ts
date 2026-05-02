@@ -3,9 +3,10 @@ import { fetchUserProfileApi } from "../api/user.api";
 import type { User } from "../types/user.types";
 import { extractUserData, parseUser } from "../utils/user.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { queryKeys } from "../../../infrastructure/query/query-keys";
 import { useAuth } from "../../../shared/auth/AuthContext";
 
-export const USER_PROFILE_QUERY_KEY = ["user", "profile"] as const;
+export const USER_PROFILE_QUERY_KEY = queryKeys.user.profile;
 
 export function useUserProfile(): UseQueryResult<User, ApiError> {
   const { isAuthenticated } = useAuth();

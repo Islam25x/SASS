@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { queryKeys } from "../../../infrastructure/query/query-keys";
 import { useAuth } from "../../../shared/auth/AuthContext";
 import { getGoalHistoryApi } from "../api/get-goal-history.api";
 import type { GoalHistoryPage } from "../types/goal.types";
@@ -15,7 +16,11 @@ export function useGoalHistory(
   const normalizedGoalId = goalId?.trim() ?? "";
 
   return useQuery<GoalHistoryPage, ApiError>({
-    queryKey: ["goal-history", normalizedGoalId, pageNumber, GOAL_HISTORY_PAGE_SIZE],
+    queryKey: queryKeys.goals.history(
+      normalizedGoalId,
+      pageNumber,
+      GOAL_HISTORY_PAGE_SIZE,
+    ),
     queryFn: async ({ signal }) => {
       const response = await getGoalHistoryApi(normalizedGoalId, pageNumber, {
         signal,

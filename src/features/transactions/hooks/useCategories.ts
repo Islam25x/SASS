@@ -3,9 +3,10 @@ import { getCategoriesApi } from "../api/get-categories.api";
 import type { TransactionCategory } from "../types/category.types";
 import { parseCategories } from "../utils/category.parser";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { queryKeys } from "../../../infrastructure/query/query-keys";
 import { useAuth } from "../../../shared/auth/AuthContext";
 
-export const TRANSACTION_CATEGORIES_QUERY_KEY = ["transactions", "categories"] as const;
+export const TRANSACTION_CATEGORIES_QUERY_KEY = queryKeys.transactions.categories;
 
 type UseCategoriesOptions = {
   enabled?: boolean;

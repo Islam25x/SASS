@@ -5,8 +5,8 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
+import { invalidateGoalDomainQueries } from "../../../infrastructure/query/invalidation/goal-invalidation";
 import { contributeGoalApi } from "../api/contribute-goal.api";
-import { GOALS_QUERY_KEY } from "./useGoals";
 
 type ContributeGoalPayload = {
   goalId: string;
@@ -44,13 +44,10 @@ export function useContributeGoal(): UseContributeGoalResult {
       }
     },
     onSuccess: async (_, variables) => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: GOALS_QUERY_KEY }),
-        queryClient.invalidateQueries({ queryKey: ["goal-detail", variables.goalId] }),
-        queryClient.invalidateQueries({ queryKey: ["goal-history", variables.goalId] }),
-        queryClient.invalidateQueries({ queryKey: ["transactions"], exact: false }),
-        queryClient.refetchQueries({ queryKey: ["transactions"] }),
-      ]);
+      await invalidateGoalDomainQueries(queryClient, {
+        goalId: variables.goalId,
+        includeTransactionEffects: true,
+      });
     },
     retry: 0,
   });
