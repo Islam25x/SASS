@@ -1,6 +1,6 @@
 import { X, Send } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAiChat } from "../hooks/useAiChat";
 import { Button, Input, Text } from "../../../shared/ui";
 
@@ -12,6 +12,20 @@ interface ChatBotProps {
 function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
   const [input, setInput] = useState("");
   const { title, messages, isSending, sendMessage } = useAiChat();
+
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = useCallback(
+    (behavior: ScrollBehavior = "smooth") => {
+      bottomRef.current?.scrollIntoView({
+        behavior,
+        block: "end",
+      });
+    },
+    [],
+  );
+
 
   const handleSend = async () => {
     const userMessage = input.trim();
@@ -34,6 +48,14 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
     setHideIcon(true);
     setTimeout(() => setHideIcon(false), 400);
   };
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      scrollToBottom(messages.length > 0 ? "smooth" : "auto");
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [messages, isSending, scrollToBottom]);
 
   return (
     <motion.div
@@ -58,7 +80,7 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
         </Button>
       </div>
 
-      <div className="flex-1 p-4 overflow-y-auto space-y-3 text-gray-800">
+      <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 text-gray-800">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -79,6 +101,7 @@ function ChatBot({ setActive, setHideIcon }: ChatBotProps) {
             Bot is typing...
           </Text>
         )}
+        <div ref={bottomRef} />
       </div>
 
       <div className="border-t p-3 flex items-center gap-2">
