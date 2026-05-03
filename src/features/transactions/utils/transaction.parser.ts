@@ -141,7 +141,7 @@ export function parseTransaction(payload: unknown): Transaction {
     hasReceipt: false,
     receiptImageUrl: null,
     method:
-      payload.method === "voice" || payload.method === "receipt"
+      payload.method === "Speech" || payload.method === "receipt"
         ? payload.method
         : undefined,
   });

@@ -1,4 +1,4 @@
-export type TransactionSource = "Manual" | "OCR" | "Chat" | "Voice";
+export type TransactionSource = "Manual" | "OCR" | "Chat" | "Speech";
 
 export interface TransactionResponseDto {
   transactionId: string;

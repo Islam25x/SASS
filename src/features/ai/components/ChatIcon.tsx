@@ -98,7 +98,7 @@ function AiActionButton({ icon: Icon, label, onClick }: AiActionButtonProps) {
 }
 
 function ChatIcon() {
-    type ActiveModal = "chat" | "voice" | "ocr" | null;
+    type ActiveModal = "chat" | "Speech" | "ocr" | null;
     const [activeModal, setActiveModal] = useState<ActiveModal>(null);
     const [isPinnedOpen, setIsPinnedOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -161,7 +161,7 @@ function ChatIcon() {
                                     icon={Mic}
                                     label="Voice Ledger"
                                     onClick={() => {
-                                        setActiveModal('voice');
+                                        setActiveModal('Speech');
                                         setIsPinnedOpen(false);
                                     }}
                                 />
@@ -216,7 +216,7 @@ function ChatIcon() {
             </AnimatePresence>
 
             <VoiceLedgerModal
-                isOpen={activeModal === "voice"}
+                isOpen={activeModal === "Speech"}
                 onClose={() => setActiveModal(null)}
             />
             <ReceiptOcrModal

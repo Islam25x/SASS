@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ParsedTransactionSchema } from "./parsed-transaction.schema";
 
-export const TransactionSourceSchema = z.enum(["Manual", "OCR", "Chat", "Voice"]);
+export const TransactionSourceSchema = z.enum(["Manual", "OCR", "Chat", "Speech"]);
 
 export const TransactionSchema = z.object({
   id: z.string().min(1),
@@ -16,7 +16,7 @@ export const TransactionSchema = z.object({
   source: TransactionSourceSchema.nullable().optional(),
   hasReceipt: z.boolean(),
   receiptImageUrl: z.string().min(1).nullable(),
-  method: z.enum(["voice", "receipt"]).optional(),
+  method: z.enum(["Speech", "receipt"]).optional(),
 });
 
 export const TransactionListSchema = z.array(TransactionSchema);
