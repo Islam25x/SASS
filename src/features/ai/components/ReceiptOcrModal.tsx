@@ -62,7 +62,8 @@ function ReceiptOcrModal({
       {
         onSuccess: (response) => {
           showToast({
-            message: response.message,
+            message:
+              response.message ?? "Receipt processed successfully",
             tone: "success",
           });
 

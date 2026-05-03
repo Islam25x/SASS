@@ -30,6 +30,7 @@ export const ReceiptOcrItemSchema = z.object({
 });
 
 export const ReceiptOcrResponseSchema = z.object({
+  message: z.string().optional(),
   items: z.array(ReceiptOcrItemSchema),
   merchant: z.string().optional(),
   issued_at: z.string().optional(),
