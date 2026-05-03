@@ -34,6 +34,7 @@ const MoneyFlowChart = () => {
 
   const { selectedRange } = useDateRange();
 
+  console.log(dashboard);
   
   const chartData = dashboard?.moneyFlow ?? [];
   const hasEnoughChartData =

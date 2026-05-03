@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import DashboardTop from "./DashboardTop";
 import SideNav from "./SideNav";
-import BudgetPieChart from "../../goals/charts/BudgetDoughnutChart";
+import BudgetPieChart from "../charts/BudgetDoughnutChart";
 import MoneyFlowChart from "../charts/MoneyFlowChart";
 import RecentTransactions from "../../transactions/components/RecentTransactions";
 import SavingGoals from "../../goals/components/SavingGoals";
