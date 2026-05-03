@@ -59,7 +59,7 @@ const FINANCIAL_METRIC_DEFINITIONS: Array<{
   },
   {
     id: "savings",
-    title: "Savings this month",
+    title: "Savings",
     showArrow: false,
   },
 ];
