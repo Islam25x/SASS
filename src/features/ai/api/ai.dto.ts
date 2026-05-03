@@ -22,6 +22,7 @@ export type {
   ReceiptOcrResponseDto,
 } from "./ocr.dto";
 export const ReceiptOcrItemSchema = z.object({
+  message: z.string().optional(),
   name: z.string().optional(),
   line_total: z.number().finite().optional(),
   unit_price: z.number().finite().optional(),
