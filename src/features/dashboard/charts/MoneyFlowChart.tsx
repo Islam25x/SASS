@@ -3,6 +3,7 @@ import LineChartBase from "../../../shared/chart/LineChartBase";
 import { Button, Card, Text } from "../../../shared/ui";
 import { useDashboard } from "../hooks/useDashboard";
 import { EmptyMoneyFlowState } from "./EmptyMoneyFlowState";
+import { useDateRange } from "../../../shared/ui";
 
 const chartSeries = [
   {
@@ -30,6 +31,10 @@ const legendItems = [
 
 const MoneyFlowChart = () => {
   const { data: dashboard } = useDashboard();
+
+  const { selectedRange } = useDateRange();
+
+  
   const chartData = dashboard?.moneyFlow ?? [];
   const hasEnoughChartData =
     chartData.length >= 3 &&
@@ -64,7 +69,7 @@ const MoneyFlowChart = () => {
             size="sm"
             className="px-3 py-1 rounded-full text-sm text-gray-600 border-gray-200"
           >
-            monthly
+            {selectedRange}
           </Button>
         </div>
       </div>
