@@ -102,7 +102,7 @@ const BudgetDoughnutChart = memo(() => {
     <Card
       variant="default"
       padding="md"
-      className="relative overflow-hidden flex h-full w-full flex-col gap-5 lg:flex-row"
+      className="relative overflow-hidden flex h-full w-full flex-col gap-10 lg:flex-row"
     >
       <div className="flex flex-1 flex-col">
         <Text
@@ -127,19 +127,19 @@ const BudgetDoughnutChart = memo(() => {
                 key={`${item.label}-${index}`}
                 className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 px-3 py-2"
               >
-                <div className="flex min-w-0 items-center gap-2">
+                <div className="flex min-w-0 items-center">
                   <span
                     className="inline-block h-3 w-3 shrink-0 rounded-full"
                     style={item.dotStyle}
                   />
 
-                  <span className="truncate text-sm font-medium text-slate-700">
+                  <span className="truncate text-sm ms-1 font-medium text-slate-700">
                     {item.label}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-slate-900">
+                <div className="flex items-center ms-1 gap-8">
+                  <span className="text-sm font-bold ms-1 text-slate-900">
                     ${item.value}
                   </span>
 
