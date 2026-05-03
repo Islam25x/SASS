@@ -1,6 +1,5 @@
 export type ReceiptOcrState =
   | "idle"
-  | "uploading"
-  | "processing"
   | "preview"
+  | "processing"
   | "error";

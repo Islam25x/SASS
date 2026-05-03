@@ -6,16 +6,16 @@ import type {
   AddTransactionTypeInput,
 } from "../types/add-transaction.types";
 import { normalizeOptionalTransactionItem } from "./transaction-item";
-import { parseTransactionDateTimeLocalInput } from "./transaction-dates";
+import { normalizeTransactionLocalInputTimestamp } from "./transaction-dates";
 
 function normalizeOccurredAt(value: string): string {
-  const parsedDate = parseTransactionDateTimeLocalInput(value);
+  const normalizedTimestamp = normalizeTransactionLocalInputTimestamp(value);
 
-  if (!parsedDate) {
+  if (!normalizedTimestamp) {
     throw new ApiError("Transaction date is invalid.", 400, "INVALID_RESPONSE");
   }
 
-  return parsedDate.toISOString();
+  return normalizedTimestamp;
 }
 
 function normalizeTransactionType(value: AddTransactionTypeInput): AddTransactionType {

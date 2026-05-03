@@ -4,6 +4,7 @@ import { Brain, Mic, ReceiptText } from "lucide-react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import ChatBot from "./ChatBot";
 import VoiceLedgerModal from "./VoiceLedgerModal";
+import ReceiptOcrModal from "./ReceiptOcrModal";
 import { Button, Text } from "../../../shared/ui";
 
 const NOOP = () => { };
@@ -97,15 +98,17 @@ function AiActionButton({ icon: Icon, label, onClick }: AiActionButtonProps) {
 }
 
 function ChatIcon() {
-    const [active, setActive] = useState(false);
-    const [voiceModalOpen, setVoiceModalOpen] = useState(false);
-    const [ocrModalOpen, setOcrModalOpen] = useState(false);
+    type ActiveModal = "chat" | "voice" | "ocr" | null;
+    const [activeModal, setActiveModal] = useState<ActiveModal>(null);
     const [isPinnedOpen, setIsPinnedOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const previewUrl = selectedFile
+        ? URL.createObjectURL(selectedFile)
+        : null;
 
     const launcherRef = useRef<HTMLDivElement | null>(null);
 
-
-    const isAnyModalOpen = active || voiceModalOpen || ocrModalOpen;
+    const isAnyModalOpen = activeModal !== null;
 
     useEffect(() => {
         if (!isPinnedOpen) return;
@@ -144,13 +147,13 @@ function ChatIcon() {
                         >
                             <motion.div
                                 variants={actionsVariants}
-                                className="flex min-w-0 items-center gap-2 pl-3 pr-6" 
+                                className="flex min-w-0 items-center gap-2 pl-3 pr-6"
                             >
                                 <AiActionButton
                                     icon={Brain}
                                     label="Finexa Assist"
                                     onClick={() => {
-                                        setActive(true);
+                                        setActiveModal('chat');
                                         setIsPinnedOpen(false);
                                     }}
                                 />
@@ -158,7 +161,7 @@ function ChatIcon() {
                                     icon={Mic}
                                     label="Voice Ledger"
                                     onClick={() => {
-                                        setVoiceModalOpen(true);
+                                        setActiveModal('voice');
                                         setIsPinnedOpen(false);
                                     }}
                                 />
@@ -166,7 +169,7 @@ function ChatIcon() {
                                     icon={ReceiptText}
                                     label="Smart Receipt"
                                     onClick={() => {
-                                        setOcrModalOpen(true);
+                                        setActiveModal('ocr');
                                         setIsPinnedOpen(false);
                                     }}
                                 />
@@ -204,12 +207,28 @@ function ChatIcon() {
             </AnimatePresence>
 
             <AnimatePresence>
-                {active && <ChatBot setActive={setActive} setHideIcon={NOOP} />}
+                {activeModal === "chat" && (
+                    <ChatBot
+                        setActive={() => setActiveModal(null)}
+                        setHideIcon={NOOP}
+                    />
+                )}
             </AnimatePresence>
 
             <VoiceLedgerModal
-                isOpen={voiceModalOpen}
-                onClose={() => setVoiceModalOpen(false)}
+                isOpen={activeModal === "voice"}
+                onClose={() => setActiveModal(null)}
+            />
+            <ReceiptOcrModal
+                isOpen={activeModal === "ocr"}
+                state="idle"
+                selectedFile={selectedFile}
+                previewUrl={previewUrl}
+                onFileChange={setSelectedFile}
+                onClose={() => {
+                    setActiveModal(null);
+                    setSelectedFile(null);
+                }}
             />
         </>
     );

@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import { invalidateTransactionDomainQueries } from "../../../infrastructure/query/invalidation/transaction-invalidation";
-import type { CreateTransactionsFromSpeechResponseDto } from "../api/ai.dto";
+import type { CreateTransactionsFromSpeechResponseDto } from "../api/speech.dto";
 import { createTransactionsFromSpeechApi } from "../api/ai.api";
 
 type CreateTransactionsFromSpeechMutation = UseMutationResult<

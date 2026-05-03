@@ -1,7 +1,7 @@
 import type {
   ChatDto,
   ChatMessageDto,
-} from "../api/ai.dto";
+} from "../api/chat.dto";
 import { queryKeys } from "../../../infrastructure/query/query-keys";
 import type { ChatConversation, ChatMessage } from "../types/ai.types";
 

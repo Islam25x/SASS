@@ -1,7 +1,7 @@
 import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import { requestJson } from "../../../infrastructure/api/http";
-import type { VoiceToTextResponse } from "./ai.dto";
-import { parseVoiceToTextResponse } from "../utils/ai.parser";
+import type { VoiceToTextResponse } from "./voice.dto";
+import { parseVoiceToTextResponse } from "../utils/voice.parser";
 
 export async function voiceToTextApi(
   file: File,

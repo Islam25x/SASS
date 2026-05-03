@@ -4,7 +4,7 @@ import { sendChatMessageApi } from "../api/ChatBot.api";
 import type {
   SendChatMessageDto,
   SendChatMessageResponseDto,
-} from "../api/ai.dto";
+} from "../api/chat.dto";
 import type {
   ChatConversation,
 } from "../types/ai.types";

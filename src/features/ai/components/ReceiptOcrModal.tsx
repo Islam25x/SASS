@@ -1,23 +1,18 @@
 import { useCallback, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Loader2, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
+import { useToast } from "../../../shared/ui";
 import type { ReceiptOcrState } from "../hooks/useReceiptOcrFlow";
-import type { Transaction } from "../../transactions/types/transaction.types";
 import { Button, Input, Text } from "../../../shared/ui";
-import { formatBackendTimestampForDisplay } from "../../../shared/utils/date-time";
+import { useReceiptOcr } from "../hooks/useReceiptOcr";
 
 interface ReceiptOcrModalProps {
   isOpen: boolean;
   state: ReceiptOcrState;
   selectedFile: File | null;
   previewUrl: string | null;
-  extractedTransactions: (Transaction & { method?: "receipt" })[];
-  isLoading: boolean;
-  error: string | null;
   onClose: () => void;
   onFileChange: (file: File | null) => void;
-  onProcess: () => void;
-  onConfirm: () => void;
 }
 
 const MODAL_TRANSITION = {
@@ -30,15 +25,17 @@ function ReceiptOcrModal({
   state,
   selectedFile,
   previewUrl,
-  extractedTransactions,
-  isLoading,
-  error,
   onClose,
   onFileChange,
-  onProcess,
-  onConfirm,
 }: ReceiptOcrModalProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { showToast } = useToast();
+
+  const {
+    mutate: performOcr,
+    isPending,
+    error,
+  } = useReceiptOcr();
 
   const pickFile = useCallback(() => {
     fileInputRef.current?.click();
@@ -47,23 +44,53 @@ function ReceiptOcrModal({
   const handleDrop = useCallback(
     (files: FileList | File[]) => {
       if (!files || files.length === 0) return;
+
       const file = files[0];
+
       if (!file.type.startsWith("image/")) return;
+
       onFileChange(file);
     },
     [onFileChange],
   );
 
-  const statusLabel = useMemo(() => {
-    if (state === "uploading") return "Uploading image...";
-    if (state === "processing") return "Extracting transactions...";
-    if (state === "preview") return "Review extracted transactions.";
-    if (state === "error") return "Unable to extract transactions.";
-    return "Upload a receipt image to extract transactions.";
-  }, [state]);
+  const handleConfirm = useCallback(() => {
+    if (!selectedFile) return;
 
-  const showPreviewList =
-    state === "preview" && extractedTransactions.length > 0;
+    performOcr(
+      { file: selectedFile },
+      {
+        onSuccess: (response) => {
+          showToast({
+            message: response.message,
+            tone: "success",
+          });
+
+
+          onClose();
+        },
+        onError: (error) => {
+          console.error(error.message);
+        },
+      },
+    );
+  }, [performOcr, selectedFile, onClose]);
+
+  const statusLabel = useMemo(() => {
+    if (state === "processing") {
+      return "Extracting transactions...";
+    }
+
+    if (state === "error") {
+      return "Unable to extract transactions.";
+    }
+
+    if (previewUrl) {
+      return "Review your receipt before processing.";
+    }
+
+    return "Upload a receipt image to extract transactions.";
+  }, [state, previewUrl]);
 
   return (
     <AnimatePresence>
@@ -84,7 +111,7 @@ function ReceiptOcrModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.97 }}
             transition={MODAL_TRANSITION}
-            className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl flex flex-col max-h-[90vh]"
+            className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl border border-slate-200 bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             {/* HEADER */}
@@ -99,10 +126,12 @@ function ReceiptOcrModal({
                 >
                   Smart Receipt
                 </Text>
+
                 <Text variant="body" className="mt-2 text-slate-500">
                   {statusLabel}
                 </Text>
               </div>
+
               <Button
                 type="button"
                 onClick={onClose}
@@ -116,16 +145,16 @@ function ReceiptOcrModal({
               </Button>
             </header>
 
-            {/* BODY (Scrollable) */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {/* BODY */}
+            <div className="flex-1 space-y-4 overflow-y-auto p-6">
               <Input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
                 onChange={(event) => {
-                  const target = event.currentTarget;
-                  const files = "files" in target ? target.files : null;
+                  const files = event.currentTarget.files;
+
                   handleDrop(files ?? []);
                 }}
               />
@@ -135,15 +164,22 @@ function ReceiptOcrModal({
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={(event) => {
                     event.preventDefault();
+
                     handleDrop(event.dataTransfer.files);
                   }}
                   onClick={pickFile}
                   className="cursor-pointer rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center transition hover:border-primary/50 hover:bg-slate-100/70"
                 >
                   <Upload size={20} className="mx-auto text-slate-500" />
-                  <Text variant="body" weight="medium" className="mt-2 text-slate-700">
+
+                  <Text
+                    variant="body"
+                    weight="medium"
+                    className="mt-2 text-slate-700"
+                  >
                     Drag and drop a receipt image
                   </Text>
+
                   <Text variant="caption" className="text-slate-500">
                     or click to browse
                   </Text>
@@ -151,11 +187,12 @@ function ReceiptOcrModal({
               )}
 
               {previewUrl && (
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 flex justify-center">
+                <div className="flex justify-center rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <img
                     src={previewUrl}
                     alt="Receipt preview"
-                    className="h-40 w-auto object-contain rounded-lg shadow-sm"
+                    className={`h-40 w-auto rounded-lg object-contain shadow-sm ${isPending ? "opacity-60" : ""
+                      }`}
                   />
                 </div>
               )}
@@ -171,52 +208,11 @@ function ReceiptOcrModal({
                 </Text>
               )}
 
-              {isLoading && (
-                <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-                  <Loader2 size={16} className="animate-spin" />
-                  <Text as="span" variant="body" weight="medium" className="text-slate-700">
-                    {state === "uploading"
-                      ? "Uploading..."
-                      : "Processing..."}
-                  </Text>
-                </div>
-              )}
-
-              {showPreviewList && (
-                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-                    <CheckCircle2 size={16} />
-                    <Text as="span" variant="body" weight="medium" className="text-emerald-700">
-                      {extractedTransactions.length} extracted
-                    </Text>
-                  </div>
-
-                  <ul className="max-h-42 space-y-2 overflow-auto pr-1 text-sm text-slate-700">
-                    {extractedTransactions.map((transaction) => (
-                      <li
-                        key={transaction.id}
-                        className="rounded-lg border border-slate-200 bg-white p-2"
-                      >
-                        <Text variant="body" weight="bold" className="text-slate-900">
-                          {transaction.description}
-                        </Text>
-                        <Text variant="body">
-                          {transaction.amount} | {transaction.category}
-                        </Text>
-                        <Text variant="body">
-                          {transaction.type}{" "}
-                          | {formatBackendTimestampForDisplay(transaction.date)}
-                        </Text>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
 
               {error && (
                 <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
                   <Text variant="body" className="text-rose-700">
-                    {error}
+                    {error.message}
                   </Text>
                 </div>
               )}
@@ -227,7 +223,7 @@ function ReceiptOcrModal({
               <Button
                 type="button"
                 onClick={onClose}
-                disabled={isLoading}
+                disabled={isPending}
                 variant="secondary"
                 size="sm"
                 className="rounded-xl border-slate-300 bg-white px-4 py-2 text-sm text-slate-700"
@@ -235,33 +231,16 @@ function ReceiptOcrModal({
                 Cancel
               </Button>
 
-              {!showPreviewList && (
-                <Button
-                  type="button"
-                  onClick={onProcess}
-                  disabled={!selectedFile || state === "processing"}
-                  variant="primary"
-                  size="sm"
-                  className="rounded-xl px-4 py-2 text-sm"
-                >
-                  {state === "processing"
-                    ? "Processing..."
-                    : "Extract Transactions"}
-                </Button>
-              )}
-
-              {showPreviewList && (
-                <Button
-                  type="button"
-                  onClick={onConfirm}
-                  disabled={isLoading}
-                  variant="primary"
-                  size="sm"
-                  className="rounded-xl px-4 py-2 text-sm"
-                >
-                  Confirm Import
-                </Button>
-              )}
+              <Button
+                type="button"
+                onClick={handleConfirm}
+                disabled={!selectedFile || isPending}
+                variant="primary"
+                size="sm"
+                className="rounded-xl px-4 py-2 text-sm"
+              >
+                {isPending ? "Processing..." : "Confirm"}
+              </Button>
             </footer>
           </motion.section>
         </motion.div>
@@ -271,4 +250,5 @@ function ReceiptOcrModal({
 }
 
 export default ReceiptOcrModal;
+
 export type { ReceiptOcrModalProps };

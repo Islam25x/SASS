@@ -2,13 +2,21 @@ import { z } from "zod";
 import { ApiError } from "../../../infrastructure/api/api-error";
 import {
   TransactionListSchema,
+  TransactionSourceSchema,
   TransactionSchema,
   type Transaction,
 } from "./transaction.schema";
-import type { TransactionResponseDto } from "../api/transaction.dto";
+import type {
+  TransactionResponseDto,
+  TransactionSource,
+} from "../api/transaction.dto";
 import { normalizeOptionalTransactionItem } from "./transaction-item";
 import { parseParsedTransaction } from "./parsed-transaction.schema";
-import { parseTransactionDate } from "./transaction-dates";
+import {
+  normalizeTransactionCreationTimestamp,
+  normalizeTransactionTimestamp,
+  parseTransactionDate,
+} from "./transaction-dates";
 
 type ReceiptTransactionLikeItem = {
   name?: string;
@@ -57,6 +65,10 @@ const toTrimmedString = (value: unknown): string | null =>
 const toFiniteNumber = (value: unknown): number | null =>
   typeof value === "number" && Number.isFinite(value) ? value : null;
 
+function isTransactionSource(value: unknown): value is TransactionSource {
+  return TransactionSourceSchema.safeParse(value).success;
+}
+
 function isTransactionType(value: unknown): value is TransactionResponseDto["type"] {
   return value === "Income" || value === "Expense";
 }
@@ -86,7 +98,9 @@ function isTransactionDto(value: unknown): value is TransactionResponseDto {
       typeof value.merchant === "string") &&
     (typeof value.source === "undefined" ||
       value.source === null ||
-      typeof value.source === "string")
+      isTransactionSource(value.source)) &&
+    typeof value.hasReceipt === "boolean" &&
+    (value.receiptImageUrl === null || typeof value.receiptImageUrl === "string")
   );
 }
 
@@ -108,19 +122,24 @@ export function parseTransaction(payload: unknown): Transaction {
     asString(payload.transactionType) ??
     asString(payload.type) ??
     undefined;
+  const normalizedDate = normalizeTransactionCreationTimestamp(parsed.date);
 
   return TransactionSchema.parse({
     id: id ?? "",
     item: normalizeOptionalTransactionItem(parsed.merchant ?? parsed.description),
     amount: parsed.amount,
+    categoryId: null,
     category: parsed.category,
     description: parsed.description ?? "",
     merchant: normalizeOptionalTransactionItem(parsed.merchant),
-    date: parsed.date,
+    date: normalizedDate ?? undefined,
     type:
       transactionType === "Income" || transactionType === "Expense"
         ? transactionType
         : "Expense",
+    source: null,
+    hasReceipt: false,
+    receiptImageUrl: null,
     method:
       payload.method === "voice" || payload.method === "receipt"
         ? payload.method
@@ -139,13 +158,14 @@ function parseTransactionDto(dto: unknown): Transaction {
   }
 
   const occurredAt = toTrimmedString(dto.occurredAt);
-  if (!occurredAt || !parseTransactionDate(occurredAt)) {
+  const normalizedOccurredAt = normalizeTransactionTimestamp(occurredAt);
+  if (!occurredAt || !parseTransactionDate(occurredAt) || !normalizedOccurredAt) {
     throw new ApiError("Transaction date is invalid.", 500, "INVALID_RESPONSE");
   }
 
   const categoryName = toTrimmedString(dto.categoryName) ?? "Other";
+  const categoryId = toTrimmedString(dto.categoryId);
   const notes = toTrimmedString(dto.notes) ?? "";
-  const source = toTrimmedString(dto.source);
   const merchant = normalizeOptionalTransactionItem(dto.merchant);
   const item = normalizeOptionalTransactionItem(dto.item);
   const description = notes || item || "";
@@ -154,12 +174,15 @@ function parseTransactionDto(dto: unknown): Transaction {
     id: dto.transactionId,
     item,
     amount,
+    categoryId,
     category: categoryName,
     description,
     merchant,
-    date: occurredAt,
+    date: normalizedOccurredAt,
     type: dto.type,
-    method: source === "voice" || source === "receipt" ? source : undefined,
+    source: dto.source ?? null,
+    hasReceipt: dto.hasReceipt,
+    receiptImageUrl: toTrimmedString(dto.receiptImageUrl),
   });
 }
 
@@ -250,15 +273,21 @@ export function buildTransactionFromParsed(
   input: { id: string },
 ): Transaction {
   const data = parseParsedTransaction(parsed);
+  const normalizedDate = normalizeTransactionCreationTimestamp(data.date);
+
   return TransactionSchema.parse({
     id: input.id,
     item: normalizeOptionalTransactionItem(data.merchant ?? data.description),
     amount: data.amount,
+    categoryId: null,
     category: data.category,
     description: data.description ?? "",
     merchant: normalizeOptionalTransactionItem(data.merchant),
-    date: data.date,
+    date: normalizedDate ?? undefined,
     type: data.transaction_type === "income" ? "Income" : "Expense",
+    source: null,
+    hasReceipt: false,
+    receiptImageUrl: null,
   });
 }
 
@@ -266,16 +295,23 @@ export function buildTransactionsFromReceipt(
   response: ReceiptTransactionLikeResponse,
   input: { issuedAt: string; ids: string[] },
 ): Transaction[] {
+  const normalizedIssuedAt = normalizeTransactionCreationTimestamp(input.issuedAt);
+
   return response.items.map((item, index) =>
     TransactionSchema.parse({
       id: input.ids[index] ?? "",
       item: normalizeOptionalTransactionItem(item.name),
       description: normalizeOptionalTransactionItem(item.name) ?? "",
       amount: item.line_total ?? item.unit_price ?? 0,
+      categoryId: null,
       category: "Receipt",
       merchant: normalizeOptionalTransactionItem(response.merchant),
-      date: input.issuedAt,
+      date: normalizedIssuedAt ?? undefined,
       type: "Expense",
+      source: null,
+      hasReceipt: false,
+      receiptImageUrl: null,
+      // TODO: keep draft OCR ingestion metadata separate from persisted transaction source.
       method: "receipt",
     }),
   );

@@ -1,3 +1,5 @@
+export type TransactionSource = "Manual" | "OCR" | "Chat" | "Voice";
+
 export interface TransactionResponseDto {
   transactionId: string;
   amount: number;
@@ -8,5 +10,7 @@ export interface TransactionResponseDto {
   notes?: string | null;
   occurredAt: string;
   categoryName?: string | null;
-  source?: string | null;
+  source?: TransactionSource | null;
+  hasReceipt: boolean;
+  receiptImageUrl: string | null;
 }

@@ -101,6 +101,14 @@ function parseDateParts(
   return value.match(pattern);
 }
 
+export function isDateOnlyValue(value: string): boolean {
+  return DATE_ONLY_PATTERN.test(value.trim());
+}
+
+export function hasExplicitTimezone(value: string): boolean {
+  return HAS_EXPLICIT_TIMEZONE_PATTERN.test(value.trim());
+}
+
 function getCairoPartsFormatter(): Intl.DateTimeFormat {
   return new Intl.DateTimeFormat("en-US-u-nu-latn", {
     timeZone: CAIRO_TIME_ZONE,
@@ -273,6 +281,18 @@ export function formatDateForDateTimeLocal(
 
 export function formatNowForDateTimeLocal(): string {
   return formatDateForDateTimeLocal(new Date());
+}
+
+export function normalizeLocalDateTimeInputToUtcTimestamp(
+  value?: string | null,
+): string | null {
+  const parsedDate = parseLocalDateTimeInput(value);
+
+  if (!parsedDate) {
+    return null;
+  }
+
+  return parsedDate.toISOString();
 }
 
 export function formatBackendTimestampForDateTimeInput(
