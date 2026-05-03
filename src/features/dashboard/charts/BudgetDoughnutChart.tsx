@@ -24,6 +24,8 @@ const BudgetDoughnutChart = memo(() => {
 
   const totalExpenses = dashboard?.totalExpense ?? 0;
 
+  const hasExpenseData = expenseBreakdown.length > 0;
+
   const formattedTotalExpenses = useMemo(
     () =>
       new Intl.NumberFormat("en-US", {
@@ -76,61 +78,87 @@ const BudgetDoughnutChart = memo(() => {
 
   const legendItems = useMemo(
     () =>
-      expenseBreakdown.map((item, index) => ({
-        label: item.categoryName,
-        value: item.amount,
+      expenseBreakdown.map((item, index) => {
+        const percentage =
+          totalExpenses > 0
+            ? Math.round((item.amount / totalExpenses) * 100)
+            : 0;
 
-        dotStyle: {
-          backgroundColor:
-            CHART_COLORS[index % CHART_COLORS.length],
-        } as CSSProperties,
-      })),
-    [expenseBreakdown],
+        return {
+          label: item.categoryName,
+          value: item.amount,
+          percentage,
+
+          dotStyle: {
+            backgroundColor:
+              CHART_COLORS[index % CHART_COLORS.length],
+          } as CSSProperties,
+        };
+      }),
+    [expenseBreakdown, totalExpenses],
   );
 
   return (
     <Card
       variant="default"
       padding="md"
-      className="flex h-full w-full flex-col gap-4 lg:flex-row"
+      className="relative overflow-hidden flex h-full w-full flex-col gap-5 lg:flex-row"
     >
       <div className="flex flex-1 flex-col">
         <Text
           as="h2"
           variant="subtitle"
           weight="bold"
-          className="mb-3 text-slate-900"
+          className="mb-4 text-slate-900"
         >
           Expense Breakdown
         </Text>
 
         {legendItems.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 items-center justify-center ">
             <Text variant="body" className="text-xs text-slate-500">
               No expense data available
             </Text>
           </div>
         ) : (
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {legendItems.map((item, index) => (
               <li
                 key={`${item.label}-${index}`}
-                className="flex items-center justify-between gap-2 rounded-md bg-slate-50/70 px-2 py-1 text-[11px]"
+                className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 px-3 py-2"
               >
-                <div className="flex min-w-0 items-center gap-1.5">
+                <div className="flex min-w-0 items-center gap-2">
                   <span
-                    className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                    className="inline-block h-3 w-3 shrink-0 rounded-full"
                     style={item.dotStyle}
                   />
 
-                  <span className="max-w-[72px] truncate text-slate-700">
+                  <span className="truncate text-sm font-medium text-slate-700">
                     {item.label}
                   </span>
                 </div>
 
-                <span className="text-[11px] font-semibold text-slate-900">
-                  ${item.value}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-slate-900">
+                    ${item.value}
+                  </span>
+
+                  <span
+                    className="rounded-xl border px-2 py-1 text-xs font-semibold"
+                    style={{
+                      color:
+                        CHART_COLORS[index % CHART_COLORS.length],
+
+                      borderColor:
+                        `${CHART_COLORS[index % CHART_COLORS.length]}25`,
+
+                      backgroundColor:
+                        `${CHART_COLORS[index % CHART_COLORS.length]}10`,
+                    }}
+                  >
+                    {item.percentage}%
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
@@ -139,14 +167,16 @@ const BudgetDoughnutChart = memo(() => {
 
       <div className="flex flex-1 items-center justify-center">
         <div className="relative flex items-center justify-center">
-          <DoughnutChartBase
-            data={data}
-            options={options}
-            width={165}
-            height={165}
-          />
+          <div className="relative z-10">
+            <DoughnutChartBase
+              data={data}
+              options={options}
+              width={165}
+              height={165}
+            />
+          </div>
 
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center">
             <span className="text-[11px] font-medium text-slate-500">
               Expenses
             </span>
@@ -157,6 +187,25 @@ const BudgetDoughnutChart = memo(() => {
           </div>
         </div>
       </div>
+
+      {!hasExpenseData && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-xs">
+          <Text
+            variant="subtitle"
+            weight="semiBold"
+            className="text-gray-800"
+          >
+            Not enough expense history
+          </Text>
+
+          <Text
+            variant="body"
+            className="mt-2 max-w-[260px] text-center text-white text-sm mb-4"
+          >
+            Add transactions to unlock expense insights and category analytics.
+          </Text>
+        </div>
+      )}
     </Card>
   );
 });
