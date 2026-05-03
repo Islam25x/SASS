@@ -9,12 +9,12 @@ import { Card, Text } from "../../../shared/ui";
 import { useDashboard } from "../hooks/useDashboard";
 
 const CHART_COLORS = [
-  "#6366F1", // Indigo
-  "#10B981", // Emerald
-  "#F59E0B", // Amber
-  "#EF4444", // Red
-  "#06B6D4", // Cyan
-  "#8B5CF6", // Violet
+  "#6366F1",
+  "#10B981",
+  "#F59E0B",
+  "#EF4444",
+  "#06B6D4",
+  "#8B5CF6",
 ];
 
 const BudgetDoughnutChart = memo(() => {
@@ -102,49 +102,49 @@ const BudgetDoughnutChart = memo(() => {
     <Card
       variant="default"
       padding="md"
-      className="relative overflow-hidden flex h-full w-full flex-col gap-10 lg:flex-row"
+      className="relative overflow-hidden flex h-full w-full flex-col gap-5 lg:flex-row"
     >
       <div className="flex flex-1 flex-col">
         <Text
           as="h2"
           variant="subtitle"
           weight="bold"
-          className="mb-4 text-slate-900"
+          className="mb-3 text-slate-900"
         >
           Expense Breakdown
         </Text>
 
         {legendItems.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center ">
-            <Text variant="body" className="text-xs text-slate-500">
+          <div className="flex flex-1 items-center justify-center">
+            <Text variant="body" className="text-[10px] text-slate-500">
               No expense data available
             </Text>
           </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-1.5">
             {legendItems.map((item, index) => (
               <li
                 key={`${item.label}-${index}`}
-                className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 px-3 py-2"
+                className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 px-2.5 py-1.5"
               >
-                <div className="flex min-w-0 items-center">
+                <div className="flex min-w-0 items-center gap-1.5">
                   <span
-                    className="inline-block h-3 w-3 shrink-0 rounded-full"
+                    className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
                     style={item.dotStyle}
                   />
 
-                  <span className="truncate text-sm ms-1 font-medium text-slate-700">
+                  <span className="truncate text-[11px] font-medium text-slate-700">
                     {item.label}
                   </span>
                 </div>
 
-                <div className="flex items-center ms-1 gap-8">
-                  <span className="text-sm font-bold ms-1 text-slate-900">
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-semibold text-slate-900">
                     ${item.value}
                   </span>
 
                   <span
-                    className="rounded-xl border px-2 py-1 text-xs font-semibold"
+                    className="rounded-md border px-1.5 py-[2px] text-[9px] font-semibold"
                     style={{
                       color:
                         CHART_COLORS[index % CHART_COLORS.length],
@@ -171,17 +171,17 @@ const BudgetDoughnutChart = memo(() => {
             <DoughnutChartBase
               data={data}
               options={options}
-              width={165}
-              height={165}
+              width={160}
+              height={160}
             />
           </div>
 
           <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center">
-            <span className="text-[11px] font-medium text-slate-500">
+            <span className="text-[10px] font-medium text-slate-500">
               Expenses
             </span>
 
-            <span className="text-xl font-bold tracking-tight text-slate-900">
+            <span className="text-lg font-bold tracking-tight text-slate-900">
               {formattedTotalExpenses}
             </span>
           </div>
