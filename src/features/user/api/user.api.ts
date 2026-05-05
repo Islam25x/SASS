@@ -3,6 +3,7 @@ import { getAppApiBaseUrl } from "../../../infrastructure/api/api-config";
 import type {
   UpdateUserProfileRequestDto,
   UpdateUserProfileResponseDto,
+  ChangePasswordRequestDto,
 } from "./user.dto";
 
 export async function fetchUserProfileApi(
@@ -40,6 +41,18 @@ export async function uploadImage(
     body: formData,
     signal: options?.signal,
     baseUrl: getAppApiBaseUrl(),
+    withAuth: true,
+  });
+}
+
+export async function changePassword(
+  payload: ChangePasswordRequestDto,
+  options?: { signal?: AbortSignal },
+): Promise<void> {
+  await requestJson<unknown>("/api/User/change-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    signal: options?.signal,
     withAuth: true,
   });
 }

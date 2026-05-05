@@ -19,3 +19,9 @@ export interface UpdateUserProfileRequestDto {
 export interface UpdateUserProfileResponseDto {
   message: string;
 }
+
+export interface ChangePasswordRequestDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
