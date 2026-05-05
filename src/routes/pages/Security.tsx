@@ -43,7 +43,7 @@ const Security = () => {
 
     if (formData.currentPassword.length < 6) {
       nextErrors.currentPassword =
-        "Current password must be at least 6 characters.";
+        "Current password must be at least 6 characters .";
     }
 
     if (formData.newPassword.length < 6) {
