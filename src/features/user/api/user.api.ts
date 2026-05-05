@@ -56,3 +56,13 @@ export async function changePassword(
     withAuth: true,
   });
 }
+
+export async function deleteUser(
+  options?: { signal?: AbortSignal },
+): Promise<void> {
+  await requestJson<unknown>("/api/User", {
+    method: "DELETE",
+    signal: options?.signal,
+    withAuth: true,
+  });
+}

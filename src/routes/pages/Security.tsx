@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Lock, Trash2 } from "lucide-react";
 import { useChangePassword } from "../../features/user/hooks/useChangePassword";
+import { useDeleteUser } from "../../features/user/hooks/useDeleteUser";
 
 type FormDataType = {
   currentPassword: string;
@@ -18,6 +19,7 @@ type NoticeType = {
 
 const Security = () => {
   const changePasswordMutation = useChangePassword();
+  const deleteUserMutation = useDeleteUser();
 
   const [formData, setFormData] = useState<FormDataType>({
     currentPassword: "",
@@ -133,6 +135,40 @@ const Security = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to permanently delete your account?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setNotice(null);
+
+    try {
+      await deleteUserMutation.mutateAsync();
+
+      setNotice({
+        tone: "success",
+        message: "Account deleted successfully.",
+      });
+
+      // TODO:
+      // clear auth tokens
+      // logout user
+      // redirect to login/home
+    } catch (deleteError) {
+      setNotice({
+        tone: "error",
+        message:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "Failed to delete account.",
+      });
+    }
+  };
+
   const inputClass =
     "flex h-9 w-full rounded-2xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 pl-10 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-200";
 
@@ -187,7 +223,8 @@ const Security = () => {
               name="currentPassword"
               placeholder="Current Password"
               disabled={
-                changePasswordMutation.isPending
+                changePasswordMutation.isPending ||
+                deleteUserMutation.isPending
               }
             />
 
@@ -218,7 +255,8 @@ const Security = () => {
               name="newPassword"
               placeholder="New Password"
               disabled={
-                changePasswordMutation.isPending
+                changePasswordMutation.isPending ||
+                deleteUserMutation.isPending
               }
             />
 
@@ -249,7 +287,8 @@ const Security = () => {
               name="confirmPassword"
               placeholder="Confirm Password"
               disabled={
-                changePasswordMutation.isPending
+                changePasswordMutation.isPending ||
+                deleteUserMutation.isPending
               }
             />
 
@@ -266,6 +305,7 @@ const Security = () => {
             type="submit"
             disabled={
               changePasswordMutation.isPending ||
+              deleteUserMutation.isPending ||
               !hasChanges
             }
             className="inline-flex h-9 items-center justify-center rounded-2xl bg-gradient-to-r from-sky-400 to-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] transition hover:from-sky-500 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
@@ -279,10 +319,15 @@ const Security = () => {
 
           <button
             type="button"
-            className="inline-flex h-9 items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+            onClick={handleDeleteAccount}
+            disabled={deleteUserMutation.isPending}
+            className="inline-flex h-9 items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Trash2 className="mr-2" size={18} />
-            Delete Account
+
+            {deleteUserMutation.isPending
+              ? "Deleting..."
+              : "Delete Account"}
           </button>
         </div>
       </form>
