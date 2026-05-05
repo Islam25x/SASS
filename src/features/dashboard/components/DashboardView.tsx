@@ -21,20 +21,6 @@ function DashboardView({
   const [activeComponent, setActiveComponent] = useState<string>(
     initialActiveComponent
   );
-  const isSettingView = activeComponent === "Setting";
-
-  useEffect(() => {
-    if (!isSettingView) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isSettingView]);
 
   useEffect(() => {
     setActiveComponent(initialActiveComponent);
@@ -44,31 +30,37 @@ function DashboardView({
     switch (activeComponent) {
       case "ChatAgent":
         return <AI />;
+
       case "Setting":
         return <ProfilePanel />;
+
       case "Transactions":
         return <TransactionsPage />;
+
       case "Goals":
         return <GoalsPage />;
+
       default:
         return (
           <div className="Charts mt-[-1.5rem] space-y-6 px-2 md:px-0">
             {/* 🔹 الصف الأول */}
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="lg:w-[65%] w-full">
+            <div className="flex flex-col gap-4 lg:flex-row">
+              <div className="w-full lg:w-[65%]">
                 <MoneyFlowChart />
               </div>
-              <div className="lg:w-[35%] w-full">
+
+              <div className="w-full lg:w-[35%]">
                 <BudgetPieChart />
               </div>
             </div>
 
             {/* 🔹 الصف الثاني */}
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1 basis-[65%] min-w-0">
+            <div className="flex flex-col gap-4 lg:flex-row">
+              <div className="min-w-0 flex-1 basis-[65%]">
                 <RecentTransactions />
               </div>
-              <div className="flex-1 basis-[35%] min-w-0">
+
+              <div className="min-w-0 flex-1 basis-[35%]">
                 <SavingGoals />
               </div>
             </div>
@@ -80,9 +72,7 @@ function DashboardView({
   return (
     <section
       id="Admin"
-      className={`h-screen flex bg-gray-50 overflow-x-hidden ${
-        isSettingView ? "overflow-hidden" : "overflow-y-auto"
-      } relative`}
+      className="relative flex min-h-screen overflow-x-hidden overflow-y-auto bg-gray-50"
     >
       {/* 🧭 الشريط الجانبي */}
       <SideNav
@@ -91,17 +81,19 @@ function DashboardView({
       />
 
       {/* 📊 المحتوى الرئيسي */}
-      <div className="flex-1 flex flex-col lg:ml-60 md:ml-20 sm:ml-16 transition-all duration-300">
+      <div className="flex flex-1 flex-col transition-all duration-300 sm:ml-16 md:ml-20 lg:ml-60">
         {activeComponent !== "Setting" &&
           activeComponent !== "Transactions" &&
           activeComponent !== "Goals" && (
-          <DashboardTop />
-        )}
-        <div className={isSettingView ? "p-4 overflow-hidden" : "p-4"}>
+            <DashboardTop />
+          )}
+
+        <div className="p-4">
           {renderActiveComponent()}
         </div>
       </div>
-      <div className="fixed bottom-8 right-8 z-1111">
+
+      <div className="fixed bottom-8 right-8 z-[1111]">
         <ChatIcon />
       </div>
     </section>

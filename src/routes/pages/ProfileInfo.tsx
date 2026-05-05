@@ -31,15 +31,22 @@ type FormNotice = {
   message: string;
 } | null;
 
-function formatDateForInput(value: Date | null): string {
+function formatDateForInput(
+  value: Date | string | null,
+): string {
   if (!value) {
     return "";
   }
 
-  const year = value.getUTCFullYear();
-  const month = `${value.getUTCMonth() + 1}`.padStart(2, "0");
-  const day = `${value.getUTCDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  if (typeof value === "string") {
+    return value.split("T")[0];
+  }
+
+  return [
+    value.getFullYear(),
+    `${value.getMonth() + 1}`.padStart(2, "0"),
+    `${value.getDate()}`.padStart(2, "0"),
+  ].join("-");
 }
 
 const ProfileInfo = () => {
@@ -71,29 +78,37 @@ const ProfileInfo = () => {
     });
   }, [profile]);
 
+  const hasChanges = profile
+    ? formData.firstName !== profile.firstName ||
+    formData.lastName !== profile.lastName ||
+    formData.phoneNumber !== profile.phoneNumber ||
+    formData.dateOfBirth !==
+    formatDateForInput(profile.dateOfBirth)
+    : false;
+
   const validate = (): boolean => {
     const newErrors: ErrorsType = {};
     const nameRegex = /^[A-Za-z\s'-]+$/;
     const phoneRegex = /^[0-9]+$/;
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    } else if (!nameRegex.test(formData.firstName)) {
-      newErrors.firstName = "First name must contain only letters";
+    if (
+      formData.firstName &&
+      !nameRegex.test(formData.firstName)
+    ) {
+      newErrors.firstName =
+        "First name must contain only letters";
     }
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    } else if (!nameRegex.test(formData.lastName)) {
-      newErrors.lastName = "Last name must contain only letters";
+    if (
+      formData.firstName &&
+      !nameRegex.test(formData.lastName)
+    ) {
+      newErrors.firstName =
+        "First name must contain only letters";
     }
 
     if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
       newErrors.phoneNumber = "Phone number must contain only numbers";
-    }
-
-    if (!formData.dateOfBirth) {
-      newErrors.dateOfBirth = "Date of birth is required";
     }
 
     setErrors(newErrors);
@@ -120,9 +135,7 @@ const ProfileInfo = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phoneNumber: formData.phoneNumber,
-        dateOfBirth: formData.dateOfBirth
-          ? new Date(`${formData.dateOfBirth}T00:00:00.000Z`).toISOString()
-          : "",
+        dateOfBirth: formData.dateOfBirth || "",
       });
 
       setNotice({
@@ -151,14 +164,12 @@ const ProfileInfo = () => {
         type: "text",
         icon: <CircleUser size={18} />,
         placeholder: "First Name",
-        required: true,
       },
       {
         id: "lastName",
         label: "Last Name",
         type: "text",
         placeholder: "Last Name",
-        required: true,
       },
     ],
     [
@@ -186,7 +197,6 @@ const ProfileInfo = () => {
         label: "Date of Birth",
         type: "date",
         icon: <Calendar size={18} />,
-        required: true,
       },
       {
         id: "phoneNumber",
@@ -214,11 +224,10 @@ const ProfileInfo = () => {
       {isError && <p className="mb-4 text-sm text-red-500">{error.message}</p>}
       {notice && (
         <div
-          className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
-            notice.tone === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-red-200 bg-red-50 text-red-700"
-          }`}
+          className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${notice.tone === "success"
+            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+            : "border-red-200 bg-red-50 text-red-700"
+            }`}
           aria-live="polite"
         >
           {notice.message}
@@ -245,11 +254,10 @@ const ProfileInfo = () => {
                     placeholder={field.placeholder}
                     required={field.required}
                     disabled={field.disabled || updateProfileMutation.isPending}
-                    className={`${inputClass} ${field.icon ? "pl-10" : ""} ${
-                      field.disabled
-                        ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                        : ""
-                    }`}
+                    className={`${inputClass} ${field.icon ? "pl-10" : ""} ${field.disabled
+                      ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                      : ""
+                      }`}
                   />
                   {errors[field.id] && (
                     <p className="mt-1.5 text-sm text-red-500">{errors[field.id]}</p>
@@ -263,8 +271,11 @@ const ProfileInfo = () => {
         <div className="flex justify-start pt-0.5">
           <button
             type="submit"
-            disabled={updateProfileMutation.isPending}
-            className="inline-flex h-9 items-center justify-center rounded-2xl bg-gradient-to-r from-sky-400 to-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] transition hover:from-sky-500 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={
+              updateProfileMutation.isPending ||
+              !hasChanges
+            }
+            className="inline-flex h-9 items-center justify-center rounded-2xl bg-gradient-to-r from-sky-400 to-primary px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(14,165,233,0.24)] transition hover:from-sky-500 hover:to-sky-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
             <Save size={18} className="mr-2" />
             {updateProfileMutation.isPending ? "Saving..." : "Update Profile"}
