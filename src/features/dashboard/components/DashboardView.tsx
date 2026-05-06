@@ -42,20 +42,20 @@ function DashboardView({
 
       default:
         return (
-          <div className="Charts mt-[-1.5rem] space-y-6 px-2 md:px-0">
+          <div className="Charts mt-0 space-y-4 px-2 sm:px-3 md:px-0 lg:mt-[-1.5rem]">
             {/* 🔹 الصف الأول */}
-            <div className="flex flex-col gap-4 lg:flex-row">
-              <div className="w-full lg:w-[65%]">
+            <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:gap-4">
+              <div className="min-w-0 w-full lg:w-[65%]">
                 <MoneyFlowChart />
               </div>
 
-              <div className="w-full lg:w-[35%]">
+              <div className="min-w-0 w-full lg:w-[35%]">
                 <BudgetPieChart />
               </div>
             </div>
 
             {/* 🔹 الصف الثاني */}
-            <div className="flex flex-col gap-4 lg:flex-row">
+            <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:gap-4">
               <div className="min-w-0 flex-1 basis-[65%]">
                 <RecentTransactions />
               </div>
@@ -81,19 +81,32 @@ function DashboardView({
       />
 
       {/* 📊 المحتوى الرئيسي */}
-      <div className="flex flex-1 flex-col transition-all duration-300 sm:ml-16 md:ml-20 lg:ml-60">
+      <div
+        className="
+          ml-16
+          flex
+          min-w-0
+          flex-1
+          flex-col
+          overflow-x-hidden
+          transition-all
+          duration-300
+          md:ml-20
+          lg:ml-60
+        "
+      >
         {activeComponent !== "Setting" &&
           activeComponent !== "Transactions" &&
           activeComponent !== "Goals" && (
             <DashboardTop />
           )}
 
-        <div className="p-4">
+        <div className="min-w-0 p-3 sm:p-4 md:p-4">
           {renderActiveComponent()}
         </div>
       </div>
 
-      <div className="fixed bottom-8 right-8 z-[1111]">
+      <div className="fixed bottom-5 right-5 z-[1111] sm:bottom-8 sm:right-8">
         <ChatIcon />
       </div>
     </section>
