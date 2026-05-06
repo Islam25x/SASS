@@ -7,7 +7,7 @@ import RecentTransactions from "../../transactions/components/RecentTransactions
 import SavingGoals from "../../goals/components/SavingGoals";
 import AI from "../../ai/components/AIPanel";
 import ChatIcon from "../../ai/components/ChatIcon";
-import ProfilePanel from "../../../routes/pages/ProfilePanel";
+import ProfilePanel from "../../user/components/ProfilePanel";
 import TransactionsPage from "../../transactions/components/TransactionsPage";
 import GoalsPage from "../../goals/components/GoalsPage";
 

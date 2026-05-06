@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Lock, Trash2 } from "lucide-react";
-import { useChangePassword } from "../../features/user/hooks/useChangePassword";
-import { useDeleteUser } from "../../features/user/hooks/useDeleteUser";
+import { useChangePassword } from "../hooks/useChangePassword";
+import { useDeleteUser } from "../hooks/useDeleteUser";
 
 type FormDataType = {
   currentPassword: string;
@@ -187,11 +187,10 @@ const Security = () => {
 
       {notice && (
         <div
-          className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
-            notice.tone === "success"
+          className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${notice.tone === "success"
               ? "border-emerald-200 bg-emerald-50 text-emerald-700"
               : "border-red-200 bg-red-50 text-red-700"
-          }`}
+            }`}
           aria-live="polite"
         >
           {notice.message}

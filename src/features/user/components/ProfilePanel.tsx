@@ -13,18 +13,18 @@ import {
 import ProfileInfo from "./ProfileInfo";
 import Security from "./Security";
 import Preferences from "./Preferences";
-import ProfileImageUploadModal from "../../features/user/components/ProfileImageUploadModal";
-import { useTransactions } from "../../features/transactions/hooks/useTransactions";
-import { useUserProfile } from "../../features/user/hooks/useUserProfile";
+import ProfileImageUploadModal from "./ProfileImageUploadModal";
+import { useTransactions } from "../../transactions/hooks/useTransactions";
+import { useUserProfile } from "../hooks/useUserProfile";
 import {
     getUserDisplayName,
     getUserInitial,
-} from "../../features/user/utils/user.selectors";
+} from "../utils/user.selectors";
 import {
     selectTransactionsInsights,
     type TransactionsInsights,
-} from "../../features/transactions/utils/transaction.selectors";
-import { Text } from "../../shared/ui";
+} from "../../transactions/utils/transaction.selectors";
+import { Text } from "../../../shared/ui";
 
 const PAGE_SHELL_CLASS =
     "relative overflow-hidden rounded-[28px] bg-gradient-to-br from-white via-[#fbfcff] to-[#eef7ff] py-6 text-slate-900";
@@ -279,8 +279,8 @@ const Profile = () => {
                                         key={index}
                                         onClick={() => toggleOpen(index)}
                                         className={`${TAB_BASE_CLASS} ${activeIndex === index
-                                                ? "bg-gradient-to-r from-sky-400 to-primary text-white shadow-[0_12px_24px_rgba(14,165,233,0.22)]"
-                                                : "text-slate-500 hover:bg-white hover:text-slate-900"
+                                            ? "bg-gradient-to-r from-sky-400 to-primary text-white shadow-[0_12px_24px_rgba(14,165,233,0.22)]"
+                                            : "text-slate-500 hover:bg-white hover:text-slate-900"
                                             }`}
                                     >
                                         {btn.icon}
