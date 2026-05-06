@@ -1,17 +1,22 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { motionHover, motionViewport, popIn, slideIn } from "../../shared/animations/motionPresets";
+import {
+  motionHover,
+  motionViewport,
+  popIn,
+  slideIn,
+} from "../../../shared/animations/motionPresets";
 
-const CONTAINER_CLASS = "mx-auto max-w-7xl px-6";
-
-interface CTASectionProps {
+interface WelcomeCTASectionProps {
   onTryFree: () => void;
 }
 
-export default function CTASection({ onTryFree }: CTASectionProps) {
+const CONTAINER_CLASS = "mx-auto max-w-7xl px-4 sm:px-6";
+
+export default function WelcomeCTASection({ onTryFree }: WelcomeCTASectionProps) {
   const shouldReduceMotion = Boolean(useReducedMotion());
 
   return (
-    <section className="bg-slate-50 py-12 lg:py-20" aria-labelledby="landing-cta-title">
+    <section className="bg-slate-50 py-12 sm:py-14 lg:py-20" aria-labelledby="landing-cta-title">
       <div className={CONTAINER_CLASS}>
         <div className="text-center">
           <motion.h2
@@ -24,10 +29,11 @@ export default function CTASection({ onTryFree }: CTASectionProps) {
             whileInView="visible"
             viewport={motionViewport.once}
             id="landing-cta-title"
-            className="text-3xl font-semibold text-slate-900 sm:text-4xl"
+            className="text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl"
           >
             Take control of your salary.
           </motion.h2>
+
           <motion.button
             type="button"
             aria-label="Try Finexa and take control"

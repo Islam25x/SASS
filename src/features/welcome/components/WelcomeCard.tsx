@@ -1,10 +1,10 @@
-import type { LandingCardItem } from "./types";
+import type { LandingCardItem } from "../types";
 
-interface CardProps {
+interface WelcomeCardProps {
   item: LandingCardItem;
 }
 
-export default function Card({ item }: CardProps) {
+export default function WelcomeCard({ item }: WelcomeCardProps) {
   const Icon = item.icon;
 
   return (
@@ -13,7 +13,7 @@ export default function Card({ item }: CardProps) {
         <Icon className="h-7 w-7 text-primary" />
       </div>
       <h3 className="mt-4 text-lg font-semibold text-slate-900">{item.title}</h3>
-      <p className="mt-2 text-sm text-slate-500">{item.description}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-500">{item.description}</p>
     </article>
   );
 }
