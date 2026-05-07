@@ -137,39 +137,40 @@ const Security = () => {
     }
   };
 
- const handleDeleteAccount = async () => {
-  const confirmed = window.confirm(
-    "Are you sure you want to permanently delete your account?",
-  );
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to permanently delete your account?",
+    );
 
-  if (!confirmed) {
-    return;
-  }
+    if (!confirmed) {
+      return;
+    }
 
-  setNotice(null);
+    setNotice(null);
 
-  try {
-    await deleteUserMutation.mutateAsync();
+    try {
+      await deleteUserMutation.mutateAsync();
 
-    sessionStorage.clear();
+      localStorage.clear();
+      sessionStorage.clear();
 
-    setNotice({
-      tone: "success",
-      message: "Account deleted successfully.",
-    });
+      setNotice({
+        tone: "success",
+        message: "Account deleted successfully.",
+      });
 
-    // redirect to home
-    navigate("/");
-  } catch (deleteError) {
-    setNotice({
-      tone: "error",
-      message:
-        deleteError instanceof Error
-          ? deleteError.message
-          : "Failed to delete account.",
-    });
-  }
-};
+      // redirect to home
+      navigate("/");
+    } catch (deleteError) {
+      setNotice({
+        tone: "error",
+        message:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "Failed to delete account.",
+      });
+    }
+  };
 
   const inputClass =
     "flex h-9 w-full rounded-2xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 pl-10 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-200";
@@ -190,8 +191,8 @@ const Security = () => {
       {notice && (
         <div
           className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${notice.tone === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-red-200 bg-red-50 text-red-700"
+            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+            : "border-red-200 bg-red-50 text-red-700"
             }`}
           aria-live="polite"
         >
