@@ -151,12 +151,7 @@ const Security = () => {
   try {
     await deleteUserMutation.mutateAsync();
 
-    // clear auth storage
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-
-    // optional:
-    // sessionStorage.clear();
+    sessionStorage.clear();
 
     setNotice({
       tone: "success",
