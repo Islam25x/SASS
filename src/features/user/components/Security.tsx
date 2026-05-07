@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Lock, Trash2 } from "lucide-react";
 import { useChangePassword } from "../hooks/useChangePassword";
 import { useDeleteUser } from "../hooks/useDeleteUser";
+import { useNavigate } from "react-router-dom";
 
 type FormDataType = {
   currentPassword: string;
@@ -20,6 +21,7 @@ type NoticeType = {
 const Security = () => {
   const changePasswordMutation = useChangePassword();
   const deleteUserMutation = useDeleteUser();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormDataType>({
     currentPassword: "",
@@ -135,39 +137,44 @@ const Security = () => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to permanently delete your account?",
-    );
+ const handleDeleteAccount = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to permanently delete your account?",
+  );
 
-    if (!confirmed) {
-      return;
-    }
+  if (!confirmed) {
+    return;
+  }
 
-    setNotice(null);
+  setNotice(null);
 
-    try {
-      await deleteUserMutation.mutateAsync();
+  try {
+    await deleteUserMutation.mutateAsync();
 
-      setNotice({
-        tone: "success",
-        message: "Account deleted successfully.",
-      });
+    // clear auth storage
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
 
-      // TODO:
-      // clear auth tokens
-      // logout user
-      // redirect to login/home
-    } catch (deleteError) {
-      setNotice({
-        tone: "error",
-        message:
-          deleteError instanceof Error
-            ? deleteError.message
-            : "Failed to delete account.",
-      });
-    }
-  };
+    // optional:
+    // sessionStorage.clear();
+
+    setNotice({
+      tone: "success",
+      message: "Account deleted successfully.",
+    });
+
+    // redirect to home
+    navigate("/");
+  } catch (deleteError) {
+    setNotice({
+      tone: "error",
+      message:
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Failed to delete account.",
+    });
+  }
+};
 
   const inputClass =
     "flex h-9 w-full rounded-2xl border border-slate-200 bg-slate-50/90 px-3.5 py-2 pl-10 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-200";
