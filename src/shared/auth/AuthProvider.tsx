@@ -14,6 +14,7 @@ import {
   setAuthSession,
   subscribeToAuthSession,
 } from "../../infrastructure/auth/auth-session-store";
+import { clearPersistedAuthState } from "../../infrastructure/auth/auth-storage";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
 
 export function AuthProvider({ children }: PropsWithChildren) {
@@ -33,7 +34,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setAuthSession(nextSession);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await queryClient.cancelQueries();
+    clearPersistedAuthState();
     clearAuthSessionState();
     queryClient.clear();
   }, [queryClient]);
@@ -44,7 +47,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
 
     const handleUnauthorized = () => {
-      logout();
+      void logout();
     };
 
     window.addEventListener(API_UNAUTHORIZED_EVENT, handleUnauthorized);
@@ -55,7 +58,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const value: AuthContextValue = useMemo(() => ({
     session,
-    isAuthenticated: Boolean(session?.token),
+    isAuthenticated: session !== null,
     login,
     logout,
   }), [login, logout, session]);

@@ -4,6 +4,7 @@ import { Lock, Trash2 } from "lucide-react";
 import { useChangePassword } from "../hooks/useChangePassword";
 import { useDeleteUser } from "../hooks/useDeleteUser";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../shared/auth/AuthContext";
 
 type FormDataType = {
   currentPassword: string;
@@ -22,6 +23,7 @@ const Security = () => {
   const changePasswordMutation = useChangePassword();
   const deleteUserMutation = useDeleteUser();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const [formData, setFormData] = useState<FormDataType>({
     currentPassword: "",
@@ -150,17 +152,8 @@ const Security = () => {
 
     try {
       await deleteUserMutation.mutateAsync();
-
-      localStorage.clear();
-      sessionStorage.clear();
-
-      setNotice({
-        tone: "success",
-        message: "Account deleted successfully.",
-      });
-
-      // redirect to home
-      navigate("/");
+      await logout();
+      navigate("/", { replace: true });
     } catch (deleteError) {
       setNotice({
         tone: "error",

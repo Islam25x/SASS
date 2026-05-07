@@ -89,3 +89,13 @@ export function clearStoredPendingConfirmationEmail(): void {
 
   window.localStorage.removeItem(PENDING_CONFIRMATION_EMAIL_STORAGE_KEY);
 }
+
+export function clearPersistedAuthState(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  clearStoredAuthSession();
+  clearStoredPendingConfirmationEmail();
+  window.sessionStorage.clear();
+}
