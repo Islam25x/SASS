@@ -182,7 +182,7 @@ export default function ConfirmEmailPage() {
           <Button
             type="button"
             size="lg"
-            onClick={() => navigate("/login", { replace: true })}
+            onClick={() => navigate("/", { replace: true })}
             className="mt-8 h-14 w-full rounded-2xl bg-[#1D5CE8] text-base font-semibold text-white shadow-[0_18px_45px_rgba(29,92,232,0.3)] hover:bg-[#184CC0]"
           >
             Go to Login

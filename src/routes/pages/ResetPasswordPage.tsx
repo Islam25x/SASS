@@ -129,7 +129,7 @@ export default function ResetPasswordPage() {
     }
   };
 
-  const goToLogin = () => navigate("/login", { replace: true });
+  const goToLogin = () => navigate("/", { replace: true });
 
   return (
     <main className="relative h-screen overflow-hidden bg-[#f6f8ff] text-slate-900">
